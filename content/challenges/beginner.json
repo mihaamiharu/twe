@@ -138,39 +138,45 @@
       "xpReward": 25,
       "order": 2003,
       "title": {
-        "en": "If-Else Logic",
-        "id": "Logika If-Else"
+        "en": "Classify Controlled Test Runs",
+        "id": "Klasifikasikan Test Run Terkontrol"
       },
       "description": {
         "en": "Classify controlled result data without letting a condition silently skip a required check.",
         "id": "Klasifikasikan result data yang terkontrol tanpa membiarkan condition diam-diam melewatkan pemeriksaan wajib."
       },
       "instructions": {
-        "en": "# If-Else Logic\n\n## Why this matters\nA condition should represent an intentional rule, not hide an unexpected product state. This exercise classifies controlled test-run data into one of three explicit outcomes.\n\n## Example\n```javascript\nif (status === \"passed\") {\n    result = \"READY\";\n} else {\n    result = \"INVESTIGATE\";\n}\n```\n\nIn a browser test, avoid patterns such as “if the required banner exists, assert it; otherwise do nothing.” That branch can create a false pass. Control the starting state or fail clearly when required evidence is missing.\n\n## Your task\nAssign one status to `result`:\n- If `passCount` equals `totalTests`, use `\"ALL_PASSED\"`.\n- Otherwise, if `passCount` is greater than `0`, use `\"PARTIAL\"`.\n- Otherwise, use `\"ALL_FAILED\"`.",
-        "id": "# Logika If-Else\n\n## Kenapa ini penting\nCondition seharusnya mewakili rule yang disengaja, bukan menyembunyikan state produk yang nggak sesuai ekspektasi. Latihan ini mengklasifikasikan controlled test-run data menjadi satu dari tiga outcome yang jelas.\n\n## Contoh\n```javascript\nif (status === \"passed\") {\n    result = \"READY\";\n} else {\n    result = \"INVESTIGATE\";\n}\n```\n\nDi browser test, hindari pola seperti “kalau required banner ada, assert; kalau tidak ada, jangan lakukan apa-apa.” Branch seperti itu bisa membuat false pass. Kontrol starting state atau fail dengan jelas saat bukti wajib hilang.\n\n## Tugas kamu\nIsi `result` dengan satu status:\n- Kalau `passCount` sama dengan `totalTests`, gunakan `\"ALL_PASSED\"`.\n- Kalau tidak, tapi `passCount` lebih besar dari `0`, gunakan `\"PARTIAL\"`.\n- Selain itu, gunakan `\"ALL_FAILED\"`."
+        "en": "# Classify Controlled Test Runs\n\n## Why this matters\nA condition should represent an intentional rule, not hide an unexpected product state. This exercise classifies three controlled test-run summaries so every intended branch produces an explicit outcome.\n\nIn a browser test, avoid patterns such as “if the required banner exists, assert it; otherwise do nothing.” That branch can create a false pass. Control the starting state or fail clearly when required evidence is missing.\n\n## Your task\n1. Complete `classifyRun(run)` with three explicit branches:\n   - return `\"ALL_PASSED\"` when `passCount` equals `totalTests`;\n   - return `\"PARTIAL\"` when `passCount` is greater than `0`;\n   - otherwise return `\"ALL_FAILED\"`.\n2. Use `map()` to classify every object in `testRuns`.\n3. Join the statuses with ` | ` and store the exact string `ALL_PASSED | PARTIAL | ALL_FAILED` in `const result`.\n\nThe three summaries are controlled reporting data. These branches do not make it safe to conditionally skip a required browser assertion.",
+        "id": "# Klasifikasikan Test Run Terkontrol\n\n## Kenapa ini penting\nCondition seharusnya mewakili rule yang disengaja, bukan menyembunyikan state produk yang nggak sesuai ekspektasi. Latihan ini mengklasifikasikan tiga ringkasan test run terkontrol supaya setiap branch yang memang diinginkan menghasilkan outcome yang jelas.\n\nDi browser test, hindari pola seperti “kalau required banner ada, assert; kalau tidak ada, jangan lakukan apa-apa.” Branch seperti itu bisa membuat false pass. Kontrol starting state atau fail dengan jelas saat evidence wajib tidak tersedia.\n\n## Tugas kamu\n1. Lengkapi `classifyRun(run)` dengan tiga branch yang jelas:\n   - return `\"ALL_PASSED\"` saat `passCount` sama dengan `totalTests`;\n   - return `\"PARTIAL\"` saat `passCount` lebih besar dari `0`;\n   - selain itu, return `\"ALL_FAILED\"`.\n2. Gunakan `map()` untuk mengklasifikasikan setiap object di `testRuns`.\n3. Gabungkan semua status dengan ` | `, lalu simpan string persis `ALL_PASSED | PARTIAL | ALL_FAILED` dalam `const result`.\n\nKetiga ringkasan tersebut adalah controlled reporting data. Branch ini tidak membuat conditional skip terhadap browser assertion yang wajib menjadi aman."
       },
       "hints": {
         "en": [
-          "You'll need three branches of logic: one for perfect, one for partial, and one for none.",
-          "Use '===' for exact equality and '>' for greater than checks.",
-          "Make sure your string values exactly match 'ALL_PASSED', 'PARTIAL', or 'ALL_FAILED'."
+          "The function needs an if, an else-if, and a final else branch.",
+          "Use `testRuns.map((run) => classifyRun(run))` to execute every branch case.",
+          "Join the returned statuses with ` | ` before assigning `result`."
         ],
         "id": [
-          "Kamu butuh tiga cabang logika: satu untuk sukses semua, satu untuk sebagian, dan satu untuk gagal semua.",
-          "Gunakan '===' untuk cek kesamaan persis dan '>' untuk cek lebih besar dari.",
-          "Pastikan nilai string Kamu tepat sama dengan 'ALL_PASSED', 'PARTIAL', atau 'ALL_FAILED'."
+          "Function-nya membutuhkan branch if, else-if, dan else terakhir.",
+          "Gunakan `testRuns.map((run) => classifyRun(run))` untuk menjalankan setiap branch case.",
+          "Gabungkan status yang dihasilkan dengan ` | ` sebelum mengisi `result`."
         ]
       },
-      "htmlContent": "<div class=\"test-status\">\n  <h3>Test Results</h3>\n  <div id=\"status-display\"></div>\n</div>",
-      "starterCode": "// Given values (don't modify)\nconst passCount = 5;\nconst totalTests = 10;\n\n// Write your if-else logic here.\n// Define 'result' and assign \"ALL_PASSED\", \"PARTIAL\", or \"ALL_FAILED\"\n\n// Your code here\n",
+      "htmlContent": "<div class=\"test-status\"><output>10/10 · 5/10 · 0/10</output></div>",
+      "starterCode": "const testRuns = [\n    { passCount: 10, totalTests: 10 },\n    { passCount: 5, totalTests: 10 },\n    { passCount: 0, totalTests: 10 }\n];\n\nfunction classifyRun(run) {\n    // TODO 1\n}\n\n// TODO 2\n",
       "testCases": [
         {
           "description": "Returns the expected output",
-          "expectedOutput": "PARTIAL",
+          "expectedOutput": "ALL_PASSED | PARTIAL | ALL_FAILED",
           "isHidden": false
         }
       ],
-      "solution": "// Given values (don't modify)\nconst passCount = 5;\nconst totalTests = 10;\n\n// Write your if-else logic here\nlet result;\n\nif (passCount === totalTests) {\n    result = \"ALL_PASSED\";\n} else if (passCount > 0) {\n    result = \"PARTIAL\";\n} else {\n    result = \"ALL_FAILED\";\n}",
+      "solution": "const testRuns = [\n    { passCount: 10, totalTests: 10 },\n    { passCount: 5, totalTests: 10 },\n    { passCount: 0, totalTests: 10 }\n];\n\nfunction classifyRun(run) {\n    if (run.passCount === run.totalTests) {\n        return \"ALL_PASSED\";\n    } else if (run.passCount > 0) {\n        return \"PARTIAL\";\n    } else {\n        return \"ALL_FAILED\";\n    }\n}\n\nconst statuses = testRuns.map((run) => classifyRun(run));\nconst result = statuses.join(\" | \");",
+      "validation": {
+        "requiredFunctionCalls": ["classifyRun"],
+        "requiredMemberCalls": ["map", "join"],
+        "requiredConstBindings": ["testRuns", "statuses", "result"],
+        "minimumConditionalBranches": 3
+      },
       "tags": ["javascript", "conditionals", "logic", "beginner"]
     },
     {
@@ -311,16 +317,16 @@
       "xpReward": 40,
       "order": 2007,
       "title": {
-        "en": "Array Methods",
-        "id": "Metode Array"
+        "en": "Filter Controlled Test Results",
+        "id": "Filter Hasil Test Terkontrol"
       },
       "description": {
         "en": "Filter and search controlled arrays used by test code.",
         "id": "Filter dan cari controlled array yang dipakai test code."
       },
       "instructions": {
-        "en": "# Array Methods for Test Data\n\n## Why this matters\n`filter`, `map`, and `find` help test code process arrays that already exist in memory. They do not observe the browser UI by themselves.\n\n| Method | Purpose | Example |\n|---|---|---|\n| `map()` | Transform every item | `arr.map(x => x * 2)` |\n| `filter()` | Keep all matching items | `arr.filter(x => x > 10)` |\n| `find()` | Return the first match or `undefined` | `arr.find(x => x.id === 1)` |\n\n## QA boundary\nUse these methods for controlled fixtures, API data that has been validated, or values already read from the page. Use Playwright locators and web assertions to observe the live UI. If a required `find()` result is missing, fail clearly instead of silently skipping the assertion.\n\n## Your task\nGiven the `testResults` array:\n1. Use `filter()` to keep items whose status is `\"passed\"`.\n2. Count the filtered items.\n3. Store that count in `result`.",
-        "id": "# Array Method untuk Test Data\n\n## Kenapa ini penting\n`filter`, `map`, dan `find` membantu test code memproses array yang sudah ada di memory. Method ini tidak mengamati browser UI dengan sendirinya.\n\n| Method | Tujuan | Contoh |\n|---|---|---|\n| `map()` | Mengubah setiap item | `arr.map(x => x * 2)` |\n| `filter()` | Menyimpan semua item yang cocok | `arr.filter(x => x > 10)` |\n| `find()` | Mengembalikan hasil pertama atau `undefined` | `arr.find(x => x.id === 1)` |\n\n## Batasan untuk QA\nGunakan method ini untuk controlled fixture, API data yang sudah divalidasi, atau value yang sudah dibaca dari halaman. Gunakan Playwright locator dan web assertion untuk mengamati UI aktif. Kalau hasil `find()` yang diwajibkan tidak ada, fail dengan jelas daripada diam-diam melewatkan assertion.\n\n## Tugas kamu\nDengan array `testResults`:\n1. Gunakan `filter()` untuk menyimpan item dengan status `\"passed\"`.\n2. Hitung item hasil filter.\n3. Simpan jumlahnya ke `result`."
+        "en": "# Filter Controlled Test Results\n\n## Why this matters\n`filter`, `map`, and `find` help test code process arrays that already exist in memory. They do not observe the browser UI by themselves.\n\n| Method | Purpose | Example |\n|---|---|---|\n| `map()` | Transform every item | `arr.map(x => x * 2)` |\n| `filter()` | Keep all matching items | `arr.filter(x => x > 10)` |\n| `find()` | Return the first match or `undefined` | `arr.find(x => x.id === 1)` |\n\n## QA boundary\nUse these methods for controlled fixtures, API data that has been validated, or values already read from the page. Use Playwright locators and web assertions to observe the live UI. If a required `find()` result is missing, fail clearly instead of silently skipping the assertion.\n\n## Your task\nGiven the `testResults` array:\n1. Use `filter()` to keep items whose status is `\"passed\"`.\n2. Count the filtered items.\n3. Declare `const result` with that count.",
+        "id": "# Filter Hasil Test Terkontrol\n\n## Kenapa ini penting\n`filter`, `map`, dan `find` membantu test code memproses array yang sudah ada di memory. Method ini tidak mengamati browser UI dengan sendirinya.\n\n| Method | Tujuan | Contoh |\n|---|---|---|\n| `map()` | Mengubah setiap item | `arr.map(x => x * 2)` |\n| `filter()` | Mempertahankan setiap item yang cocok | `arr.filter(x => x > 10)` |\n| `find()` | Mengembalikan hasil pertama atau `undefined` | `arr.find(x => x.id === 1)` |\n\n## Batasan untuk QA\nGunakan method ini untuk controlled fixture, API data yang sudah divalidasi, atau value yang sudah dibaca dari halaman. Gunakan Playwright locator dan web assertion untuk mengamati UI aktif. Kalau hasil `find()` yang diwajibkan tidak ada, fail dengan jelas daripada diam-diam melewatkan assertion.\n\n## Tugas kamu\nDengan array `testResults`:\n1. Gunakan `filter()` untuk mempertahankan item dengan status `\"passed\"`.\n2. Hitung item hasil filter.\n3. Declare `const result` dengan jumlah tersebut."
       },
       "hints": {
         "en": [
@@ -329,13 +335,13 @@
           "Filter for 'status === \"passed\"' and store the length of that new collection."
         ],
         "id": [
-          "Pikirkan metode array mana yang membantu Kamu *menyisihkan* hanya item yang memenuhi kondisi.",
-          "Kamu bisa menyambung metode filter secara langsung atau menggunakan '.length' pada hasilnya.",
+          "Pikirkan array method mana yang membantu kamu *mempertahankan* hanya item yang memenuhi condition.",
+          "Kamu bisa menyambung filter secara langsung atau menggunakan `.length` pada hasilnya.",
           "Filter untuk 'status === \"passed\"' dan simpan panjang (length) dari koleksi baru tersebut."
         ]
       },
-      "htmlContent": "<div class=\"results-processor\">\n  <h3>Results Processor</h3>\n</div>",
-      "starterCode": "const testResults = [\n    { name: \"Login\", status: \"passed\" },\n    { name: \"Signup\", status: \"failed\" },\n    { name: \"Profile\", status: \"passed\" },\n    { name: \"Settings\", status: \"passed\" },\n    { name: \"Logout\", status: \"failed\" }\n];\n\n// Filter to get only passed tests, then get the count\n// Your code here\n",
+      "htmlContent": "<div class=\"results-processor\"><output>passed · failed · passed · passed · failed</output></div>",
+      "starterCode": "const testResults = [\n    { name: \"Login\", status: \"passed\" },\n    { name: \"Signup\", status: \"failed\" },\n    { name: \"Profile\", status: \"passed\" },\n    { name: \"Settings\", status: \"passed\" },\n    { name: \"Logout\", status: \"failed\" }\n];\n\n// TODO\n",
       "testCases": [
         {
           "description": "Returns the expected output",
@@ -344,6 +350,10 @@
         }
       ],
       "solution": "const testResults = [\n    { name: \"Login\", status: \"passed\" },\n    { name: \"Signup\", status: \"failed\" },\n    { name: \"Profile\", status: \"passed\" },\n    { name: \"Settings\", status: \"passed\" },\n    { name: \"Logout\", status: \"failed\" }\n];\nconst passedTests = testResults.filter(t => t.status === \"passed\");\nconst result = passedTests.length;",
+      "validation": {
+        "requiredMemberCalls": ["filter"],
+        "requiredConstBindings": ["testResults", "result"]
+      },
       "tags": ["javascript", "array-methods", "map", "filter", "beginner"]
     },
     {
@@ -448,8 +458,8 @@
         "id": "Gunakan array, object, dan function kecil untuk menghitung satu ekspektasi cart yang terkontrol."
       },
       "instructions": {
-        "en": "# Scenario: Build a Cart Expectation\n\n## Why this matters\nA UI assertion is easier to review when its test data and expected calculation are explicit. In this controlled exercise, each object describes one cart case and a small function owns the subtotal calculation.\n\n## Your task\n1. Keep the provided `cartCases` array as the controlled test data.\n2. Complete `expectedSubtotal(item)` so it returns `unitPrice * quantity` for the given case.\n3. Select the first object from `cartCases` and store it in `selectedCase`.\n4. Pass that object to `expectedSubtotal` and store the returned value in `subtotal`.\n5. Set `result` to the exact string `Mechanical Keyboard: 240` by combining the selected product name and subtotal.\n\nThis challenge checks JavaScript data handling only. A real browser test would still need an assertion against the product's observable cart output.",
-        "id": "# Skenario: Susun Ekspektasi Keranjang\n\n## Kenapa ini penting\nUI assertion lebih gampang direview kalau test data dan expected calculation-nya terlihat jelas. Di latihan terkontrol ini, setiap object menjelaskan satu cart case dan sebuah function kecil menangani perhitungan subtotal.\n\n## Tugas kamu\n1. Pertahankan array `cartCases` sebagai controlled test data.\n2. Lengkapi `expectedSubtotal(item)` supaya mengembalikan `unitPrice * quantity` dari case yang diberikan.\n3. Pilih object pertama dari `cartCases`, lalu simpan sebagai `selectedCase`.\n4. Kirim object itu ke `expectedSubtotal`, lalu simpan hasilnya sebagai `subtotal`.\n5. Isi `result` dengan string persis `Mechanical Keyboard: 240` dengan menggabungkan nama produk dan subtotal.\n\nChallenge ini hanya memeriksa pengolahan data JavaScript. Browser test sungguhan tetap membutuhkan assertion terhadap output cart yang bisa diamati."
+        "en": "# Scenario: Build a Cart Expectation\n\n## Why this matters\nA UI assertion is easier to review when its test data and expected calculation are explicit. In this controlled exercise, each object describes one cart case and a small function owns the subtotal calculation.\n\n## Your task\n1. Keep the provided `cartCases` array as the controlled test data.\n2. Complete `expectedSubtotal(item)` so it returns `unitPrice * quantity` for the given case.\n3. Select the first object from `cartCases` and declare it as `const selectedCase`.\n4. Pass that object to `expectedSubtotal` and declare the returned value as `const subtotal`.\n5. Declare `const result` and set it to the exact string `Mechanical Keyboard: 240` by combining the selected product name and subtotal.\n\nThese bindings are not reassigned, so `const` communicates their intended stability. This challenge checks JavaScript data handling only. A real browser test would still need an assertion against the product's observable cart output.",
+        "id": "# Skenario: Susun Ekspektasi Keranjang\n\n## Kenapa ini penting\nUI assertion lebih gampang direview kalau test data dan expected calculation-nya terlihat jelas. Di latihan terkontrol ini, setiap object menjelaskan satu cart case dan sebuah function kecil menangani perhitungan subtotal.\n\n## Tugas kamu\n1. Pertahankan array `cartCases` sebagai controlled test data.\n2. Lengkapi `expectedSubtotal(item)` supaya mengembalikan `unitPrice * quantity` dari case yang diberikan.\n3. Pilih object pertama dari `cartCases`, lalu declare sebagai `const selectedCase`.\n4. Kirim object itu ke `expectedSubtotal`, lalu declare hasilnya sebagai `const subtotal`.\n5. Declare `const result`, lalu isi dengan string persis `Mechanical Keyboard: 240` dengan menggabungkan nama produk dan subtotal.\n\nKetiga binding tersebut tidak di-assign ulang, jadi `const` menunjukkan stability yang memang diinginkan. Challenge ini hanya memeriksa pengolahan data JavaScript. Browser test sungguhan tetap membutuhkan assertion terhadap output cart yang bisa diamati."
       },
       "hints": {
         "en": [
@@ -463,8 +473,8 @@
           "Gunakan template literal untuk menggabungkan `selectedCase.productName` dan `subtotal` dengan `: ` di tengahnya."
         ]
       },
-      "htmlContent": "<div class=\"cart-expectation\">\n  <h3>Controlled Cart Case</h3>\n  <p>Calculate the expected subtotal before comparing it with the UI.</p>\n</div>",
-      "starterCode": "const cartCases = [\n    { productName: \"Mechanical Keyboard\", unitPrice: 120, quantity: 2 },\n    { productName: \"Wireless Mouse\", unitPrice: 40, quantity: 1 }\n];\n\nfunction expectedSubtotal(item) {\n    // Return the expected subtotal for this case\n}\n\n// Select the first case, calculate its subtotal, and format result\n// Your code here\n",
+      "htmlContent": "<div class=\"cart-expectation\"><output>Mechanical Keyboard × 2</output></div>",
+      "starterCode": "const cartCases = [\n    { productName: \"Mechanical Keyboard\", unitPrice: 120, quantity: 2 },\n    { productName: \"Wireless Mouse\", unitPrice: 40, quantity: 1 }\n];\n\nfunction expectedSubtotal(item) {\n    // TODO 1\n}\n\n// TODO 2\n",
       "testCases": [
         {
           "description": "Builds the expected output from the controlled cart case",
@@ -473,6 +483,15 @@
         }
       ],
       "solution": "const cartCases = [\n    { productName: \"Mechanical Keyboard\", unitPrice: 120, quantity: 2 },\n    { productName: \"Wireless Mouse\", unitPrice: 40, quantity: 1 }\n];\n\nfunction expectedSubtotal(item) {\n    return item.unitPrice * item.quantity;\n}\n\nconst selectedCase = cartCases[0];\nconst subtotal = expectedSubtotal(selectedCase);\nconst result = `${selectedCase.productName}: ${subtotal}`;",
+      "validation": {
+        "requiredFunctionCalls": ["expectedSubtotal"],
+        "requiredConstBindings": [
+          "cartCases",
+          "selectedCase",
+          "subtotal",
+          "result"
+        ]
+      },
       "tags": ["javascript", "qa", "test-data", "cart", "core-practice"]
     },
     {
@@ -483,40 +502,50 @@
       "xpReward": 20,
       "order": 2100,
       "title": {
-        "en": "querySelector vs querySelectorAll",
-        "id": "querySelector vs querySelectorAll"
+        "en": "Capture a Live DOM Investigation Note",
+        "id": "Catat Hasil Investigasi Live DOM"
       },
       "description": {
-        "en": "Practice inspecting one element or a collection with browser DOM APIs.",
-        "id": "Latih cara memeriksa satu elemen atau koleksi dengan browser DOM API."
+        "en": "Inspect a control, its current state, repeated required fields, and visible status before proposing test code.",
+        "id": "Periksa sebuah kontrol, current state-nya, field wajib yang berulang, dan status yang terlihat sebelum mengusulkan code test."
       },
       "instructions": {
-        "en": "# querySelector vs querySelectorAll\n\n## Concept\nThese browser DOM APIs are useful for inspecting a page in DevTools or a small DOM exercise. `querySelector` returns the first match, while `querySelectorAll` returns every match.\n\n| Method | Returns | Use Case |\n|---|---|---|\n| `querySelector(\"#id\")` | Single element | Finding a unique button, header, or link |\n| `querySelectorAll(\".class\")` | NodeList (All) | Finding all items in a list or grid |\n\n## Code Example\n```javascript\nconst title = document.querySelector(\"h1\");\nconst items = document.querySelectorAll(\"li\");\nconsole.log(items.length); // 4\n```\n\n## Real World Scenario\nWhile investigating a shopping cart in DevTools, you can use `querySelector` to inspect one known control and `querySelectorAll` to count a repeated set. These raw queries explain the DOM; a production Playwright test should normally use Playwright locators.\n\n## Your Task\n1. Use `document.querySelector` to find the element with id `\"title\"`.\n2. Use `document.querySelectorAll` to find all elements with class `\"item\"`.\n3. Count how many items were found in step 2.\n4. Store this count in the `result` variable.\n",
-        "id": "# querySelector vs querySelectorAll\n\n## Concept\nDua browser DOM API ini berguna untuk memeriksa halaman lewat DevTools atau latihan DOM kecil. `querySelector` mengembalikan kecocokan pertama, sedangkan `querySelectorAll` mengembalikan semua kecocokan.\n\n| Method | Return value | Kapan dipakai |\n|---|---|---|\n| `querySelector(\"#id\")` | Satu elemen | Mencari button, heading, atau link yang unik |\n| `querySelectorAll(\".class\")` | NodeList | Mencari semua item dalam list atau grid |\n\n## Code Example\n```javascript\nconst title = document.querySelector(\"h1\");\nconst items = document.querySelectorAll(\"li\");\nconsole.log(items.length); // 4\n```\n\n## Real World Scenario\nSaat menginvestigasi keranjang di DevTools, kamu bisa memakai `querySelector` untuk memeriksa satu kontrol dan `querySelectorAll` untuk menghitung sekumpulan item berulang. Query mentah ini membantu membaca DOM; test Playwright biasanya tetap memakai Playwright locator.\n\n## Tugas Kamu\n1. Gunakan `document.querySelector` untuk menemukan elemen dengan id `\"title\"`.\n2. Gunakan `document.querySelectorAll` untuk menemukan semua elemen dengan class `\"item\"`.\n3. Hitung berapa banyak item yang ditemukan di langkah 2.\n4. Simpan jumlah ini ke dalam variabel `result`.\n"
+        "en": "# Capture a Live DOM Investigation Note\n\nA profile save attempt did not succeed. Before changing any test code, inspect the supplied post-attempt page and record what the browser currently exposes. This is the same kind of small query you can run in the DevTools Console.\n\n- `document.querySelector(...)` returns one matching element.\n- `document.querySelectorAll(...)` returns every matching element as a collection.\n- A control's `disabled` property represents its current live state.\n- `textContent.trim()` reads the text in the supplied DOM. It does not by itself prove that text is visible in a production test.\n\n## Your task\n\n1. Use `document.querySelector` to find the **Save changes** submit button.\n2. Read its text and report whether its current state is `enabled` or `disabled`.\n3. Use `document.querySelectorAll` to count all form controls marked `required`.\n4. Use `document.querySelector` to read the text from the `[role=\"status\"]` region.\n5. Store one investigation note in `result` using this exact format:\n\n```text\nSave changes | enabled | 2 required fields | Changes not saved\n```\n\nBuild the note from the supplied live DOM values. You may choose equivalent selectors, but use both required browser DOM methods and preserve the observed control identity, state, required-field count, and visible status. This evidence helps explain the page; a later Playwright test should use Playwright locators and assertions to prove the intended user outcome.\n",
+        "id": "# Catat Hasil Investigasi Live DOM\n\nPercobaan menyimpan profile nggak berhasil. Sebelum mengubah code test, periksa halaman setelah percobaan tersebut lalu catat apa yang sekarang benar-benar terlihat di browser. Query kecil seperti ini juga bisa kamu jalankan lewat DevTools Console.\n\n- `document.querySelector(...)` mengembalikan satu element yang cocok.\n- `document.querySelectorAll(...)` mengembalikan semua element yang cocok sebagai sebuah collection.\n- Property `disabled` pada control menunjukkan current state-nya di live DOM.\n- `textContent.trim()` membaca text dari DOM yang tersedia. Dalam production test, hasil ini saja belum membuktikan bahwa text tersebut terlihat oleh user.\n\n## Tugas kamu\n\n1. Gunakan `document.querySelector` untuk menemukan submit button **Save changes**.\n2. Baca text-nya lalu catat apakah current state-nya `enabled` atau `disabled`.\n3. Gunakan `document.querySelectorAll` untuk menghitung semua form control yang memiliki attribute `required`.\n4. Gunakan `document.querySelector` untuk membaca text dari region `[role=\"status\"]`.\n5. Simpan satu catatan investigasi dalam variable `result` dengan format persis berikut:\n\n```text\nSave changes | enabled | 2 required fields | Changes not saved\n```\n\nSusun catatan tersebut dari value yang ada di live DOM. Kamu boleh memilih selector lain yang setara, tetapi tetap gunakan kedua browser DOM method yang diminta dan pertahankan identity control, state, jumlah required field, serta status yang terlihat. Evidence ini membantu menjelaskan kondisi halaman; nanti, production test dengan Playwright tetap perlu memakai locator dan assertion Playwright untuk membuktikan expected result dari sisi user.\n"
       },
       "hints": {
         "en": [
-          "Use the specific document methods for finding one unique element vs multiple elements.",
-          "Remember that an ID selector uses '#' and a class selector uses '.' as a prefix.",
-          "The multi-selection method returns a collection with a .length property to give you the count."
+          "The submit button can be found with the selector 'button[type=\"submit\"]', and its text is available through textContent.",
+          "Use the button's disabled boolean to choose the word 'disabled' or 'enabled'.",
+          "The required-field collection has a length, and the status region can be found with '[role=\"status\"]'."
         ],
         "id": [
-          "Gunakan DOM method yang sesuai untuk mencari satu elemen unik atau banyak elemen.",
-          "Ingat bahwa selector ID memakai prefix '#' dan selector class memakai '.'.",
-          "Method untuk memilih banyak elemen mengembalikan koleksi dengan property .length."
+          "Submit button bisa ditemukan dengan selector 'button[type=\"submit\"]', dan text-nya tersedia lewat textContent.",
+          "Gunakan boolean disabled pada button untuk memilih kata 'disabled' atau 'enabled'.",
+          "Collection untuk required field punya property length, dan status region bisa ditemukan dengan '[role=\"status\"]'."
         ]
       },
-      "htmlContent": "<div class=\"shopping-list\">\n  <h1 id=\"title\">My Shopping List</h1>\n  <ul>\n    <li class=\"item\">Apples</li>\n    <li class=\"item\">Bananas</li>\n    <li class=\"item\">Oranges</li>\n    <li class=\"item\">Milk</li>\n  </ul>\n</div>",
-      "starterCode": "// 1. Get the title element by ID\n// Your code here\n\n// 2. Get all items by class\n// Your code here\n\n// 3. Store the count of items\n// Your code here",
+      "htmlContent": "<main aria-labelledby=\"profile-heading\">\n  <h1 id=\"profile-heading\">Profile settings</h1>\n  <form aria-describedby=\"save-status\">\n    <label for=\"display-name\">Display name</label>\n    <input id=\"display-name\" name=\"displayName\" value=\"Ari Tester\" required />\n\n    <label for=\"timezone\">Timezone</label>\n    <select id=\"timezone\" name=\"timezone\" required>\n      <option selected>Asia/Jakarta</option>\n    </select>\n\n    <button type=\"submit\">Save changes</button>\n    <p id=\"save-status\" role=\"status\">Changes not saved</p>\n  </form>\n</main>",
+      "starterCode": "const saveButton = document.querySelector(/* TODO */);\nconst requiredFields = document.querySelectorAll(/* TODO */);\nconst statusRegion = document.querySelector(/* TODO */);\n\nconst controlName = /* TODO */;\nconst controlState = /* TODO */;\nconst requiredFieldCount = /* TODO */;\nconst visibleStatus = /* TODO */;\n\nconst result = /* TODO */;",
       "testCases": [
         {
-          "description": "Returns the expected output",
-          "expectedOutput": "4",
+          "description": "Builds the investigation note from the supplied live DOM evidence",
+          "expectedOutput": "Save changes | enabled | 2 required fields | Changes not saved",
           "isHidden": false
         }
       ],
-      "solution": "const titleElement = document.querySelector('#title');\nconst items = document.querySelectorAll('.item');\nconst result = items.length;",
-      "tags": ["javascript", "dom", "querySelector", "beginner"]
+      "validation": {
+        "requiredMethods": ["querySelector", "querySelectorAll"]
+      },
+      "solution": "const saveButton = document.querySelector('button[type=\"submit\"]');\nconst requiredFields = document.querySelectorAll('[required]');\nconst statusRegion = document.querySelector('[role=\"status\"]');\n\nconst controlName = saveButton.textContent.trim();\nconst controlState = saveButton.disabled ? 'disabled' : 'enabled';\nconst requiredFieldCount = requiredFields.length;\nconst visibleStatus = statusRegion.textContent.trim();\n\nconst result = `${controlName} | ${controlState} | ${requiredFieldCount} required fields | ${visibleStatus}`;",
+      "tags": [
+        "javascript",
+        "dom",
+        "devtools",
+        "inspection",
+        "evidence",
+        "beginner"
+      ]
     },
     {
       "slug": "dom-element-properties",
@@ -940,8 +969,8 @@
           "Kembalikan `order.id`; baris terakhir yang disediakan sudah menunggu async function buatanmu."
         ]
       },
-      "htmlContent": "<div class=\"async-setup\">\n  <h3>Controlled Order Setup</h3>\n  <p>Resolve setup data before the next test step uses it.</p>\n</div>",
-      "starterCode": "const createTestOrder = () =>\n    Promise.resolve({ id: \"ORD-104\", status: \"ready\" });\n\n// Create async function getPreparedOrderId.\n// Await createTestOrder(), then return the resolved order id.\n// Your code here\n\nconst result = await getPreparedOrderId();",
+      "htmlContent": "<div class=\"async-setup\">\n  <output>ORD-104</output>\n</div>",
+      "starterCode": "const createTestOrder = () =>\n    Promise.resolve({ id: \"ORD-104\", status: \"ready\" });\n\n// TODO\n\nconst result = await getPreparedOrderId();",
       "testCases": [
         {
           "description": "Returns the order id after awaiting controlled setup",
@@ -950,6 +979,14 @@
         }
       ],
       "solution": "const createTestOrder = () =>\n    Promise.resolve({ id: \"ORD-104\", status: \"ready\" });\n\nasync function getPreparedOrderId() {\n    const order = await createTestOrder();\n    return order.id;\n}\n\nconst result = await getPreparedOrderId();",
+      "validation": {
+        "requiredAsyncFunctions": ["getPreparedOrderId"],
+        "requiredAwaitedFunctionCalls": [
+          "createTestOrder",
+          "getPreparedOrderId"
+        ],
+        "requiredConstBindings": ["order", "result"]
+      },
       "tags": ["javascript", "async", "await", "test-setup", "core-practice"]
     },
     {
@@ -983,8 +1020,8 @@
           "Return fallback persis `no-recommendations`; jangan mengabaikan error dari operasi wajib dengan cara ini."
         ]
       },
-      "htmlContent": "<div class=\"optional-recommendations\">\n  <h3>Optional Recommendations</h3>\n  <p>Use a fallback only because the scenario explicitly allows it.</p>\n</div>",
-      "starterCode": "const loadRecommendations = () =>\n    Promise.reject(new Error(\"Recommendation service unavailable\"));\n\n// Create async function recommendationStatus.\n// Return the operation result, or the documented optional fallback.\n// Your code here\n\nconst result = await recommendationStatus();",
+      "htmlContent": "<div class=\"optional-recommendations\">\n  <output>no-recommendations</output>\n</div>",
+      "starterCode": "const loadRecommendations = () =>\n    Promise.reject(new Error(\"Recommendation service unavailable\"));\n\n// TODO\n\nconst result = await recommendationStatus();",
       "testCases": [
         {
           "description": "Uses the documented fallback for an optional failure",
@@ -993,6 +1030,15 @@
         }
       ],
       "solution": "const loadRecommendations = () =>\n    Promise.reject(new Error(\"Recommendation service unavailable\"));\n\nasync function recommendationStatus() {\n    try {\n        return await loadRecommendations();\n    } catch (error) {\n        return \"no-recommendations\";\n    }\n}\n\nconst result = await recommendationStatus();",
+      "validation": {
+        "requiredAsyncFunctions": ["recommendationStatus"],
+        "requiredAwaitedFunctionCalls": [
+          "loadRecommendations",
+          "recommendationStatus"
+        ],
+        "requiredConstBindings": ["result"],
+        "minimumTryCatchBlocks": 1
+      },
       "tags": ["javascript", "async", "error-handling", "beginner"]
     },
     {
@@ -1003,39 +1049,47 @@
       "xpReward": 50,
       "order": 2203,
       "title": {
-        "en": "Parallel Async Operations",
-        "id": "Operasi Asinkron Paralel"
+        "en": "Prepare Independent Test Fixtures",
+        "id": "Siapkan Test Fixture yang Independen"
       },
       "description": {
         "en": "Use Promise.all only after confirming asynchronous operations are independent.",
         "id": "Gunakan Promise.all hanya setelah memastikan operasi asynchronous memang independen."
       },
       "instructions": {
-        "en": "# Parallel Independent Operations\n\n## Why this matters\n`Promise.all()` starts several promises without awaiting each one first, then waits for all of them. This is appropriate only when the operations are independent and do not compete for the same mutable state.\n\n| Choice | Use when |\n|---|---|\n| Sequential awaits | A later operation needs an earlier value or state |\n| `Promise.all()` | Every operation can start safely without another result |\n\n`Promise.all()` rejects when any included promise rejects. It does not make dependent work safe and it does not guarantee a specific percentage improvement.\n\n## Your task\nThe provided `getA()`, `getB()`, and `getC()` helpers are explicitly independent:\n1. Start them together with `Promise.all()`.\n2. Await and destructure the three values.\n3. Add the values.\n4. Store the sum in `result`.",
-        "id": "# Operasi Independen secara Parallel\n\n## Kenapa ini penting\n`Promise.all()` memulai beberapa promise tanpa menunggu satu per satu, lalu menunggu semuanya selesai. Cara ini hanya cocok kalau operasinya independen dan tidak berebut mutable state yang sama.\n\n| Pilihan | Gunakan saat |\n|---|---|\n| Await secara sequential | Operasi berikutnya membutuhkan value atau state sebelumnya |\n| `Promise.all()` | Semua operasi aman dimulai tanpa hasil dari operasi lain |\n\n`Promise.all()` akan reject saat salah satu promise reject. Ia tidak membuat pekerjaan yang saling bergantung menjadi aman dan tidak menjamin persentase peningkatan tertentu.\n\n## Tugas kamu\nHelper `getA()`, `getB()`, dan `getC()` yang disediakan memang dibuat independen:\n1. Mulai semuanya dengan `Promise.all()`.\n2. Await dan destructure tiga value tersebut.\n3. Jumlahkan semua value.\n4. Simpan hasilnya ke `result`."
+        "en": "# Prepare Independent Test Fixtures\n\n## Why this matters\nCalling independent promise-producing helpers in one `Promise.all()` expression lets their operations remain in progress together, then waits for all of them. This is appropriate only when the operations are independent and do not compete for the same mutable state.\n\n| Choice | Use when |\n|---|---|\n| Sequential awaits | A later operation needs an earlier value or state |\n| `Promise.all()` | Every operation can start safely without another result |\n\n`Promise.all()` rejects when any included promise rejects. It does not make dependent work safe and it does not guarantee a specific percentage improvement.\n\n## Your task\nThe provided `loadTestAccount()` and `loadProductFixture()` helpers are controlled, independent setup operations:\n1. Call both helpers inside one `Promise.all()` expression.\n2. Await and destructure the account and product values.\n3. Declare `const result` with the exact string `qa@example.com | KB-104` by combining the account email and product SKU.\n\nThis pattern is not appropriate when one setup operation needs data or state produced by the other.",
+        "id": "# Siapkan Test Fixture yang Independen\n\n## Kenapa ini penting\nMemanggil helper yang menghasilkan promise dan saling independen dalam satu expression `Promise.all()` membuat operasinya bisa berjalan bersamaan, lalu menunggu semuanya selesai. Cara ini hanya cocok kalau operasinya independen dan tidak berebut mutable state yang sama.\n\n| Pilihan | Gunakan saat |\n|---|---|\n| Await secara berurutan | Operasi berikutnya membutuhkan value atau state sebelumnya |\n| `Promise.all()` | Semua operasi aman dimulai tanpa hasil dari operasi lain |\n\n`Promise.all()` akan reject saat salah satu promise reject. Method ini tidak membuat pekerjaan yang saling bergantung menjadi aman dan tidak menjamin persentase peningkatan tertentu.\n\n## Tugas kamu\nHelper `loadTestAccount()` dan `loadProductFixture()` yang disediakan adalah controlled setup operation yang independen:\n1. Panggil kedua helper dalam satu expression `Promise.all()`.\n2. Await dan destructure value account dan product.\n3. Declare `const result` dengan string persis `qa@example.com | KB-104` dengan menggabungkan email account dan SKU product.\n\nPola ini tidak cocok kalau salah satu setup operation membutuhkan data atau state yang dihasilkan oleh operasi lainnya."
       },
       "hints": {
         "en": [
-          "Think about running multiple independent tasks at the exact same time instead of waiting for each one.",
-          "Pass an array of your task calls into Promise.all() to trigger them all together.",
-          "Use destructuring like 'const [a, b, c] = await Promise.all(...)' to access the results efficiently."
+          "Pass both helper calls in one array to `Promise.all()`.",
+          "Use `const [account, product] = await Promise.all(...)` to name the resolved values.",
+          "Build `result` from `account.email` and `product.sku` after both promises resolve."
         ],
         "id": [
-          "Pikirkan tentang menjalankan beberapa tugas independen pada waktu yang sama daripada menunggu satu per satu.",
-          "Masukkan array dari panggilan tugas Kamu ke dalam Promise.all() untuk memicu semuanya bersamaan.",
-          "Gunakan destrukturisasi seperti 'const [a, b, c] = await Promise.all(...)' untuk mengakses hasilnya secara efisien."
+          "Masukkan kedua helper call dalam satu array ke `Promise.all()`.",
+          "Gunakan `const [account, product] = await Promise.all(...)` untuk memberi nama pada resolved value.",
+          "Susun `result` dari `account.email` dan `product.sku` setelah kedua promise selesai."
         ]
       },
-      "htmlContent": "<div class=\"parallel-demo\">\n  <h3>Parallel Execution</h3>\n</div>",
-      "starterCode": "// Helpers: return promises resolving to numbers\nconst getA = () => Promise.resolve(10);\nconst getB = () => Promise.resolve(20);\nconst getC = () => Promise.resolve(12);\n\n// Run all in parallel, destructure results, and assign their sum to 'result'\n// Your code here\n",
+      "htmlContent": "<div class=\"parallel-setup\">\n  <output>qa@example.com · KB-104</output>\n</div>",
+      "starterCode": "const loadTestAccount = () =>\n    Promise.resolve({ email: \"qa@example.com\" });\nconst loadProductFixture = () =>\n    Promise.resolve({ sku: \"KB-104\", status: \"ready\" });\n\n// TODO\n",
       "testCases": [
         {
-          "description": "Returns the expected output",
-          "expectedOutput": "42",
+          "description": "Combines independently prepared test fixtures",
+          "expectedOutput": "qa@example.com | KB-104",
           "isHidden": false
         }
       ],
-      "solution": "const getA = () => Promise.resolve(10);\nconst getB = () => Promise.resolve(20);\nconst getC = () => Promise.resolve(12);\nconst [a, b, c] = await Promise.all([getA(), getB(), getC()]);\nconst result = a + b + c;",
+      "solution": "const loadTestAccount = () =>\n    Promise.resolve({ email: \"qa@example.com\" });\nconst loadProductFixture = () =>\n    Promise.resolve({ sku: \"KB-104\", status: \"ready\" });\n\nconst [account, product] = await Promise.all([\n    loadTestAccount(),\n    loadProductFixture(),\n]);\nconst result = `${account.email} | ${product.sku}`;",
+      "validation": {
+        "requiredAwaitedMemberCalls": ["Promise.all"],
+        "requiredPromiseAllFunctionCalls": [
+          "loadTestAccount",
+          "loadProductFixture"
+        ],
+        "requiredConstBindings": ["result"]
+      },
       "tags": ["javascript", "async", "parallel", "promise-all", "beginner"]
     },
     {

@@ -73,13 +73,38 @@
           "Setelah click, gunakan status role dan text assertion untuk membuktikan hasilnya."
         ]
       },
-      "htmlContent": "<div class=\"signup\">\n  <h1>Join Us</h1>\n  <button onclick=\"document.getElementById('result').textContent = 'Signed up!'\">Sign Up</button>\n  <div id=\"result\" role=\"status\"></div>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('sign up through the user-facing control', async ({ page }) => {\n  // 1. Find Sign Up by role and accessible name\n  // 2. Click it\n  // 3. Assert the status role has exact text 'Signed up!'\n});",
+      "htmlContent": "<div class=\"signup\">\n  <h1>Join Us</h1>\n  <button type=\"button\" onclick=\"document.getElementById('result').textContent = 'Signed up!'\">Sign Up</button>\n  <button type=\"button\">Learn More</button>\n  <div id=\"result\" role=\"status\"></div>\n</div>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
       "solution": "await page.getByRole('button', { name: 'Sign Up' }).click();\nawait expect(page.getByRole('status')).toHaveText('Signed up!');",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["getByRole", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Sign Up"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByRole",
+              "value": "status"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "accessibility", "intermediate"]
     },
@@ -114,13 +139,29 @@
           "Kirim locator ke `expect(...).toBeVisible()`."
         ]
       },
-      "htmlContent": "<section aria-label=\"Order result\">\n  <h2>Order complete</h2>\n  <p>Confirmation number: ORD-104</p>\n</section>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('inspect the visible order result', async ({ page }) => {\n  // 1. Locate exact text 'Order complete'\n  // 2. Assert it is visible\n});",
+      "htmlContent": "<section aria-label=\"Order result\">\n  <h2>Order complete</h2>\n  <p>Order complete details are available.</p>\n  <p>Confirmation number: ORD-104</p>\n</section>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
       "solution": "await expect(page.getByText('Order complete', { exact: true })).toBeVisible();",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["getByText"]
+        "requiredMethods": ["getByText"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "locator": {
+              "method": "getByText",
+              "value": "Order complete",
+              "exact": true
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "text", "intermediate"]
     },
@@ -140,28 +181,63 @@
         "id": "Isi form control lewat associated label lalu verifikasi value yang dimasukkan."
       },
       "instructions": {
-        "en": "# Locate Fields by Their Label Contract\n\nA labelled field can be located through the relationship between the visible label and its control. This should survive a generated ID change while still exposing a broken label association.\n\n## Your task\n1. Fill the field labelled `Username` with `testuser`.\n2. Fill the field labelled `Password` with any non-empty practice value.\n3. Assert the Username field has value `testuser` with `toHaveValue`.\n\nThis exercise uses controlled data. Do not put real credentials in challenge code or reports.",
-        "id": "# Temukan Field dari Kontrak Label\n\nLabelled field bisa ditemukan lewat relationship antara visible label dan control-nya. Kontrak ini seharusnya bertahan saat generated ID berubah, tapi tetap menunjukkan label association yang rusak.\n\n## Tugas kamu\n1. Isi field berlabel `Username` dengan `testuser`.\n2. Isi field berlabel `Password` dengan practice value apa pun yang tidak kosong.\n3. Assert Username field memiliki value `testuser` dengan `toHaveValue`.\n\nLatihan ini memakai controlled data. Jangan memasukkan credential sungguhan ke challenge code atau report."
+        "en": "# Locate Fields by Their Label Contract\n\nA labelled field can be located through the relationship between the visible label and its control. This should survive a generated ID change while still exposing a broken label association.\n\n## Your task\n1. Fill the field labelled `Username` with `testuser`.\n2. Fill the field labelled `Password` with the controlled value `practice-pass`.\n3. Assert the Username field has value `testuser` with `toHaveValue`.\n\nThis exercise uses controlled data. Do not put real credentials in challenge code or reports.",
+        "id": "# Temukan Field dari Kontrak Label\n\nLabelled field bisa ditemukan lewat relationship antara visible label dan control-nya. Kontrak ini seharusnya bertahan saat generated ID berubah, tapi tetap menunjukkan label association yang rusak.\n\n## Tugas kamu\n1. Isi field berlabel `Username` dengan `testuser`.\n2. Isi field berlabel `Password` dengan controlled value `practice-pass`.\n3. Assert Username field memiliki value `testuser` dengan `toHaveValue`.\n\nLatihan ini memakai controlled data. Jangan memasukkan credential sungguhan ke challenge code atau report."
       },
       "hints": {
         "en": [
           "Use the associated visible label rather than the generated input ID.",
-          "Call `getByLabel(...).fill(...)` for both controlled fields.",
+          "Call `getByLabel(...).fill(...)` with the requested value for both controlled fields.",
           "Use `toHaveValue('testuser')` on the Username locator for the evidence."
         ],
         "id": [
           "Gunakan associated visible label, bukan generated input ID.",
-          "Panggil `getByLabel(...).fill(...)` untuk kedua controlled field.",
+          "Panggil `getByLabel(...).fill(...)` dengan value yang diminta untuk kedua controlled field.",
           "Gunakan `toHaveValue('testuser')` pada Username locator sebagai buktinya."
         ]
       },
       "htmlContent": "<form>\n  <label for=\"user\">Username</label>\n  <input type=\"text\" id=\"user\" />\n  \n  <label for=\"pass\">Password</label>\n  <input type=\"password\" id=\"pass\" />\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill fields by their labels', async ({ page }) => {\n  // 1. Fill 'Username' with 'testuser'\n  // 2. Fill 'Password' with a non-empty practice value\n  // 3. Assert the Username-labelled field has value 'testuser'\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Username').fill('testuser');\nawait page.getByLabel('Password').fill('secret123');\nawait expect(page.getByLabel('Username')).toHaveValue('testuser');",
+      "solution": "await page.getByLabel('Username').fill('testuser');\nawait page.getByLabel('Password').fill('practice-pass');\nawait expect(page.getByLabel('Username')).toHaveValue('testuser');",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["getByLabel", "fill"]
+        "requiredMethods": ["getByLabel", "fill"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["testuser"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Username"
+            }
+          },
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["practice-pass"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Password"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Username"
+            }
+          }
+        ]
       },
       "tags": [
         "playwright",
@@ -239,13 +315,38 @@
           "Gunakan `toHaveText('1')` pada test-ID locator sebagai hasil."
         ]
       },
-      "htmlContent": "<div class=\"product\">\n  <h3>Widget Pro</h3>\n  <button onclick=\"document.getElementById('cart-count').textContent = '1'\">Add to Cart</button>\n  <span id=\"cart-count\" data-testid=\"cart-count\">0</span>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('use an explicit test contract', async ({ page }) => {\n  // 1. Click Add to Cart by role\n  // 2. Locate testid='cart-count'\n  // 3. Assert the count is '1'\n});",
+      "htmlContent": "<div class=\"product\">\n  <h3>Widget Pro</h3>\n  <button type=\"button\" onclick=\"document.getElementById('cart-count').textContent = '1'\">Add to Cart</button>\n  <button type=\"button\">View Details</button>\n  <span id=\"cart-count\" data-testid=\"cart-count\">0</span>\n</div>",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
       "solution": "await page.getByRole('button', { name: 'Add to Cart' }).click();\nawait expect(page.getByTestId('cart-count')).toHaveText('1');",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "getByTestId"]
+        "requiredMethods": ["getByRole", "getByTestId", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Add to Cart"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByTestId",
+              "value": "cart-count"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "testid", "intermediate"]
     },
@@ -360,12 +461,27 @@
         ]
       },
       "htmlContent": "<ul class=\"todo-list\">\n  <li>Buy groceries</li>\n  <li>Walk the dog</li>\n  <li>Write tests</li>\n  <li>Review PRs</li>\n  <li>Deploy app</li>\n</ul>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('count items', async ({ page }) => {\n  // 1. Assert list items count is 5\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n});",
       "testCases": [],
-      "solution": "await expect(page.getByRole('listitem')).toHaveCount(5);",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await expect(page.getByRole('listitem')).toHaveCount(5);\n});",
       "validation": {
         "requiredAssertions": ["toHaveCount"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["getByRole"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "locator": {
+              "method": "getByRole",
+              "value": "listitem"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "lists", "multiple", "intermediate"]
     },
@@ -401,12 +517,83 @@
         ]
       },
       "htmlContent": "<div class=\"products\">\n  <article role=\"article\" data-testid=\"product-1\">\n    <h3>Widget Basic</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </article>\n  <article role=\"article\" data-testid=\"product-2\">\n    <h3>Widget Pro</h3>\n    <span class=\"badge in-stock\">In Stock</span>\n    <button onclick=\"document.getElementById('msg').textContent='Added Widget Pro!'\">Add to Cart</button>\n  </article>\n  <article role=\"article\" data-testid=\"product-3\">\n    <h3>Widget Pro Max</h3>\n    <span class=\"badge out-of-stock\">Out of Stock</span>\n    <button disabled>Add to Cart</button>\n  </article>\n</div>\n<div id=\"msg\" role=\"status\"></div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('add the exact available product', async ({ page }) => {\n  // 1. Locate article cards\n  // 2. Filter by exact Widget Pro heading and exact In Stock text\n  // 3. Assert one card remains\n  // 4. Click Add to Cart inside it\n  // 5. Assert the status message\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n  // TODO 5\n});",
       "testCases": [],
-      "solution": "const card = page\n  .getByRole('article')\n  .filter({\n    has: page.getByRole('heading', { name: 'Widget Pro', exact: true }),\n  })\n  .filter({ has: page.getByText('In Stock', { exact: true }) });\n\nawait expect(card).toHaveCount(1);\nawait card.getByRole('button', { name: 'Add to Cart' }).click();\nawait expect(page.getByRole('status')).toHaveText('Added Widget Pro!');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const card = page\n    .getByRole('article')\n    .filter({\n      has: page.getByRole('heading', { name: 'Widget Pro', exact: true }),\n    })\n    .filter({ has: page.getByText('In Stock', { exact: true }) });\n\n  await expect(card).toHaveCount(1);\n  await card.getByRole('button', { name: 'Add to Cart' }).click();\n  await expect(page.getByRole('status')).toHaveText('Added Widget Pro!');\n});",
       "validation": {
         "requiredAssertions": ["toHaveCount", "toHaveText"],
-        "requiredMethods": ["filter", "getByRole"]
+        "requiredMethods": ["filter", "getByRole", "getByText", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "locator": {
+              "method": "getByRole",
+              "value": "article",
+              "filters": [
+                {
+                  "has": {
+                    "method": "getByRole",
+                    "value": "heading",
+                    "name": "Widget Pro",
+                    "exact": true
+                  }
+                },
+                {
+                  "has": {
+                    "method": "getByText",
+                    "value": "In Stock",
+                    "exact": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Add to Cart",
+              "scope": {
+                "method": "getByRole",
+                "value": "article",
+                "filters": [
+                  {
+                    "has": {
+                      "method": "getByRole",
+                      "value": "heading",
+                      "name": "Widget Pro",
+                      "exact": true
+                    }
+                  },
+                  {
+                    "has": {
+                      "method": "getByText",
+                      "value": "In Stock",
+                      "exact": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByRole",
+              "value": "status"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "locators", "scenario", "boss", "intermediate"]
     },
@@ -442,12 +629,40 @@
         ]
       },
       "htmlContent": "<main>\n  <button type=\"button\" onclick=\"document.getElementById('shipping-dialog').style.display='block'\">Show shipping details</button>\n  <section id=\"shipping-dialog\" role=\"dialog\" aria-label=\"Shipping details\" style=\"display:none\">\n    <p>Courier delivery takes 2–3 business days.</p>\n  </section>\n</main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('shipping details appear', async ({ page }) => {\n  // Trigger Show shipping details.\n  // Prove the Shipping details dialog becomes visible.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByRole('button', { name: 'Show shipping details' }).click();\nawait expect(page.getByRole('dialog', { name: 'Shipping details' })).toBeVisible();",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByRole('button', { name: 'Show shipping details' }).click();\n  await expect(\n    page.getByRole('dialog', { name: 'Shipping details' }),\n  ).toBeVisible();\n});",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["getByRole", "click"]
+        "requiredMethods": ["getByRole", "click"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Show shipping details"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "locator": {
+              "method": "getByRole",
+              "value": "dialog",
+              "name": "Shipping details"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "visibility", "intermediate"]
     },
@@ -483,12 +698,33 @@
         ]
       },
       "htmlContent": "<main>\n  <h1>Order confirmed</h1>\n  <p role=\"status\">Order 1042 is ready for pickup</p>\n</main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('order confirmation text', async ({ page }) => {\n  // Assert the exact confirmation heading.\n  // Assert the stable phrase inside the dynamic status.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await expect(page.getByRole('heading')).toHaveText('Order confirmed');\nawait expect(page.getByRole('status')).toContainText('ready for pickup');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await expect(page.getByRole('heading')).toHaveText('Order confirmed');\n  await expect(page.getByRole('status')).toContainText('ready for pickup');\n});",
       "validation": {
         "requiredAssertions": ["toHaveText", "toContainText"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["getByRole"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Order confirmed"],
+            "locator": { "method": "getByRole", "value": "heading" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toContainText",
+            "arguments": ["ready for pickup"],
+            "locator": { "method": "getByRole", "value": "status" }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "text", "intermediate"]
     },
@@ -524,12 +760,40 @@
         ]
       },
       "htmlContent": "<form>\n  <label for=\"notification-email\">Notification email</label>\n  <input type=\"email\" id=\"notification-email\" value=\"old@example.com\" />\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('notification email value', async ({ page }) => {\n  // Replace the labeled field value.\n  // Prove its live value with toHaveValue.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "const email = page.getByLabel('Notification email');\nawait email.fill('test@example.com');\nawait expect(email).toHaveValue('test@example.com');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const email = page.getByLabel('Notification email');\n  await email.fill('test@example.com');\n  await expect(email).toHaveValue('test@example.com');\n});",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["getByLabel", "fill"]
+        "requiredMethods": ["getByLabel", "fill"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["test@example.com"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Notification email"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "arguments": ["test@example.com"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Notification email"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "forms", "intermediate"]
     },
@@ -565,12 +829,50 @@
         ]
       },
       "htmlContent": "<form>\n  <label><input type=\"checkbox\" id=\"terms\" onclick=\"document.getElementById('submit').disabled=!this.checked\" /> Accept Terms</label>\n  <button id=\"submit\" disabled>Submit</button>\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check states', async ({ page }) => {\n  // 1. Check checkbox\n  // 2. Assert checked\n  // 3. Assert button enabled\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n});",
       "testCases": [],
-      "solution": "const terms = page.getByLabel('Accept Terms');\nconst submit = page.getByRole('button', { name: 'Submit' });\nawait expect(submit).toBeDisabled();\nawait terms.check();\nawait expect(terms).toBeChecked();\nawait expect(submit).toBeEnabled();",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const terms = page.getByLabel('Accept Terms');\n  const submit = page.getByRole('button', { name: 'Submit' });\n\n  await expect(submit).toBeDisabled();\n  await terms.check();\n  await expect(terms).toBeChecked();\n  await expect(submit).toBeEnabled();\n});",
       "validation": {
         "requiredAssertions": ["toBeDisabled", "toBeChecked", "toBeEnabled"],
-        "requiredMethods": ["getByLabel", "getByRole", "check"]
+        "requiredMethods": ["getByLabel", "getByRole", "check"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toBeDisabled",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Submit"
+            }
+          },
+          {
+            "type": "method",
+            "method": "check",
+            "target": "locator",
+            "locator": { "method": "getByLabel", "value": "Accept Terms" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeChecked",
+            "locator": { "method": "getByLabel", "value": "Accept Terms" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeEnabled",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Submit"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "state", "intermediate"]
     },
@@ -606,12 +908,41 @@
         ]
       },
       "htmlContent": "<nav aria-label=\"Account links\">\n  <a href=\"/legal/privacy\" target=\"_blank\">Privacy policy</a>\n</nav>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('privacy-policy destination', async ({ page }) => {\n  // Locate Privacy policy by role.\n  // Prove its href and target contracts.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "const privacyPolicy = page.getByRole('link', { name: 'Privacy policy' });\nawait expect(privacyPolicy).toHaveAttribute('href', '/legal/privacy');\nawait expect(privacyPolicy).toHaveAttribute('target', '_blank');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const privacyPolicy = page.getByRole('link', { name: 'Privacy policy' });\n  await expect(privacyPolicy).toHaveAttribute('href', '/legal/privacy');\n  await expect(privacyPolicy).toHaveAttribute('target', '_blank');\n});",
       "validation": {
         "requiredAssertions": ["toHaveAttribute"],
-        "requiredMethods": ["getByRole"]
+        "requiredMethods": ["getByRole"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveAttribute",
+            "arguments": ["href", "/legal/privacy"],
+            "locator": {
+              "method": "getByRole",
+              "value": "link",
+              "name": "Privacy policy"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveAttribute",
+            "arguments": ["target", "_blank"],
+            "locator": {
+              "method": "getByRole",
+              "value": "link",
+              "name": "Privacy policy"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "attributes", "intermediate"]
     },
@@ -647,12 +978,43 @@
         ]
       },
       "htmlContent": "<main>\n  <ul id=\"results\">\n    <li>Customer 1</li>\n    <li>Customer 2</li>\n    <li>Customer 3</li>\n    <li>Customer 4</li>\n  </ul>\n  <button type=\"button\" onclick=\"document.getElementById('results').insertAdjacentHTML('beforeend','<li>Customer 5</li>')\">Add matching customer</button>\n</main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('saved-search result count', async ({ page }) => {\n  // Prove the initial list count.\n  // Add a matching customer.\n  // Prove the updated count.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "const items = page.getByRole('listitem');\nawait expect(items).toHaveCount(4);\nawait page.getByRole('button', { name: 'Add matching customer' }).click();\nawait expect(items).toHaveCount(5);",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const items = page.getByRole('listitem');\n\n  await expect(items).toHaveCount(4);\n  await page.getByRole('button', { name: 'Add matching customer' }).click();\n  await expect(items).toHaveCount(5);\n});",
       "validation": {
         "requiredAssertions": ["toHaveCount"],
-        "requiredMethods": ["getByRole", "click"]
+        "requiredMethods": ["getByRole", "click"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "arguments": [4],
+            "locator": { "method": "getByRole", "value": "listitem" }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Add matching customer"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "arguments": [5],
+            "locator": { "method": "getByRole", "value": "listitem" }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "count", "intermediate"]
     },
@@ -688,12 +1050,51 @@
         ]
       },
       "htmlContent": "<section aria-labelledby=\"readiness-heading\">\n  <h2 id=\"readiness-heading\">Profile readiness</h2>\n  <ul>\n    <li>Name: Ready</li>\n    <li>Email: Ready</li>\n    <li>Password: Ready</li>\n  </ul>\n</section>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('profile-readiness diagnostics', async ({ page }) => {\n  // Soft-check the three independent readiness lines.\n  // Do not continue into a dependent workflow.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "await expect.soft(page.getByText('Name: Ready', { exact: true })).toBeVisible();\nawait expect.soft(page.getByText('Email: Ready', { exact: true })).toBeVisible();\nawait expect.soft(page.getByText('Password: Ready', { exact: true })).toBeVisible();",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await expect.soft(\n    page.getByText('Name: Ready', { exact: true }),\n  ).toBeVisible();\n  await expect.soft(\n    page.getByText('Email: Ready', { exact: true }),\n  ).toBeVisible();\n  await expect.soft(\n    page.getByText('Password: Ready', { exact: true }),\n  ).toBeVisible();\n});",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["soft", "getByText"]
+        "requiredMethods": ["getByText"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidence": [
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "soft": true,
+            "locator": {
+              "method": "getByText",
+              "value": "Name: Ready",
+              "exact": true
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "soft": true,
+            "locator": {
+              "method": "getByText",
+              "value": "Email: Ready",
+              "exact": true
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "soft": true,
+            "locator": {
+              "method": "getByText",
+              "value": "Password: Ready",
+              "exact": true
+            }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "soft", "intermediate"]
     },
@@ -729,9 +1130,9 @@
         ]
       },
       "htmlContent": "<form id=\"signup\">\n  <div class=\"field\">\n    <label>Email <input type=\"email\" id=\"email\" value=\"bad-email\" /></label>\n    <span class=\"error\" id=\"email-error\" role=\"alert\">Invalid email format</span>\n  </div>\n  <div class=\"field\">\n    <label>Password <input type=\"password\" id=\"password\" placeholder=\"8+ characters\" /></label>\n    <span class=\"hint\">Must be 8+ characters</span>\n  </div>\n  <button id=\"submit\" disabled>Register</button>\n</form>\n<script>\n  document.getElementById('email').addEventListener('input', validate);\n  document.getElementById('password').addEventListener('input', validate);\n  function validate() {\n    const email = document.getElementById('email').value;\n    const pass = document.getElementById('password').value;\n    const valid = email.includes('@') && pass.length >= 8;\n    document.getElementById('submit').disabled = !valid;\n    document.getElementById('email-error').style.display = email.includes('@') ? 'none' : 'block';\n  }\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('registration follows validation state', async ({ page }) => {\n  // Prove the invalid starting state and its guidance.\n  // Fill valid labeled values.\n  // Prove the guidance and submission state both transition.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n  // TODO 5\n});",
       "testCases": [],
-      "solution": "const emailError = page.getByRole('alert');\nconst register = page.getByRole('button', { name: 'Register' });\nawait expect(emailError).toBeVisible();\nawait expect(emailError).toHaveText('Invalid email format');\nawait expect(register).toBeDisabled();\nawait page.getByLabel('Email').fill('user@example.com');\nawait page.getByLabel('Password').fill('password123');\nawait expect(emailError).toBeHidden();\nawait expect(register).toBeEnabled();",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const emailError = page.getByRole('alert');\n  const register = page.getByRole('button', { name: 'Register' });\n\n  await expect(emailError).toBeVisible();\n  await expect(emailError).toHaveText('Invalid email format');\n  await expect(register).toBeDisabled();\n\n  await page.getByLabel('Email').fill('user@example.com');\n  await page.getByLabel('Password').fill('password123');\n\n  await expect(emailError).toBeHidden();\n  await expect(register).toBeEnabled();\n});",
       "validation": {
         "requiredAssertions": [
           "toBeVisible",
@@ -740,7 +1141,66 @@
           "toBeHidden",
           "toBeEnabled"
         ],
-        "requiredMethods": ["getByRole", "getByLabel", "fill"]
+        "requiredMethods": ["getByRole", "getByLabel", "fill"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["user@example.com"],
+            "locator": { "method": "getByLabel", "value": "Email" }
+          },
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["password123"],
+            "locator": { "method": "getByLabel", "value": "Password" }
+          }
+        ],
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "locator": { "method": "getByRole", "value": "alert" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Invalid email format"],
+            "locator": { "method": "getByRole", "value": "alert" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeDisabled",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Register"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeHidden",
+            "locator": { "method": "getByRole", "value": "alert" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeEnabled",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Register"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "assertions", "scenario", "boss", "intermediate"]
     },
@@ -817,12 +1277,41 @@
         ]
       },
       "htmlContent": "<form class=\"login-form\" autocomplete=\"off\">\n  <label for=\"email\">Email</label>\n  <input type=\"email\" id=\"email\" placeholder=\"Email\" autocomplete=\"off\" />\n  <label for=\"password\">Password</label>\n  <input type=\"password\" id=\"password\" placeholder=\"Password\" autocomplete=\"new-password\" />\n  <button type=\"submit\">Login</button>\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('fill form', async ({ page }) => {\n  // 1. Fill email (use getByLabel)\n  // 2. Fill password (use getByLabel)\n  // 3. Verify email value\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Email').fill('qa@test.com');\nawait page.getByLabel('Password').fill('secret123');\nawait expect(page.getByLabel('Email')).toHaveValue('qa@test.com');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Email').fill('qa@test.com');\n  await page.getByLabel('Password').fill('secret123');\n  await expect(page.getByLabel('Email')).toHaveValue('qa@test.com');\n});",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["getByLabel", "fill"]
+        "requiredMethods": ["getByLabel", "fill"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["qa@test.com"],
+            "locator": { "method": "getByLabel", "value": "Email" }
+          },
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["secret123"],
+            "locator": { "method": "getByLabel", "value": "Password" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "arguments": ["qa@test.com"],
+            "locator": { "method": "getByLabel", "value": "Email" }
+          }
+        ]
       },
       "tags": ["playwright", "fill", "forms", "intermediate"]
     },
@@ -858,12 +1347,40 @@
         ]
       },
       "htmlContent": "<form>\n  <label for=\"language\">Choose Language:</label>\n  <select id=\"language\">\n    <option value=\"\">Select...</option>\n    <option value=\"python\">Python</option>\n    <option value=\"javascript\">JavaScript</option>\n    <option value=\"typescript\">TypeScript</option>\n  </select>\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('select language', async ({ page }) => {\n  // 1. Select 'javascript' (use getByLabel)\n  // 2. Verify value\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Choose Language:').selectOption('javascript');\nawait expect(page.getByLabel('Choose Language:')).toHaveValue('javascript');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Choose Language:').selectOption('javascript');\n  await expect(page.getByLabel('Choose Language:')).toHaveValue('javascript');\n});",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["getByLabel", "selectOption"]
+        "requiredMethods": ["getByLabel", "selectOption"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "selectOption",
+            "target": "locator",
+            "arguments": ["javascript"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Choose Language:"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "arguments": ["javascript"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Choose Language:"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "select", "dropdown", "intermediate"]
     },
@@ -899,12 +1416,38 @@
         ]
       },
       "htmlContent": "<form>\n  <label>\n    <input type=\"checkbox\" id=\"terms\" />\n    Accept Terms & Conditions\n  </label>\n  <label>\n    <input type=\"checkbox\" id=\"newsletter\" />\n    Subscribe to Newsletter\n  </label>\n</form>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('check terms', async ({ page }) => {\n  // 1. Check terms (use getByLabel)\n  // 2. Verify checked state\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Accept Terms & Conditions').check();\nawait expect(page.getByLabel('Accept Terms & Conditions')).toBeChecked();",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Accept Terms & Conditions').check();\n  await expect(page.getByLabel('Accept Terms & Conditions')).toBeChecked();\n});",
       "validation": {
         "requiredAssertions": ["toBeChecked"],
-        "requiredMethods": ["getByLabel", "check"]
+        "requiredMethods": ["getByLabel", "check"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "check",
+            "target": "locator",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Accept Terms & Conditions"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeChecked",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Accept Terms & Conditions"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "checkbox", "state", "intermediate"]
     },
@@ -940,12 +1483,41 @@
         ]
       },
       "htmlContent": "<div class=\"search-box\">\n  <label for=\"search\">Search</label>\n  <input type=\"search\" id=\"search\" role=\"searchbox\" />\n  <div id=\"result\" role=\"status\"></div>\n</div>\n<script>\n  document.getElementById('search').addEventListener('keydown', (e) => {\n    if (e.key === 'Enter') {\n      document.getElementById('result').textContent = 'Searching for: ' + e.target.value;\n    }\n  });\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('search with keyboard', async ({ page }) => {\n  // 1. Locate and fill the searchbox.\n  // 2. Press Enter on that locator.\n  // 3. Verify the status result.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "const search = page.getByRole('searchbox');\nawait search.fill('Playwright');\nawait search.press('Enter');\nawait expect(page.getByRole('status')).toHaveText('Searching for: Playwright');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const search = page.getByRole('searchbox');\n  await search.fill('Playwright');\n  await search.press('Enter');\n  await expect(page.getByRole('status')).toHaveText('Searching for: Playwright');\n});",
       "validation": {
         "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "fill", "press"]
+        "requiredMethods": ["getByRole", "fill", "press"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["Playwright"],
+            "locator": { "method": "getByRole", "value": "searchbox" }
+          },
+          {
+            "type": "method",
+            "method": "press",
+            "target": "locator",
+            "arguments": ["Enter"],
+            "locator": { "method": "getByRole", "value": "searchbox" }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Searching for: Playwright"],
+            "locator": { "method": "getByRole", "value": "status" }
+          }
+        ]
       },
       "tags": ["playwright", "keyboard", "input", "intermediate"]
     },
@@ -1022,12 +1594,37 @@
         ]
       },
       "htmlContent": "<div class=\"upload-area\">\n  <label for=\"file-input\">Upload Resume</label>\n  <input type=\"file\" id=\"file-input\" />\n  <div role=\"status\">No file selected</div>\n</div>\n<script>\n  document.getElementById('file-input').addEventListener('change', (e) => {\n    const file = e.target.files[0];\n    document.querySelector('[role=status]').textContent = 'Selected: ' + file.name;\n  });\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('upload file', async ({ page }) => {\n  // 1. Upload 'resume.pdf' to 'Upload Resume'\n  // 2. Verify status text\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');\nawait expect(page.getByRole('status')).toContainText('resume.pdf');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByLabel('Upload Resume').setInputFiles('resume.pdf');\n  await expect(page.getByRole('status')).toContainText('resume.pdf');\n});",
       "validation": {
         "requiredAssertions": ["toContainText"],
-        "requiredMethods": ["getByLabel", "getByRole", "setInputFiles"]
+        "requiredMethods": ["getByLabel", "getByRole", "setInputFiles"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "setInputFiles",
+            "target": "locator",
+            "arguments": ["resume.pdf"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Upload Resume"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toContainText",
+            "arguments": ["resume.pdf"],
+            "locator": { "method": "getByRole", "value": "status" }
+          }
+        ]
       },
       "tags": ["playwright", "upload", "files", "intermediate"]
     },
@@ -1104,12 +1701,48 @@
         ]
       },
       "htmlContent": "<iframe title=\"Secure payment\" srcdoc='<label for=\"card-number\">Card number</label><input id=\"card-number\">'></iframe>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('iframe input', async ({ page }) => {\n  // 1. Enter the Secure payment frame.\n  // 2. Fill Card number.\n  // 3. Verify its value.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n});",
       "testCases": [],
-      "solution": "const frame = page.frameLocator('[title=\"Secure payment\"]');\nconst cardNumber = frame.getByLabel('Card number');\nawait cardNumber.fill('1234');\nawait expect(cardNumber).toHaveValue('1234');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const frame = page.frameLocator('[title=\"Secure payment\"]');\n  const cardNumber = frame.getByLabel('Card number');\n\n  await cardNumber.fill('1234');\n  await expect(cardNumber).toHaveValue('1234');\n});",
       "validation": {
         "requiredAssertions": ["toHaveValue"],
-        "requiredMethods": ["frameLocator", "getByLabel", "fill"]
+        "requiredMethods": ["frameLocator", "getByLabel", "fill"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["1234"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Card number",
+              "scope": {
+                "method": "frameLocator",
+                "value": "[title=\"Secure payment\"]"
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveValue",
+            "arguments": ["1234"],
+            "locator": {
+              "method": "getByLabel",
+              "value": "Card number",
+              "scope": {
+                "method": "frameLocator",
+                "value": "[title=\"Secure payment\"]"
+              }
+            }
+          }
+        ]
       },
       "tags": ["playwright", "frames", "iframes", "intermediate"]
     },
@@ -1129,28 +1762,72 @@
         "id": "Terapkan locator composition pada changing table lalu verifikasi row-local outcome."
       },
       "instructions": {
-        "en": "# Complete a Named Project Row\n\nThis is a transfer exercise from Module 4: table order can change, so position is not project identity. Find the row that contains **Project X**, perform **Complete** only inside that row, and verify that same row reports **Done**. The final assertion proves both the action outcome and the scope.\n\n## Your Task\n1. Start from the collection of `row` roles.\n2. Filter to the row containing `Project X`.\n3. Click its **Complete** button.\n4. Verify its local status becomes `Done`.\n",
-        "id": "# Selesaikan Project Row yang Tepat\n\nIni transfer exercise dari Module 4: table order bisa berubah, jadi position bukan project identity. Cari row yang berisi **Project X**, jalankan **Complete** hanya di row tersebut, lalu verifikasi row yang sama menampilkan **Done**. Final assertion membuktikan action outcome sekaligus scope-nya.\n\n## Tugas Kamu\n1. Mulai dari collection dengan role `row`.\n2. Filter ke row yang berisi `Project X`.\n3. Click button **Complete** di dalamnya.\n4. Verifikasi local status menjadi `Done`.\n"
+        "en": "# Complete a Named Project Row\n\nThis is a transfer exercise from Module 4: table order can change, so position is not project identity. Find the row that contains **Project X**, perform **Complete** only inside that row, and verify that same row reports **Done**. The final assertion proves both the action outcome and the scope.\n\n## Your Task\n1. Start from the collection of `row` roles.\n2. Filter to the row containing `Project X`.\n3. Assert that exactly one row remains.\n4. Click its **Complete** button.\n5. Verify its local status becomes `Done`.\n",
+        "id": "# Selesaikan Project Row yang Tepat\n\nIni transfer exercise dari Module 4: urutan tabel bisa berubah, jadi posisi bukan identitas project. Cari row yang berisi **Project X**, jalankan **Complete** hanya di dalam row tersebut, lalu verifikasi row yang sama menampilkan **Done**. Final assertion membuktikan outcome action sekaligus scope-nya.\n\n## Tugas Kamu\n1. Mulai dari collection dengan role `row`.\n2. Filter ke row yang berisi `Project X`.\n3. Assert bahwa hanya ada satu row yang tersisa.\n4. Click button **Complete** di dalamnya.\n5. Verifikasi local status menjadi `Done`.\n"
       },
       "hints": {
         "en": [
           "Find a specific row by a unique piece of text it contains, then look for a button within just that row.",
           "Use the '.filter({ hasText: ... })' method to isolate the correct row from all other rows.",
-          "Locate the row with 'Project X', click the 'Complete' button inside it, and verify its local status text."
+          "Prove one Project X row remains, click Complete inside it, and verify its local status text."
         ],
         "id": [
           "Temukan baris spesifik berdasarkan teks unik yang dikandungnya, lalu cari tombol hanya di dalam baris tersebut.",
           "Gunakan metode '.filter({ hasText: ... })' untuk memisahkan baris yang benar dari semua baris lainnya.",
-          "Temukan baris dengan 'Project X', klik tombol 'Complete' di dalamnya, dan verifikasi teks status lokalnya."
+          "Buktikan hanya ada satu row Project X, click Complete di dalamnya, lalu verifikasi local status text-nya."
         ]
       },
       "htmlContent": "<div class=\"app\">\n  <div class=\"task-row\" role=\"row\">\n    <span class=\"name\">Project X</span>\n    <span class=\"status\" role=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n  <div class=\"task-row\" role=\"row\">\n    <span class=\"name\">Project Y</span>\n    <span class=\"status\" role=\"status\">In Progress</span>\n    <button onclick=\"this.parentElement.querySelector('.status').textContent='Done'\">Complete</button>\n  </div>\n</div>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  // 1. Find row with 'Project X'\n  // 2. Click Complete\n  // 3. Verify status is 'Done'\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n});",
       "testCases": [],
-      "solution": "import { test, expect } from '@playwright/test';\n\ntest('dynamic table', async ({ page }) => {\n  const row = page.getByRole('row').filter({ hasText: 'Project X' });\n  await row.getByRole('button', { name: 'Complete' }).click();\n  await expect(row.getByRole('status')).toHaveText('Done');\n});",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const row = page.getByRole('row').filter({ hasText: 'Project X' });\n  await expect(row).toHaveCount(1);\n  await row.getByRole('button', { name: 'Complete' }).click();\n  await expect(row.getByRole('status')).toHaveText('Done');\n});",
       "validation": {
-        "requiredAssertions": ["toHaveText"],
-        "requiredMethods": ["getByRole", "filter", "click"]
+        "requiredAssertions": ["toHaveCount", "toHaveText"],
+        "requiredMethods": ["getByRole", "filter", "click"],
+        "forbiddenMethods": ["first", "last", "nth"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "locator": {
+              "method": "getByRole",
+              "value": "row",
+              "filters": [{ "hasText": "Project X" }]
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Complete",
+              "scope": {
+                "method": "getByRole",
+                "value": "row",
+                "filters": [{ "hasText": "Project X" }]
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "locator": {
+              "method": "getByRole",
+              "value": "status",
+              "scope": {
+                "method": "getByRole",
+                "value": "row",
+                "filters": [{ "hasText": "Project X" }]
+              }
+            }
+          }
+        ]
       },
       "tags": ["playwright", "tables", "filter", "intermediate"]
     },
@@ -1186,12 +1863,63 @@
         ]
       },
       "htmlContent": "<div class=\"shop\">\n  <div class=\"product\">\n    <h3>Widget Pro</h3>\n    <button id=\"add-btn\" onclick=\"addToCart()\">Add to Cart</button>\n  </div>\n  <div class=\"cart\" style=\"display:none;\">\n    <label for=\"qty\">Quantity</label>\n    <input type=\"number\" id=\"qty\" value=\"1\" />\n    <label><input type=\"checkbox\" id=\"express\" checked /> Express Shipping</label>\n    <button id=\"checkout-btn\" onclick=\"checkout()\">Checkout</button>\n  </div>\n  <div id=\"confirmation\" role=\"status\" style=\"display:none;\"></div>\n</div>\n<script>\n  function addToCart() {\n    document.querySelector('.cart').style.display = 'block';\n    document.getElementById('add-btn').textContent = 'Added!';\n  }\n  function checkout() {\n    const qty = document.getElementById('qty').value;\n    const express = document.getElementById('express').checked;\n    document.getElementById('confirmation').style.display = 'block';\n    document.getElementById('confirmation').textContent = \n      'Order confirmed: ' + qty + ' items' + (express ? ' (Express)' : '');\n  }\n</script>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('checkout flow', async ({ page }) => {\n  // 1. Click \"Add to Cart\" (getByRole)\n  // 2. Fill \"Quantity\" to \"3\" (getByLabel)\n  // 3. Check \"Express Shipping\" (getByLabel)\n  // 4. Click \"Checkout\" (getByRole)\n  // 5. Verify confirmation text\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n  // TODO 3\n  // TODO 4\n  // TODO 5\n});",
       "testCases": [],
-      "solution": "await page.getByRole('button', { name: 'Add to Cart' }).click();\nawait page.getByLabel('Quantity').fill('3');\nawait page.getByLabel('Express Shipping').check();\nawait page.getByRole('button', { name: 'Checkout' }).click();\nawait expect(page.getByRole('status')).toContainText('3 items (Express)');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByRole('button', { name: 'Add to Cart' }).click();\n  await page.getByLabel('Quantity').fill('3');\n  await page.getByLabel('Express Shipping').check();\n  await page.getByRole('button', { name: 'Checkout' }).click();\n  await expect(page.getByRole('status')).toContainText('3 items (Express)');\n});",
       "validation": {
         "requiredAssertions": ["toContainText"],
-        "requiredMethods": ["getByRole", "getByLabel", "click", "fill", "check"]
+        "requiredMethods": ["getByRole", "getByLabel", "click", "fill", "check"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Add to Cart"
+            }
+          },
+          {
+            "type": "method",
+            "method": "fill",
+            "target": "locator",
+            "arguments": ["3"],
+            "locator": { "method": "getByLabel", "value": "Quantity" }
+          },
+          {
+            "type": "method",
+            "method": "check",
+            "target": "locator",
+            "locator": {
+              "method": "getByLabel",
+              "value": "Express Shipping"
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Checkout"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toContainText",
+            "arguments": ["3 items (Express)"],
+            "locator": { "method": "getByRole", "value": "status" }
+          }
+        ]
       },
       "tags": ["playwright", "scenario", "boss", "checkout", "intermediate"]
     },
@@ -1225,17 +1953,54 @@
         ]
       },
       "files": {
-        "/tests/cart.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // Open Cart using a user-facing locator.\n\n  // Prove the resulting page is visible.\n});",
+        "/tests/cart.spec.ts": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // TODO 1\n\n  // TODO 2\n});",
         "/app/products.html": "<main>\n  <nav aria-label=\"Store navigation\">\n    <a href=\"/app/cart.html\">Cart</a>\n  </nav>\n  <h1>Products</h1>\n  <section aria-label=\"Available products\">\n    <article>\n      <h2>Mechanical Keyboard</h2>\n      <p>A compact keyboard for a focused workspace.</p>\n    </article>\n  </section>\n</main>",
         "/app/cart.html": "<main>\n  <nav aria-label=\"Store navigation\">\n    <a href=\"/app/products.html\">Continue shopping</a>\n  </nav>\n  <h1>Your cart</h1>\n  <p>Your cart is empty.</p>\n</main>"
       },
       "editableFiles": ["/tests/cart.spec.ts"],
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // Open Cart using a user-facing locator.\n\n  // Prove the resulting page is visible.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  // TODO 1\n\n  // TODO 2\n});",
       "testCases": [],
+      "expectedState": [
+        {
+          "selector": "h1",
+          "visible": true,
+          "containsText": "Your cart"
+        }
+      ],
       "solution": "import { test, expect } from '@playwright/test';\n\ntest('customer can open the cart', async ({ page }) => {\n  await page.goto('/app/products.html');\n\n  await page.getByRole('link', { name: 'Cart' }).click();\n\n  await expect(\n    page.getByRole('heading', { name: 'Your cart' }),\n  ).toBeVisible();\n});",
       "validation": {
         "requiredAssertions": ["toBeVisible"],
-        "requiredMethods": ["goto", "getByRole", "click"]
+        "requiredMethods": ["goto", "getByRole", "click"],
+        "policy": {
+          "requireExecutedEvidence": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "goto",
+            "target": "page",
+            "arguments": ["/app/products.html"]
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "link",
+              "name": "Cart"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toBeVisible",
+            "locator": {
+              "method": "getByRole",
+              "value": "heading",
+              "name": "Your cart"
+            }
+          }
+        ]
       },
       "tags": ["playwright", "first-test", "navigation", "core-practice"]
     },
@@ -1269,9 +2034,9 @@
         ]
       },
       "htmlContent": "<main><button onclick=\"const status=document.querySelector('[role=status]');status.textContent='Saving…';setTimeout(()=>status.textContent='Profile saved',150)\">Save profile</button><p role=\"status\">Not saved</p></main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('profile save reaches a visible outcome', async ({ page }) => {\n  // Click Save profile.\n  // Wait for the observable status without a fixed sleep.\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  // TODO 1\n  // TODO 2\n});",
       "testCases": [],
-      "solution": "await page.getByRole('button', { name: 'Save profile' }).click();\nawait expect(page.getByRole('status')).toHaveText('Profile saved');",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  await page.getByRole('button', { name: 'Save profile' }).click();\n  await expect(page.getByRole('status')).toHaveText('Profile saved');\n});",
       "expectedState": [
         {
           "selector": "[role=status]",
@@ -1282,7 +2047,35 @@
       "validation": {
         "requiredAssertions": ["toHaveText"],
         "requiredMethods": ["getByRole", "click"],
-        "forbiddenMethods": ["waitForTimeout"]
+        "forbiddenMethods": ["waitForTimeout"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Save profile"
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Profile saved"],
+            "locator": {
+              "method": "getByRole",
+              "value": "status"
+            }
+          }
+        ]
       },
       "tags": [
         "playwright",
@@ -1323,9 +2116,9 @@
         ]
       },
       "htmlContent": "<main>\n  <h1>Failed orders</h1>\n  <section aria-label=\"Orders to resubmit\">\n    <article role=\"article\" aria-labelledby=\"order-1007-heading\" data-order-id=\"ORD-1007\">\n      <h2 id=\"order-1007-heading\">Order ORD-1007</h2>\n      <button type=\"button\" onclick=\"const status=this.parentElement.querySelector('[role=status]');status.textContent='Submitting…';setTimeout(()=>status.textContent='Order submitted: ORD-1007',80)\">Submit order</button>\n      <p role=\"status\">Ready to submit</p>\n    </article>\n    <article role=\"article\" aria-labelledby=\"order-1042-heading\" data-order-id=\"ORD-1042\">\n      <h2 id=\"order-1042-heading\">Order ORD-1042</h2>\n      <button type=\"button\" onclick=\"const status=this.parentElement.querySelector('[role=status]');status.textContent='Submitting…';setTimeout(()=>status.textContent='Order submitted: ORD-1042',200)\">Submit order</button>\n      <p role=\"status\">Ready to submit</p>\n    </article>\n  </section>\n</main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('resubmit Order ORD-1042', async ({ page }) => {\n  const order = page.getByRole('article').first();\n  await order.getByRole('button', { name: 'Submit order' }).click();\n  await page.waitForTimeout(1000);\n\n  const status = await page.getByRole('status').first().textContent();\n  expect(status).toBeTruthy();\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const order = page.getByRole('article').first();\n  await order.getByRole('button', { name: 'Submit order' }).click();\n  await page.waitForTimeout(1000);\n\n  const status = await page.getByRole('status').first().textContent();\n  expect(status).toBeTruthy();\n});",
       "testCases": [],
-      "solution": "const targetOrder = page.getByRole('article').filter({\n  has: page.getByRole('heading', {\n    name: 'Order ORD-1042',\n    exact: true,\n  }),\n});\n\nawait expect(targetOrder).toHaveCount(1);\nawait targetOrder.getByRole('button', { name: 'Submit order' }).click();\nawait expect(targetOrder.getByRole('status')).toHaveText(\n  'Order submitted: ORD-1042',\n);",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const targetOrder = page.getByRole('article').filter({\n    has: page.getByRole('heading', {\n      name: 'Order ORD-1042',\n      exact: true,\n    }),\n  });\n\n  await expect(targetOrder).toHaveCount(1);\n  await targetOrder.getByRole('button', { name: 'Submit order' }).click();\n  await expect(targetOrder.getByRole('status')).toHaveText(\n    'Order submitted: ORD-1042',\n  );\n});",
       "expectedState": [
         {
           "selector": "[data-order-id=\"ORD-1042\"] [role=status]",
@@ -1336,7 +2129,82 @@
       "validation": {
         "requiredAssertions": ["toHaveCount", "toHaveText"],
         "requiredMethods": ["getByRole", "filter", "click"],
-        "forbiddenMethods": ["first", "nth", "waitForTimeout", "textContent", "isVisible", "toBeTruthy"]
+        "forbiddenMethods": ["first", "nth", "waitForTimeout", "textContent", "isVisible", "toBeTruthy"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "arguments": [1],
+            "locator": {
+              "method": "getByRole",
+              "value": "article",
+              "filters": [
+                {
+                  "has": {
+                    "method": "getByRole",
+                    "value": "heading",
+                    "name": "Order ORD-1042",
+                    "exact": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Submit order",
+              "scope": {
+                "method": "getByRole",
+                "value": "article",
+                "filters": [
+                  {
+                    "has": {
+                      "method": "getByRole",
+                      "value": "heading",
+                      "name": "Order ORD-1042",
+                      "exact": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Order submitted: ORD-1042"],
+            "locator": {
+              "method": "getByRole",
+              "value": "status",
+              "scope": {
+                "method": "getByRole",
+                "value": "article",
+                "filters": [
+                  {
+                    "has": {
+                      "method": "getByRole",
+                      "value": "heading",
+                      "name": "Order ORD-1042",
+                      "exact": true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
       },
       "tags": [
         "playwright",

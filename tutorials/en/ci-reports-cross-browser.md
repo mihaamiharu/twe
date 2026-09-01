@@ -88,7 +88,7 @@ If the team never tests a deployed target, remove that branch. If it always test
 
 ### 2. Install the runtime, dependencies, and browser from scratch
 
-Because this repository uses Bun, this GitHub Actions job follows the repository setup:
+Because this repository uses Bun, this teaching example uses its commands and artifact paths while adding an explicit runtime pin:
 
 ```yaml
 name: Checkout smoke
@@ -138,7 +138,7 @@ jobs:
           retention-days: 14
 ```
 
-The versions and commands above follow this repository’s Bun workflow. In another repository, replace `1.3.4`, the lockfile command, installed browsers, and test command with that repository's values. If the repository stores its runtime version in a committed file, use that file as the source. Do not use a moving version alias when the run needs to stay reproducible.
+The commands and artifact paths above mirror this repository, while `1.3.4` is an explicit teaching pin. It is not evidence that the current repository workflow is already pinned. A maintained repository should declare its Bun version through a committed source such as `packageManager`, `engines.bun`, or a version file, then make CI consume that source. Without such a declaration, `setup-bun` can fall back to `latest`, so two clean runners started at different times may receive different runtimes. In another repository, replace the runtime version, lockfile command, installed browsers, and test command with that repository's declared values.
 
 This minimal example has no secret because the checkout smoke test does not need one. If an authenticated test needs a credential, provide it through an authorized protected environment or use a disposable test account. Pull requests from forks may not receive secrets, and pull-request code must not receive production credentials. This job has read-only repository access, a time limit, and debugging artifacts that remain available after a failed test.
 

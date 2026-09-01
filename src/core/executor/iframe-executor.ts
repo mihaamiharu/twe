@@ -27,6 +27,7 @@ import { analyzeSourcePolicy, type SourcePolicyAnalysis } from './source-policy-
 import {
   createRuntimeExecutionTrace,
   createTracedPlaywrightPage,
+  recordRuntimeAssertion,
 } from './runtime-trace';
 
 interface InteractionSequenceObserver {
@@ -504,7 +505,7 @@ export async function executePlaywrightCode(
                 timeout: assertionTimeout,
                 deadline: globalDeadline,
                 onAssertion: (assertion) => {
-                  runtimeTrace.assertions.push(assertion);
+                  recordRuntimeAssertion(runtimeTrace, assertion);
                 },
             });
 
@@ -521,11 +522,11 @@ export async function executePlaywrightCode(
             const wrappedCode = `
                         return (async () => {
                             try {
-                                const result = (async () => {
+                                const executionPromise = (async () => {
                                     ${executableCode}
                                 })();
                                 
-                                const finalResult = await result;
+                                const finalResult = await executionPromise;
 
                                 // Wait for all tests to complete
                                 if (window.__testPromises && Array.isArray(window.__testPromises)) {

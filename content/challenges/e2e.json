@@ -17,8 +17,8 @@
                 "id": "Ganti generic generated wrapper dengan satu focused login helper sambil menjaga recovery scenario dan evidence-nya tetap terlihat."
             },
                 "instructions": {
-                "en": "# Refactor Login Without Hiding the Evidence\n\nThe starter was generated with a generic `UiActions` wrapper. Methods such as `fillField` and `clickButton` only rename Playwright operations; they do not represent a meaningful product behavior.\n\n## Your Task\nRefactor the starter into one focused `submitLogin(page, credentials)` helper and one coherent recovery scenario:\n\n1. Open `/app/login.html` in the test.\n2. Submit `wronguser` and `wrongpass` through the focused helper.\n3. In the test, prove the alert says `Invalid username or password` and the URL remains `/app/login.html`.\n4. Submit `testuser` and `password123` through the same helper.\n5. In the test, prove the URL becomes `/app/dashboard.html` and the heading says `Welcome, testuser!`.\n6. Do not use the generic `fillField` or `clickButton` methods, `.first()`, or a fixed wait.\n\nThe helper owns repeated form mechanics. The test owns the user journey and its evidence. The exact variable names and code organization are otherwise your choice.\n",
-                "id": "# Refactor Login tanpa Menyembunyikan Evidence\n\nStarter dibuat dengan generic `UiActions` wrapper. Method seperti `fillField` dan `clickButton` cuma mengganti nama Playwright operation; keduanya nggak merepresentasikan meaningful product behavior.\n\n## Tugas Kamu\nRefactor starter menjadi satu focused `submitLogin(page, credentials)` helper dan satu recovery scenario yang coherent:\n\n1. Buka `/app/login.html` di dalam test.\n2. Submit `wronguser` dan `wrongpass` lewat focused helper.\n3. Di test, buktikan alert berisi `Invalid username or password` dan URL tetap `/app/login.html`.\n4. Submit `testuser` dan `password123` lewat helper yang sama.\n5. Di test, buktikan URL berubah menjadi `/app/dashboard.html` dan heading berisi `Welcome, testuser!`.\n6. Jangan gunakan generic method `fillField` atau `clickButton`, `.first()`, maupun fixed wait.\n\nHelper memiliki repeated form mechanics. Test tetap memiliki user journey dan evidence-nya. Nama variable serta organisasi code lainnya bebas.\n"
+                "en": "# Refactor Login Without Hiding the Evidence\n\nThe starter was generated with a generic `UiActions` wrapper. Methods such as `fillField` and `clickButton` only rename Playwright operations; they do not represent a meaningful product behavior.\n\n## Your Task\nRefactor the starter into one focused `submitLogin(page, credentials)` helper and one coherent recovery scenario:\n\n1. Open `/app/login.html` in the test.\n2. Submit `wronguser` and `wrongpass` through the focused helper.\n3. In the test, prove the alert says `Invalid username or password` and the URL remains `/app/login.html`.\n4. Submit `testuser` and `password123` through the same helper.\n5. In the test, prove the URL becomes `/app/dashboard.html` and the heading says `Welcome, testuser!`.\n6. Use label and role locators. Do not use the generic `fillField` or `clickButton` methods, positional or structural locators, forced actions, fixed waits, direct DOM access, or swallowed errors.\n\nThe helper owns repeated form mechanics. The test owns the user journey and its evidence. The exact variable names and code organization are otherwise your choice.\n",
+                "id": "# Refactor Login tanpa Menyembunyikan Evidence\n\nStarter dibuat dengan generic `UiActions` wrapper. Method seperti `fillField` dan `clickButton` cuma mengganti nama Playwright operation; keduanya nggak merepresentasikan meaningful product behavior.\n\n## Tugas Kamu\nRefactor starter menjadi satu focused `submitLogin(page, credentials)` helper dan satu recovery scenario yang coherent:\n\n1. Buka `/app/login.html` di dalam test.\n2. Submit `wronguser` dan `wrongpass` lewat focused helper.\n3. Di test, buktikan alert berisi `Invalid username or password` dan URL tetap `/app/login.html`.\n4. Submit `testuser` dan `password123` lewat helper yang sama.\n5. Di test, buktikan URL berubah menjadi `/app/dashboard.html` dan heading berisi `Welcome, testuser!`.\n6. Gunakan label dan role locator. Jangan gunakan generic method `fillField` atau `clickButton`, positional atau structural locator, forced action, fixed wait, direct DOM access, maupun swallowed error.\n\nHelper memiliki repeated form mechanics. Test tetap memiliki user journey dan evidence-nya. Nama variable serta organisasi code lainnya bebas.\n"
             },
             "hints": {
                 "en": [
@@ -33,21 +33,129 @@
                 ]
             },
             "files": {
-                "/tests/login.spec.ts": "import { test, expect } from '@playwright/test';\n\nclass UiActions {\n  constructor(page) {\n    this.page = page;\n  }\n\n  async fillField(label, value) {\n    await this.page.getByLabel(label).fill(value);\n  }\n\n  async clickButton(name) {\n    await this.page.getByRole('button', { name }).click();\n  }\n}\n\ntest('customer can recover after an invalid login', async ({ page }) => {\n  const ui = new UiActions(page);\n  await page.goto('/app/login.html');\n\n  // Replace the generic UI calls with one focused submitLogin helper.\n  await ui.fillField('Username', 'wronguser');\n  await ui.fillField('Password', 'wrongpass');\n  await ui.clickButton('Sign In');\n\n  // Prove the rejected result and unchanged URL here.\n\n  // Reuse the focused helper with the valid credentials.\n\n  // Prove the final URL and welcome heading here.\n});",
+                "/tests/login.spec.ts": "import { test, expect } from '@playwright/test';\n\nclass UiActions {\n  constructor(page) {\n    this.page = page;\n  }\n\n  async fillField(label, value) {\n    await this.page.getByLabel(label).fill(value);\n  }\n\n  async clickButton(name) {\n    await this.page.getByRole('button', { name }).click();\n  }\n}\n\ntest('login-recovery', async ({ page }) => {\n  const ui = new UiActions(page);\n  await page.goto('/app/login.html');\n\n  // TODO 1\n  await ui.fillField('Username', 'wronguser');\n  await ui.fillField('Password', 'wrongpass');\n  await ui.clickButton('Sign In');\n\n  // TODO 2\n\n  // TODO 3\n\n  // TODO 4\n});",
                 "/app/login.html": "<div class='min-h-screen flex items-center justify-center p-4'>\n  <div class='card max-w-md w-full p-8 animate-in'>\n    <h1 class='text-2xl font-bold mb-6'>Sign In</h1>\n    <form id='login-form' class='flex flex-col gap-4' autocomplete='off'>\n      <div>\n        <label for='username' class='text-sm font-medium text-gray-400'>Username</label>\n        <input id='username' class='input mt-1' placeholder='Enter username' autocomplete='off'>\n      </div>\n      <div>\n        <label for='password' class='text-sm font-medium text-gray-400'>Password</label>\n        <input id='password' type='password' class='input mt-1' placeholder='Enter password' autocomplete='new-password'>\n      </div>\n      <div id='error-msg' class='error-text' role='alert' hidden>Invalid username or password</div>\n      <button type='submit' class='button button-primary mt-4'>Sign In</button>\n    </form>\n  </div>\n</div>\n<script>\n  (function() {\n    const form = document.getElementById('login-form');\n    const userIn = document.getElementById('username');\n    const passIn = document.getElementById('password');\n    const errorMessage = document.getElementById('error-msg');\n    form.onsubmit = (e) => {\n      e.preventDefault();\n      if (userIn.value === 'testuser' && passIn.value === 'password123') {\n        errorMessage.hidden = true;\n        errorMessage.style.display = 'none';\n        window.__APP_STATE__ = window.__APP_STATE__ || {};\n        window.__APP_STATE__.session = { username: 'testuser' };\n        setTimeout(() => window.__VFS_NAVIGATE__('/app/dashboard.html'), 0);\n      } else {\n        errorMessage.hidden = false;\n        errorMessage.style.display = 'block';\n      }\n    };\n  })();\n</script>",
                 "/app/dashboard.html": "<div class='min-h-screen p-8 animate-in'>\n  <div class='flex justify-between items-center mb-8'>\n    <h1 class='text-2xl font-bold'>Dashboard</h1>\n    <button id='logout-btn' class='button button-ghost'>Logout</button>\n  </div>\n  <div class='card p-6 glass'>\n    <h2 id='welcome-message' class='text-xl font-medium'>Loading...</h2>\n    <p class='text-gray-400 mt-2'>Welcome back to your TestApp workspace.</p>\n  </div>\n</div>\n<script>\n  (function() {\n    const session = (window.__APP_STATE__ && window.__APP_STATE__.session) || {};\n    if (!session.username) {\n      window.__VFS_NAVIGATE__('/app/login.html');\n    } else {\n      const el = document.getElementById('welcome-message');\n      if(el) el.textContent = `Welcome, ${session.username}!`;\n    }\n    const logoutBtn = document.getElementById('logout-btn');\n    if (logoutBtn) {\n        logoutBtn.onclick = () => {\n          window.__APP_STATE__ = window.__APP_STATE__ || {};\n          window.__APP_STATE__.session = null;\n          window.__VFS_NAVIGATE__('/app/login.html');\n        };\n    }\n  })();\n</script>"
             },
             "editableFiles": ["/tests/login.spec.ts"],
-            "starterCode": "import { test, expect } from '@playwright/test';\n\nclass UiActions {\n  constructor(page) {\n    this.page = page;\n  }\n\n  async fillField(label, value) {\n    await this.page.getByLabel(label).fill(value);\n  }\n\n  async clickButton(name) {\n    await this.page.getByRole('button', { name }).click();\n  }\n}\n\ntest('customer can recover after an invalid login', async ({ page }) => {\n  const ui = new UiActions(page);\n  await page.goto('/app/login.html');\n\n  // Replace the generic UI calls with one focused submitLogin helper.\n  await ui.fillField('Username', 'wronguser');\n  await ui.fillField('Password', 'wrongpass');\n  await ui.clickButton('Sign In');\n\n  // Prove the rejected result and unchanged URL here.\n\n  // Reuse the focused helper with the valid credentials.\n\n  // Prove the final URL and welcome heading here.\n});",
+            "starterCode": "import { test, expect } from '@playwright/test';\n\nclass UiActions {\n  constructor(page) {\n    this.page = page;\n  }\n\n  async fillField(label, value) {\n    await this.page.getByLabel(label).fill(value);\n  }\n\n  async clickButton(name) {\n    await this.page.getByRole('button', { name }).click();\n  }\n}\n\ntest('login-recovery', async ({ page }) => {\n  const ui = new UiActions(page);\n  await page.goto('/app/login.html');\n\n  // TODO 1\n  await ui.fillField('Username', 'wronguser');\n  await ui.fillField('Password', 'wrongpass');\n  await ui.clickButton('Sign In');\n\n  // TODO 2\n\n  // TODO 3\n\n  // TODO 4\n});",
             "testCases": [],
-            "solution": "import { test, expect } from '@playwright/test';\n\nasync function submitLogin(page, credentials) {\n  await page.getByLabel('Username').fill(credentials.username);\n  await page.getByLabel('Password').fill(credentials.password);\n  await page.getByRole('button', { name: 'Sign In' }).click();\n}\n\ntest('customer can recover after an invalid login', async ({ page }) => {\n  await page.goto('/app/login.html');\n\n  await submitLogin(page, { username: 'wronguser', password: 'wrongpass' });\n  await expect(page.getByRole('alert')).toHaveText('Invalid username or password');\n  await expect(page).toHaveURL('/app/login.html');\n\n  await submitLogin(page, { username: 'testuser', password: 'password123' });\n  await expect(page).toHaveURL('/app/dashboard.html');\n  await expect(page.getByRole('heading', { name: /Welcome/ })).toHaveText('Welcome, testuser!');\n});",
+            "solution": "import { test, expect } from '@playwright/test';\n\nasync function submitLogin(page, credentials) {\n  await page.getByLabel('Username').fill(credentials.username);\n  await page.getByLabel('Password').fill(credentials.password);\n  await page.getByRole('button', { name: 'Sign In' }).click();\n}\n\ntest('login-recovery', async ({ page }) => {\n  await page.goto('/app/login.html');\n\n  await submitLogin(page, { username: 'wronguser', password: 'wrongpass' });\n  await expect(page.getByRole('alert')).toHaveText('Invalid username or password');\n  await expect(page).toHaveURL('/app/login.html');\n\n  await submitLogin(page, { username: 'testuser', password: 'password123' });\n  await expect(page).toHaveURL('/app/dashboard.html');\n  await expect(page.getByRole('heading', { name: 'Welcome, testuser!', exact: true })).toHaveText('Welcome, testuser!');\n});",
             "validation": {
                 "requiredAssertions": ["toHaveText", "toHaveURL"],
                 "requiredMethods": ["goto", "getByLabel", "getByRole", "fill", "click"],
-                "forbiddenMethods": ["fillField", "clickButton", "first", "waitForTimeout"],
+                "requiredAsyncFunctions": ["submitLogin"],
+                "requiredAwaitedFunctionCallCounts": [
+                    { "function": "submitLogin", "minimum": 2 }
+                ],
+                "requiredFunctionMethodEvidence": [
+                    {
+                        "function": "submitLogin",
+                        "methods": ["getByLabel", "getByRole", "fill", "click"],
+                        "exclusiveMethods": ["getByLabel", "fill", "click"]
+                    }
+                ],
+                "forbiddenMethods": [
+                    "fillField",
+                    "clickButton",
+                    "first",
+                    "nth",
+                    "waitForTimeout",
+                    "textContent",
+                    "isVisible",
+                    "toBeTruthy",
+                    "evaluate"
+                ],
                 "policy": {
-                    "requireExecutedEvidence": true
+                    "requireExecutedEvidence": true,
+                    "forbidStructuralLocators": true,
+                    "forbidForcedActions": true,
+                    "forbidDirectDomAccess": true,
+                    "forbidSwallowedErrors": true
                 },
+                "requiredEvidenceSequence": [
+                    {
+                        "type": "method",
+                        "method": "goto",
+                        "target": "page",
+                        "arguments": ["/app/login.html"]
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["wronguser"],
+                        "locator": { "method": "getByLabel", "value": "Username" }
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["wrongpass"],
+                        "locator": { "method": "getByLabel", "value": "Password" }
+                    },
+                    {
+                        "type": "method",
+                        "method": "click",
+                        "target": "locator",
+                        "locator": {
+                            "method": "getByRole",
+                            "value": "button",
+                            "name": "Sign In"
+                        }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toHaveText",
+                        "arguments": ["Invalid username or password"],
+                        "locator": { "method": "getByRole", "value": "alert" }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toHaveURL",
+                        "arguments": ["/app/login.html"]
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["testuser"],
+                        "locator": { "method": "getByLabel", "value": "Username" }
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["password123"],
+                        "locator": { "method": "getByLabel", "value": "Password" }
+                    },
+                    {
+                        "type": "method",
+                        "method": "click",
+                        "target": "locator",
+                        "locator": {
+                            "method": "getByRole",
+                            "value": "button",
+                            "name": "Sign In"
+                        }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toHaveURL",
+                        "arguments": ["/app/dashboard.html"]
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toHaveText",
+                        "arguments": ["Welcome, testuser!"],
+                        "locator": {
+                            "method": "getByRole",
+                            "value": "heading",
+                            "name": "Welcome, testuser!",
+                            "exact": true
+                        }
+                    }
+                ],
                 "interactionSequence": {
                     "event": "submit",
                     "selector": "#login-form",
@@ -150,6 +258,76 @@
                     "forbidDirectDomAccess": true,
                     "forbidSwallowedErrors": true
                 },
+                "requiredEvidenceSequence": [
+                    {
+                        "type": "method",
+                        "method": "goto",
+                        "target": "page",
+                        "arguments": ["/app/checkout.html"]
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["0"],
+                        "locator": {
+                            "method": "getByLabel",
+                            "value": "Quantity"
+                        }
+                    },
+                    {
+                        "type": "method",
+                        "method": "click",
+                        "target": "locator",
+                        "locator": {
+                            "method": "getByRole",
+                            "value": "button",
+                            "name": "Place order"
+                        }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toHaveText",
+                        "arguments": ["Quantity must be at least 1"],
+                        "locator": { "method": "getByRole", "value": "alert" }
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["2"],
+                        "locator": {
+                            "method": "getByLabel",
+                            "value": "Quantity"
+                        }
+                    },
+                    {
+                        "type": "method",
+                        "method": "click",
+                        "target": "locator",
+                        "locator": {
+                            "method": "getByRole",
+                            "value": "button",
+                            "name": "Place order"
+                        }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toBeHidden",
+                        "locator": { "method": "getByRole", "value": "alert" }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toBeVisible",
+                        "locator": { "method": "getByRole", "value": "status" }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toContainText",
+                        "arguments": ["2 items"],
+                        "locator": { "method": "getByRole", "value": "status" }
+                    }
+                ],
                 "interactionSequence": {
                     "event": "submit",
                     "selector": "#checkout-form",

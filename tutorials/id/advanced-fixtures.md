@@ -79,9 +79,10 @@ export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
 
   workerAccount: [
     async ({}, use, workerInfo) => {
-      const runId = process.env.TEST_RUN_ID ?? `local-${randomUUID()}`;
+      const runNamespace = process.env.TEST_RUN_ID ?? 'local';
+      const workerNonce = randomUUID();
       const account = await createTestAccount({
-        uniqueKey: `${runId}-${workerInfo.project.name}-${workerInfo.workerIndex}`,
+        uniqueKey: `${runNamespace}-${workerInfo.project.name}-${workerInfo.workerIndex}-${workerNonce}`,
       });
 
       try {
@@ -109,7 +110,7 @@ export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
 });
 ```
 
-Worker fixture ini nggak menyimpan password di source code. Fixture meminta account unik dari test-support utility yang memang diberi akses, lalu menghapus account tersebut di dalam `finally`. `workerIndex` hanya unik dalam satu run. Tambahkan CI run ID atau identifier run lain ke `uniqueKey` supaya account dari dua run yang berbeda nggak memakai ID yang sama. Random fallback membantu mencegah collision saat dijalankan secara local.
+Worker fixture ini nggak menyimpan password di source code. Fixture meminta account unik dari test-support utility yang memang diberi akses, lalu menghapus account tersebut di dalam `finally`. `workerIndex` hanya unik dalam satu Playwright runner invocation, sedangkan CI shard atau job lain bisa memakai nama project dan index yang sama. Stable run namespace membuat account tetap bisa dikaitkan dengan run asalnya, sementara generated nonce mencegah collision antar-runner process. Kalau CI menyediakan shard atau job identifier yang eksplisit, identifier tersebut juga bisa digunakan untuk tujuan yang sama.
 
 Test-scoped fixture membuat browser context dan page baru untuk setiap test. Block `finally` tetap menutup context ketika page gagal dibuat atau test fail. Account worker hanya aman dipakai beberapa test kalau semua test tersebut nggak mengubah profile, permission, saved address, preference, atau account-level state lainnya. Kalau state itu ikut diuji, gunakan account terpisah untuk setiap test.
 
@@ -174,16 +175,16 @@ Tetap gunakan test scope kalau belum jelas apakah resource aman dipakai bersama.
 
 ## Kalau gagal, mulai cek dari mana?
 
-| Yang terjadi                                         | Kemungkinan penyebab                                  | Cek dulu                                                   |
-| ---------------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------- |
-| Test hanya fail ketika memakai beberapa worker       | Beberapa worker mengubah account yang sama di server  | Run ID, generated ID, account setiap worker, `workerIndex` |
-| Test menjalankan setup yang nggak pernah diminta     | Automatic fixture diterapkan terlalu luas             | Fixture `{ auto: true }` dan test object yang di-import    |
-| Worker restart meninggalkan record                   | Cleanup nggak berjalan atau ID resource nggak unik    | Block `finally`, error saat setup, dan resource ID         |
-| Fixture timeout terlihat nggak berkaitan dengan test | Fixture lambat memakai timeout sendiri                | Durasi fixture dan fixture timeout yang digunakan          |
-| Mengubah satu option membuat banyak worker baru      | Worker fixture bergantung pada worker-scoped option   | Scope option dan parameter worker fixture                  |
-| Nggak ada yang bisa menjelaskan urutan setup         | Hubungan antar-fixture terlalu dalam atau tersembunyi | Gambar urutan dependency, setup, dan teardown              |
+| Yang terjadi                                         | Kemungkinan penyebab                                  | Cek dulu                                                |
+| ---------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------- |
+| Test hanya fail ketika memakai beberapa worker       | Beberapa worker mengubah account yang sama di server  | Run namespace, shard/job identity, nonce, `workerIndex` |
+| Test menjalankan setup yang nggak pernah diminta     | Automatic fixture diterapkan terlalu luas             | Fixture `{ auto: true }` dan test object yang di-import |
+| Worker restart meninggalkan record                   | Cleanup nggak berjalan atau ID resource nggak unik    | Block `finally`, error saat setup, dan resource ID      |
+| Fixture timeout terlihat nggak berkaitan dengan test | Fixture lambat memakai timeout sendiri                | Durasi fixture dan fixture timeout yang digunakan       |
+| Mengubah satu option membuat banyak worker baru      | Worker fixture bergantung pada worker-scoped option   | Scope option dan parameter worker fixture               |
+| Nggak ada yang bisa menjelaskan urutan setup         | Hubungan antar-fixture terlalu dalam atau tersembunyi | Gambar urutan dependency, setup, dan teardown           |
 
-Worker process bisa restart setelah test fail. Gunakan CI run ID atau identifier run lain yang stabil, lalu gabungkan dengan nama project dan `workerIndex`. Cleanup dan setup berikutnya juga perlu aman ketika run sebelumnya terputus di tengah jalan.
+Worker process bisa restart setelah test fail. Gunakan run namespace yang stabil kalau tersedia, gabungkan dengan nama project dan `workerIndex`, lalu tambahkan nonce atau shard/job identity supaya runner process yang berbeda nggak mengalami collision. Cleanup dan setup berikutnya juga perlu aman ketika run sebelumnya terputus di tengah jalan.
 
 Jangan langsung memaksa seluruh suite memakai satu worker untuk menghilangkan race. Cari dulu resource apa yang dipakai bersama dan test mana yang mengubahnya. Satu worker hanya menyembunyikan masalah tersebut sekaligus membuat feedback dari parallel run menjadi lebih lambat.
 

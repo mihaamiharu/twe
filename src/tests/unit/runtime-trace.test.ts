@@ -3,6 +3,7 @@ import { createExpect } from '@/core/executor/expect-matchers';
 import {
   createRuntimeExecutionTrace,
   createTracedPlaywrightPage,
+  recordRuntimeAssertion,
 } from '@/core/executor/runtime-trace';
 import { MockedPlaywrightPage } from '@/core/executor/playwright-shim';
 
@@ -19,6 +20,11 @@ describe('runtime execution trace', () => {
       'getByRole',
       'click',
     ]);
+    expect(trace.methodCalls.at(-1)?.locator).toEqual({
+      method: 'getByRole',
+      value: 'button',
+      name: 'Save',
+    });
     expect(trace.methodCalls.every((call) => call.succeeded)).toBe(true);
   });
 
@@ -29,13 +35,85 @@ describe('runtime execution trace', () => {
     const page = createTracedPlaywrightPage(rawPage, trace);
     const { expect: tracedExpect } = createExpect({
       timeout: 20,
-      onAssertion: (assertion) => trace.assertions.push(assertion),
+      onAssertion: (assertion) => recordRuntimeAssertion(trace, assertion),
     });
 
-    await tracedExpect(page.getByText('Ready')).toHaveText('Ready');
+    await tracedExpect(
+      page.getByText('Ready', { exact: true }),
+    ).toHaveText('Ready');
 
     expect(trace.methodCalls.map((call) => call.method)).toEqual(['getByText']);
     expect(trace.assertions[0]?.passed).toBe(true);
+    expect(trace.assertions[0]?.arguments).toEqual(['Ready']);
+    expect(trace.assertions[0]?.locator).toEqual({
+      method: 'getByText',
+      value: 'Ready',
+      exact: true,
+    });
+    expect(trace.events?.map((event) => event.type)).toEqual([
+      'method',
+      'assertion',
+    ]);
+  });
+
+  it('records primitive assertion arguments and soft assertion mode', async () => {
+    document.body.innerHTML = '<ul><li>One</li><li>Two</li></ul>';
+    const rawPage = new MockedPlaywrightPage(document);
+    const trace = createRuntimeExecutionTrace();
+    const page = createTracedPlaywrightPage(rawPage, trace);
+    const { expect: tracedExpect } = createExpect({
+      timeout: 20,
+      onAssertion: (assertion) => recordRuntimeAssertion(trace, assertion),
+    });
+
+    await tracedExpect.soft(page.getByRole('listitem')).toHaveCount(2);
+
+    expect(trace.assertions[0]?.arguments).toEqual([2]);
+    expect(trace.assertions[0]?.soft).toBe(true);
+  });
+
+  it('preserves composed filters as scope for nested locators', async () => {
+    document.body.innerHTML = `
+      <article role="article">
+        <h2>Widget Pro</h2>
+        <span>In Stock</span>
+        <button>Add to Cart</button>
+      </article>
+    `;
+    const trace = createRuntimeExecutionTrace();
+    const rawPage = new MockedPlaywrightPage(document, { timeout: 20 });
+    const page = createTracedPlaywrightPage(rawPage, trace);
+    const exactHeading = page.getByRole('heading', {
+      name: 'Widget Pro',
+      exact: true,
+    });
+    const card = page
+      .getByRole('article')
+      .filter({ has: exactHeading })
+      .filter({ hasText: 'In Stock' });
+
+    await card.getByRole('button', { name: 'Add to Cart' }).click();
+
+    expect(trace.methodCalls.at(-1)?.locator).toEqual({
+      method: 'getByRole',
+      value: 'button',
+      name: 'Add to Cart',
+      scope: {
+        method: 'getByRole',
+        value: 'article',
+        filters: [
+          {
+            has: {
+              method: 'getByRole',
+              value: 'heading',
+              name: 'Widget Pro',
+              exact: true,
+            },
+          },
+          { hasText: 'In Stock' },
+        ],
+      },
+    });
   });
 
   it('records bound and bracket evaluate calls and failed actions', async () => {

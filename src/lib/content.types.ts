@@ -161,6 +161,44 @@ export interface InteractionSequenceDefinition {
   steps: InteractionSequenceStep[];
 }
 
+export interface LocatorLeafEvidenceDefinition {
+  method: string;
+  value?: string;
+  name?: string;
+  exact?: boolean;
+}
+
+export interface LocatorFilterEvidenceDefinition {
+  hasText?: string;
+  has?: LocatorLeafEvidenceDefinition;
+}
+
+export interface LocatorTargetEvidenceDefinition extends LocatorLeafEvidenceDefinition {
+  filters?: LocatorFilterEvidenceDefinition[];
+}
+
+export interface LocatorEvidenceDefinition extends LocatorTargetEvidenceDefinition {
+  scope?: LocatorTargetEvidenceDefinition;
+}
+
+export type EvidenceArgument = string | number | boolean;
+
+export type RequiredEvidenceSequenceStep =
+  | {
+      type: 'method';
+      method: string;
+      target?: 'page' | 'locator';
+      arguments?: EvidenceArgument[];
+      locator?: LocatorEvidenceDefinition;
+    }
+  | {
+      type: 'assertion';
+      matcher: string;
+      arguments?: EvidenceArgument[];
+      soft?: boolean;
+      locator?: LocatorEvidenceDefinition;
+    };
+
 export interface ChallengeValidationPolicy {
   /** Require required methods and assertions to be observed at runtime. */
   requireExecutedEvidence?: boolean;
@@ -174,12 +212,86 @@ export interface ChallengeValidationPolicy {
   forbidSwallowedErrors?: boolean;
 }
 
+export type TypeScriptEvidenceDefinition =
+  | {
+      type: 'inferred-variable';
+      name: string;
+    }
+  | {
+      type: 'variable-type';
+      name: string;
+      annotation: string;
+    }
+  | {
+      type: 'interface-property';
+      interface: string;
+      property: string;
+      annotation: string;
+      optional?: boolean;
+    }
+  | {
+      type: 'function-parameter';
+      function: string;
+      parameter: string;
+      annotation: string;
+      optional?: boolean;
+    }
+  | {
+      type: 'function-return';
+      function: string;
+      annotation: string;
+    }
+  | {
+      type: 'operator';
+      operator: 'nullish-coalescing' | 'strict-undefined-check';
+    };
+
+export interface AwaitedFunctionCallCountDefinition {
+  function: string;
+  minimum: number;
+}
+
+export interface FunctionMethodEvidenceDefinition {
+  function: string;
+  methods: string[];
+  /** When listed, these methods may only be called inside the named function. */
+  exclusiveMethods?: string[];
+}
+
 export interface ChallengeValidationDefinition {
   requiredAssertions?: string[];
   requiredMethods?: string[];
+  /** Require named free-function calls in learner source. */
+  requiredFunctionCalls?: string[];
+  /** Require named member calls such as Array.prototype.filter. */
+  requiredMemberCalls?: string[];
+  /** Require named functions to be declared with async. */
+  requiredAsyncFunctions?: string[];
+  /** Require named free-function calls to be directly awaited. */
+  requiredAwaitedFunctionCalls?: string[];
+  /** Require a named free function to be directly awaited a minimum number of times. */
+  requiredAwaitedFunctionCallCounts?: AwaitedFunctionCallCountDefinition[];
+  /** Require Playwright methods to be owned by a named helper function. */
+  requiredFunctionMethodEvidence?: FunctionMethodEvidenceDefinition[];
+  /** Require named member calls such as Promise.all to be directly awaited. */
+  requiredAwaitedMemberCalls?: string[];
+  /** Require these free-function calls inside a directly awaited Promise.all. */
+  requiredPromiseAllFunctionCalls?: string[];
+  /** Require these learner bindings to be declared with const. */
+  requiredConstBindings?: string[];
+  /** Require TypeScript-specific source structure without claiming semantic checking. */
+  requiredTypeScriptEvidence?: TypeScriptEvidenceDefinition[];
+  /** Require at least one conditional chain with this many branches. */
+  minimumConditionalBranches?: number;
+  /** Require at least this many try/catch structures. */
+  minimumTryCatchBlocks?: number;
   forbiddenMethods?: string[];
   policy?: ChallengeValidationPolicy;
   interactionSequence?: InteractionSequenceDefinition;
+  /** Require successful runtime evidence without imposing an arbitrary order. */
+  requiredEvidence?: RequiredEvidenceSequenceStep[];
+  /** Require successful runtime evidence to occur in this order. */
+  requiredEvidenceSequence?: RequiredEvidenceSequenceStep[];
 }
 
 /**

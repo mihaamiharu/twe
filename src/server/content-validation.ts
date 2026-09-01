@@ -8,8 +8,12 @@ import type {
   InteractionSequenceDefinition,
   LocalizedArray,
   LocalizedString,
+  LocatorEvidenceDefinition,
+  LocatorTargetEvidenceDefinition,
+  RequiredEvidenceSequenceStep,
   SerializableExpectedStateRule,
   TestCaseDefinition,
+  TypeScriptEvidenceDefinition,
   TutorialRegistry,
   TutorialRegistryEntry,
 } from '@/lib/content.types';
@@ -95,12 +99,161 @@ const ChallengeValidationPolicySchema = z
   })
   .strict();
 
+const LocatorLeafEvidenceSchema = z
+  .object({
+    method: z.string().min(1),
+    value: z.string().min(1).optional(),
+    name: z.string().min(1).optional(),
+    exact: z.boolean().optional(),
+  })
+  .strict();
+
+const LocatorFilterEvidenceSchema = z
+  .object({
+    hasText: z.string().min(1).optional(),
+    has: LocatorLeafEvidenceSchema.optional(),
+  })
+  .strict();
+
+const LocatorTargetEvidenceSchema = LocatorLeafEvidenceSchema.extend({
+  filters: z.array(LocatorFilterEvidenceSchema).min(1).optional(),
+}).strict();
+
+const LocatorEvidenceSchema = LocatorTargetEvidenceSchema.extend({
+  scope: LocatorTargetEvidenceSchema.optional(),
+}).strict();
+
+const EvidenceArgumentSchema = z.union([z.string(), z.number(), z.boolean()]);
+
+const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
+  z
+    .object({
+      type: z.literal('method'),
+      method: z.string().min(1),
+      target: z.enum(['page', 'locator']).optional(),
+      arguments: z.array(EvidenceArgumentSchema).optional(),
+      locator: LocatorEvidenceSchema.optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('assertion'),
+      matcher: z.string().min(1),
+      arguments: z.array(EvidenceArgumentSchema).optional(),
+      soft: z.boolean().optional(),
+      locator: LocatorEvidenceSchema.optional(),
+    })
+    .strict(),
+]);
+
+const TypeScriptEvidenceSchema = z.discriminatedUnion('type', [
+  z
+    .object({
+      type: z.literal('inferred-variable'),
+      name: z.string().min(1),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('variable-type'),
+      name: z.string().min(1),
+      annotation: z.string().min(1),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('interface-property'),
+      interface: z.string().min(1),
+      property: z.string().min(1),
+      annotation: z.string().min(1),
+      optional: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('function-parameter'),
+      function: z.string().min(1),
+      parameter: z.string().min(1),
+      annotation: z.string().min(1),
+      optional: z.boolean().optional(),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('function-return'),
+      function: z.string().min(1),
+      annotation: z.string().min(1),
+    })
+    .strict(),
+  z
+    .object({
+      type: z.literal('operator'),
+      operator: z.enum(['nullish-coalescing', 'strict-undefined-check']),
+    })
+    .strict(),
+]);
+
 const ChallengeValidationSchema = z
   .object({
     requiredAssertions: z.array(z.string().min(1)).optional(),
     requiredMethods: z.array(z.string().min(1)).optional(),
+    requiredFunctionCalls: z.array(z.string().min(1)).optional(),
+    requiredMemberCalls: z.array(z.string().min(1)).optional(),
+    requiredAsyncFunctions: z.array(z.string().min(1)).optional(),
+    requiredAwaitedFunctionCalls: z.array(z.string().min(1)).optional(),
+    requiredAwaitedFunctionCallCounts: z
+      .array(
+        z
+          .object({
+            function: z.string().min(1),
+            minimum: z.number().int().positive(),
+          })
+          .strict(),
+      )
+      .min(1)
+      .optional(),
+    requiredFunctionMethodEvidence: z
+      .array(
+        z
+          .object({
+            function: z.string().min(1),
+            methods: z.array(z.string().min(1)).min(1),
+            exclusiveMethods: z.array(z.string().min(1)).min(1).optional(),
+          })
+          .strict()
+          .superRefine((evidence, context) => {
+            for (const method of evidence.exclusiveMethods ?? []) {
+              if (!evidence.methods.includes(method)) {
+                context.addIssue({
+                  code: 'custom',
+                  message: 'exclusiveMethods must also appear in methods',
+                  path: ['exclusiveMethods'],
+                });
+              }
+            }
+          }),
+      )
+      .min(1)
+      .optional(),
+    requiredAwaitedMemberCalls: z.array(z.string().min(1)).optional(),
+    requiredPromiseAllFunctionCalls: z.array(z.string().min(1)).optional(),
+    requiredConstBindings: z.array(z.string().min(1)).optional(),
+    requiredTypeScriptEvidence: z
+      .array(TypeScriptEvidenceSchema)
+      .min(1)
+      .optional(),
+    minimumConditionalBranches: z.number().int().positive().optional(),
+    minimumTryCatchBlocks: z.number().int().positive().optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
     policy: ChallengeValidationPolicySchema.optional(),
+    requiredEvidence: z
+      .array(RequiredEvidenceSequenceStepSchema)
+      .min(1)
+      .optional(),
+    requiredEvidenceSequence: z
+      .array(RequiredEvidenceSequenceStepSchema)
+      .min(1)
+      .optional(),
     interactionSequence: z
       .object({
         event: z.literal('submit'),
@@ -254,6 +407,114 @@ function normalizeInteractionSequence(
   };
 }
 
+function normalizeRequiredEvidenceSequence(
+  value: z.infer<typeof ChallengeValidationSchema>['requiredEvidenceSequence'],
+): RequiredEvidenceSequenceStep[] | undefined {
+  if (value === undefined) return undefined;
+
+  return value.map((step) => {
+    const locator =
+      step.locator === undefined
+        ? undefined
+        : normalizeLocatorEvidence(step.locator);
+
+    if (step.type === 'assertion') {
+      return {
+        type: step.type,
+        matcher: step.matcher,
+        ...omitUndefined({
+          arguments: step.arguments,
+          soft: step.soft,
+          locator,
+        }),
+      };
+    }
+
+    return {
+      type: step.type,
+      method: step.method,
+      ...omitUndefined({
+        target: step.target,
+        arguments: step.arguments,
+        locator,
+      }),
+    };
+  });
+}
+
+function normalizeLocatorTargetEvidence(
+  value: z.infer<typeof LocatorTargetEvidenceSchema>,
+): LocatorTargetEvidenceDefinition {
+  return {
+    method: value.method,
+    ...omitUndefined({
+      value: value.value,
+      name: value.name,
+      exact: value.exact,
+      filters: value.filters?.map((filter) => ({
+        ...omitUndefined({
+          hasText: filter.hasText,
+          has:
+            filter.has === undefined
+              ? undefined
+              : {
+                  method: filter.has.method,
+                  ...omitUndefined({
+                    value: filter.has.value,
+                    name: filter.has.name,
+                    exact: filter.has.exact,
+                  }),
+                },
+        }),
+      })),
+    }),
+  };
+}
+
+function normalizeLocatorEvidence(
+  value: z.infer<typeof LocatorEvidenceSchema>,
+): LocatorEvidenceDefinition {
+  return {
+    ...normalizeLocatorTargetEvidence(value),
+    ...omitUndefined({
+      scope:
+        value.scope === undefined
+          ? undefined
+          : normalizeLocatorTargetEvidence(value.scope),
+    }),
+  };
+}
+
+function normalizeTypeScriptEvidence(
+  value: z.infer<
+    typeof ChallengeValidationSchema
+  >['requiredTypeScriptEvidence'],
+): TypeScriptEvidenceDefinition[] | undefined {
+  if (value === undefined) return undefined;
+
+  return value.map((evidence) => {
+    if (evidence.type === 'interface-property') {
+      return {
+        type: evidence.type,
+        interface: evidence.interface,
+        property: evidence.property,
+        annotation: evidence.annotation,
+        ...omitUndefined({ optional: evidence.optional }),
+      };
+    }
+    if (evidence.type === 'function-parameter') {
+      return {
+        type: evidence.type,
+        function: evidence.function,
+        parameter: evidence.parameter,
+        annotation: evidence.annotation,
+        ...omitUndefined({ optional: evidence.optional }),
+      };
+    }
+    return evidence;
+  });
+}
+
 function normalizeChallengeDefinition(
   value: z.infer<typeof ChallengeDefinitionSchema>,
 ): ChallengeDefinition {
@@ -291,7 +552,41 @@ function normalizeChallengeDefinition(
               ...omitUndefined({
                 requiredAssertions: value.validation.requiredAssertions,
                 requiredMethods: value.validation.requiredMethods,
+                requiredFunctionCalls: value.validation.requiredFunctionCalls,
+                requiredMemberCalls: value.validation.requiredMemberCalls,
+                requiredAsyncFunctions: value.validation.requiredAsyncFunctions,
+                requiredAwaitedFunctionCalls:
+                  value.validation.requiredAwaitedFunctionCalls,
+                requiredAwaitedFunctionCallCounts:
+                  value.validation.requiredAwaitedFunctionCallCounts,
+                requiredFunctionMethodEvidence:
+                  value.validation.requiredFunctionMethodEvidence?.map(
+                    (evidence) => ({
+                      function: evidence.function,
+                      methods: evidence.methods,
+                      ...omitUndefined({
+                        exclusiveMethods: evidence.exclusiveMethods,
+                      }),
+                    }),
+                  ),
+                requiredAwaitedMemberCalls:
+                  value.validation.requiredAwaitedMemberCalls,
+                requiredPromiseAllFunctionCalls:
+                  value.validation.requiredPromiseAllFunctionCalls,
+                requiredConstBindings: value.validation.requiredConstBindings,
+                requiredTypeScriptEvidence: normalizeTypeScriptEvidence(
+                  value.validation.requiredTypeScriptEvidence,
+                ),
+                minimumConditionalBranches:
+                  value.validation.minimumConditionalBranches,
+                minimumTryCatchBlocks: value.validation.minimumTryCatchBlocks,
                 forbiddenMethods: value.validation.forbiddenMethods,
+                requiredEvidence: normalizeRequiredEvidenceSequence(
+                  value.validation.requiredEvidence,
+                ),
+                requiredEvidenceSequence: normalizeRequiredEvidenceSequence(
+                  value.validation.requiredEvidenceSequence,
+                ),
                 policy:
                   value.validation.policy === undefined
                     ? undefined

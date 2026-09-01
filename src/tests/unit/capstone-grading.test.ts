@@ -65,6 +65,70 @@ const capstoneValidation: ChallengeValidationDefinition = {
     forbidDirectDomAccess: true,
     forbidSwallowedErrors: true,
   },
+  requiredEvidenceSequence: [
+    {
+      type: 'method',
+      method: 'goto',
+      target: 'page',
+      arguments: ['/app/checkout.html'],
+    },
+    {
+      type: 'method',
+      method: 'fill',
+      target: 'locator',
+      arguments: ['0'],
+      locator: { method: 'getByLabel', value: 'Quantity' },
+    },
+    {
+      type: 'method',
+      method: 'click',
+      target: 'locator',
+      locator: {
+        method: 'getByRole',
+        value: 'button',
+        name: 'Place order',
+      },
+    },
+    {
+      type: 'assertion',
+      matcher: 'toHaveText',
+      arguments: ['Quantity must be at least 1'],
+      locator: { method: 'getByRole', value: 'alert' },
+    },
+    {
+      type: 'method',
+      method: 'fill',
+      target: 'locator',
+      arguments: ['2'],
+      locator: { method: 'getByLabel', value: 'Quantity' },
+    },
+    {
+      type: 'method',
+      method: 'click',
+      target: 'locator',
+      locator: {
+        method: 'getByRole',
+        value: 'button',
+        name: 'Place order',
+      },
+    },
+    {
+      type: 'assertion',
+      matcher: 'toBeHidden',
+      locator: { method: 'getByRole', value: 'alert' },
+    },
+    {
+      type: 'assertion',
+      matcher: 'toBeVisible',
+      locator: { method: 'getByRole', value: 'status' },
+    },
+    {
+      type: 'assertion',
+      matcher: 'toContainText',
+      arguments: ['2 items'],
+      locator: { method: 'getByRole', value: 'status' },
+    },
+  ],
   interactionSequence,
 };
 
@@ -117,6 +181,35 @@ describe('checkout capstone grading', () => {
 
     expect(result.status).toBe('PASSED');
     expect(decision).toEqual({ passed: true });
+  });
+
+  it('rejects correct interactions when the learner omits the invalid-state assertion', async () => {
+    const { result, decision } = await runCode(
+      `
+        await page.goto('/app/checkout.html');
+        const quantity = page.getByLabel('Quantity');
+        const placeOrder = page.getByRole('button', { name: 'Place order' });
+        const alert = page.getByRole('alert');
+
+        await quantity.fill('0');
+        await placeOrder.click();
+
+        await quantity.fill('2');
+        await placeOrder.click();
+        await expect(alert).toBeHidden();
+
+        const confirmation = page.getByRole('status');
+        await expect(confirmation).toHaveText('Order confirmed: 2 items');
+        await expect(confirmation).toBeVisible();
+        await expect(confirmation).toContainText('2 items');
+      `,
+      { includeExpectedState: true, includeInteractionSequence: true },
+    );
+
+    expect(result.status).toBe('PASSED');
+    expect(decision.passed).toBe(false);
+    expect(decision.failure?.kind).toBe('missing-required-evidence');
+    expect(decision.failure?.methods).toContain('toHaveText');
   });
 
   it('rejects actual structural locator use even when semantic locators also run', async () => {

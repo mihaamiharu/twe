@@ -1,44 +1,24 @@
-import { expect, test, describe, mock } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 
-// Mock esbuild-wasm BEFORE importing the transpiler
-const mockInitialize = mock(() => Promise.resolve());
-void mock.module('esbuild-wasm', () => ({
-    initialize: mockInitialize,
-    transform: mock((code: string) => Promise.resolve({ code: code.replace('const', 'var') })),
-}));
-
-import { transpileTypeScript, initEsbuild } from '@/core/executor/typescript-transpiler';
+import { transpileTypeScript } from '@/core/executor/typescript-transpiler';
 
 describe('TypeScript Transpiler', () => {
-    test('should initialize and transpile', async () => {
-        // Force window to be defined for initEsbuild
-        const originalWindow = globalThis.window;
-        Reflect.set(globalThis, 'window', {});
-        
+    test('transpiles with the real Node transformer without browser initialization', async () => {
         const code = 'const x: number = 1;';
         const result = await transpileTypeScript(code);
-        
-        expect(result).toContain('var x');
-        
-        // Restore
-        Reflect.set(globalThis, 'window', originalWindow);
+
+        expect(result).toContain('const x = 1');
+        expect(result).not.toContain(': number');
     });
 
-    test('should handle init errors', async () => {
-        mockInitialize.mockImplementationOnce(() => Promise.reject(new Error('init fail')));
-        
-        const originalWindow = globalThis.window;
-        Reflect.set(globalThis, 'window', {});
-        
+    test('reports transform errors', async () => {
+        let message: string | undefined;
         try {
-            await initEsbuild();
+            await transpileTypeScript('const value: = 1;');
         } catch (error) {
-            if (!(error instanceof Error)) {
-                throw error;
-            }
-            expect(error.message).toBe('init fail');
+            message = error instanceof Error ? error.message : String(error);
         }
-        
-        Reflect.set(globalThis, 'window', originalWindow);
+
+        expect(message).toContain('Transpilation Error:');
     });
 });

@@ -34,7 +34,7 @@ CSS selector bekerja berdasarkan detail yang ada di DOM:
 ```text
 CSS selector
      ↓
-Tag, ID, class, attribute, atau posisi yang digunakan
+Tag, ID, class, attribute, hierarchy, atau posisi yang digunakan
      ↓
 Element yang cocok dengan detail tersebut
 ```

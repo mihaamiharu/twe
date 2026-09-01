@@ -5,7 +5,7 @@ description: 'Pelajari cara membaca, memperbaiki, dan memigrasikan XPath dari te
 
 ## Setelah lesson ini, kamu bisa
 
-* membaca bentuk XPath yang sering ditemukan di automation code;
+* membaca relative XPath yang dibangun dari descendant, attribute, predicate, dan relationship;
 * menjelaskan kenapa absolute XPath biasanya mudah rusak ketika structure halaman berubah;
 * menentukan kapan XPath yang sudah ada cukup diperbaiki dan kapan sebaiknya dimigrasikan;
 * mengubah XPath yang bergantung pada hubungan antar-element menjadi locator Playwright yang menggunakan scope yang jelas; dan
