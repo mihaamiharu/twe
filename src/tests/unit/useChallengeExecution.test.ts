@@ -145,6 +145,89 @@ describe('useChallengeExecution', () => {
         );
     });
 
+    it('should surface JavaScript syntax errors without allowing submission', async () => {
+        const errorMessage =
+            "SyntaxError: Unexpected token ';' near line 1";
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'FAILED',
+            output: errorMessage,
+            error: errorMessage,
+            executionTime: 0,
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(mockState, mockProps, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(mockState.setHasPassed).toHaveBeenCalledWith(false);
+        expect(mockState.setTestResults).toHaveBeenCalledWith([
+            expect.objectContaining({
+                passed: false,
+                error: errorMessage,
+            }),
+        ]);
+    });
+
+    it('should show TypeScript transpilation errors as failed results', async () => {
+        const errorMessage =
+            'Transpilation Error: Unexpected token in TypeScript source';
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'ERROR',
+            output: errorMessage,
+            error: errorMessage,
+            executionTime: 0,
+        });
+        const state = createPlaygroundState({
+            ...mockState,
+            code: 'const value: = 1;',
+        });
+        const props = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                ...mockProps.challenge,
+                type: 'TYPESCRIPT',
+            }),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(state, props, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(state.setHasPassed).toHaveBeenCalledWith(false);
+        expect(state.setTestResults).toHaveBeenCalledWith([
+            expect.objectContaining({
+                passed: false,
+                error: errorMessage,
+            }),
+        ]);
+    });
+
+    it('should preserve timeout feedback as a failed result', async () => {
+        const errorMessage =
+            'Process timed out. Please review your logic for potential errors or long-running tasks.';
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'TIMEOUT',
+            output: errorMessage,
+            error: errorMessage,
+            executionTime: 100,
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(mockState, mockProps, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(mockState.setHasPassed).toHaveBeenCalledWith(false);
+        expect(mockState.setTestResults).toHaveBeenCalledWith([
+            expect.objectContaining({
+                passed: false,
+                error: errorMessage,
+            }),
+        ]);
+    });
+
     it('should validate value mismatch for JS challenge', async () => {
         spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
             status: 'PASSED',
@@ -191,6 +274,67 @@ describe('useChallengeExecution', () => {
         await act(async () => result.current.handleRunCode());
 
         expect(state.setHasPassed).toHaveBeenCalledWith(false);
+    });
+
+    it('shows localized feedback when a Playwright attempt has no assertions', async () => {
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'PASSED',
+            output: 'Success',
+            executionTime: 100,
+            assertionCount: 0,
+        });
+        const state = createPlaygroundState({
+            ...mockState,
+            locale: 'id',
+            t: i18n.getFixedT('id'),
+        });
+        const props = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                ...mockProps.challenge,
+                type: 'PLAYWRIGHT',
+            }),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(state, props, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(state.setHasPassed).toHaveBeenCalledWith(false);
+        expect(state.setTestResults).toHaveBeenCalledWith([
+            expect.objectContaining({
+                passed: false,
+                error: state.t('challenges:playground.noAssertions'),
+            }),
+        ]);
+    });
+
+    it('shows localized feedback when a JavaScript result is undefined', async () => {
+        spyOn(executor, 'executePlaywrightCode').mockResolvedValue({
+            status: 'PASSED',
+            output: 'Success',
+            executionTime: 100,
+            returnValue: undefined,
+        });
+        const state = createPlaygroundState({
+            ...mockState,
+            locale: 'id',
+            t: i18n.getFixedT('id'),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(state, mockProps, mockIframe),
+        );
+        await act(async () => result.current.handleRunCode());
+
+        expect(state.setHasPassed).toHaveBeenCalledWith(false);
+        expect(state.setTestResults).toHaveBeenCalledWith([
+            expect.objectContaining({
+                passed: false,
+                error: state.t('challenges:playground.jsUndefined'),
+            }),
+        ]);
     });
 
     it('rejects masking methods forbidden by a challenge', async () => {
@@ -348,6 +492,49 @@ describe('useChallengeExecution', () => {
 
         expect(mockState.setHasPassed).toHaveBeenCalledWith(true);
     });
+
+    it('should report a useful error when a selector does not match', () => {
+        const selectorChallenge = createChallenge({
+            ...mockProps.challenge,
+            type: 'CSS_SELECTOR',
+            targetSelector: '.target',
+        });
+        const selectorState = createPlaygroundState({
+            ...mockState,
+            isCodeChallenge: false,
+            isSelectorChallenge: true,
+            selector: '.wrong-target',
+            previewValidation: { isValid: false, matchCount: 0 },
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(
+                selectorState,
+                createPlaygroundProps({
+                    ...mockProps,
+                    challenge: selectorChallenge,
+                }),
+                mockIframe,
+            ),
+        );
+
+        act(() => {
+            result.current.handleValidateSelector();
+        });
+
+        expect(selectorState.setHasPassed).toHaveBeenCalledWith(false);
+        expect(selectorState.setTestResults).toHaveBeenCalledWith([
+            {
+                id: 'selector',
+                name: 'Selector Validation',
+                passed: false,
+                error: selectorState.t(
+                    'challenges:playground.selectorMismatch',
+                ),
+            },
+        ]);
+    });
+
     it('should reset state on confirmReset', async () => {
         const { result } = renderHook(() =>
             useChallengeExecution(mockState, mockProps, mockIframe),

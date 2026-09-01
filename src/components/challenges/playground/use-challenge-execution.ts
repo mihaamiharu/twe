@@ -198,8 +198,7 @@ export function useChallengeExecution(
                 const assertionCount = result.assertionCount ?? 0;
                 if (assertionCount === 0) {
                     validationPassed = false;
-                    outputMessage =
-                        "No assertions were called. Write assertions like: await expect(locator).toHaveText('...');";
+                    outputMessage = t('challenges:playground.noAssertions');
                     result.status = 'FAILED';
                 } else {
                     outputMessage = t('challenges:playground.correct');
@@ -229,7 +228,7 @@ export function useChallengeExecution(
                     validationPassed = false;
                     outputMessage =
                         actual === undefined
-                            ? `${t('challenges:playground.jsUndefined')} (Did you forget to assign your answer to 'result'?)`
+                            ? t('challenges:playground.jsUndefined')
                             : t('challenges:playground.jsMismatch');
                     result.status = 'FAILED';
                 } else {
