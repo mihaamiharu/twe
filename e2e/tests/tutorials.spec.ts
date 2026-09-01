@@ -111,17 +111,19 @@ test.describe('Tutorials', () => {
     page,
   }) => {
     const search = page.getByTestId('learn-search');
-    await search.fill('DOM Tree');
+    await search.fill('DOM');
 
     await expect
       .poll(() => new URL(page.url()).searchParams.get('q'))
-      .toBe('DOM Tree');
+      .toBe('DOM');
     const results = page.getByTestId('learn-results');
     await expect(
-      results.getByRole('link', { name: /Reading the DOM Tree/i }),
+      results.getByRole('link', { name: /Read the Live DOM and UI State/i }),
     ).toBeVisible();
     await expect(
-      results.getByRole('link', { name: /Anatomy of an HTML Element/i }),
+      results.getByRole('link', {
+        name: /Read HTML Through Role, Accessible Name, and State/i,
+      }),
     ).toHaveCount(0);
   });
 
@@ -207,7 +209,7 @@ test.describe('Tutorials', () => {
       'Latihan',
     );
     await expect(
-      page.locator('a[href*="/id/practice/js-variables-types"]'),
+      page.locator('a[href*="/id/practice/js-fundamentals-boss"]'),
     ).toBeVisible();
     await expect(page.getByTestId('lesson-status')).toBeVisible();
   });
