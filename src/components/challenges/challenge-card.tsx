@@ -111,7 +111,7 @@ export function ChallengeCard({
     >
       <Card
         className={cn(
-          'group relative overflow-hidden transition-all duration-300',
+          'motion-hover-arrow-group group relative overflow-hidden transition-colors duration-200',
           'hover:border-primary/50',
           isCompleted && 'border-brand-success/30 bg-brand-success/5',
           className,
@@ -212,7 +212,7 @@ export function ChallengeCard({
             </div>
 
             {/* Arrow */}
-            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="motion-hover-arrow h-4 w-4 text-muted-foreground group-hover:text-primary" />
           </div>
         </CardFooter>
       </Card>

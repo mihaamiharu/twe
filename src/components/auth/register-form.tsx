@@ -200,7 +200,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
               className="mt-2 text-muted-foreground hover:text-foreground"
             >
               {isResending ? (
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                <span className="inline-block h-4 w-4 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent mr-2" />
               ) : (
                 <RefreshCw className="h-4 w-4 mr-2" />
               )}
@@ -299,7 +299,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
         <CardFooter className="flex flex-col gap-4 pt-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              <span className="inline-block h-4 w-4 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent" />
             ) : (
               t('common:actions.signUp')
             )}

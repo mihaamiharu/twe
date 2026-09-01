@@ -174,7 +174,7 @@ function ContactPage() {
               </div>
               <div className="sm:col-start-2 sm:row-start-3 sm:flex sm:justify-end">
                 <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto sm:min-w-[9.5rem]">
-                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
+                  {isSubmitting && <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" aria-hidden="true" />}
                   {isSubmitting ? t('form.sending') : t('form.submit')}
                   {!isSubmitting && <ArrowRight className="h-4 w-4" aria-hidden="true" />}
                 </Button>

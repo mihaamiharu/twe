@@ -56,7 +56,7 @@ export function TableOfContents({
                   }
                 }}
                 className={cn(
-                  'block pl-4 -ml-px border-l-2 transition-all duration-200 hover:text-foreground no-underline',
+                  'block pl-4 -ml-px border-l-2 transition-colors duration-150 hover:text-foreground no-underline',
                   activeId === item.id
                     ? 'border-primary text-primary font-medium'
                     : 'border-transparent text-muted-foreground hover:border-border',

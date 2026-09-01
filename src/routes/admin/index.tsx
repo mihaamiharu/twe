@@ -80,7 +80,7 @@ function AdminDashboard() {
   if (isLoading) {
     return (
       <div className="p-8 flex justify-center">
-        <Activity className="h-8 w-8 animate-spin text-primary" />
+        <Activity className="h-8 w-8 animate-spin motion-reduce:animate-none text-primary" />
       </div>
     );
   }
@@ -103,7 +103,7 @@ function AdminDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-8 animate-fade-in">
+    <div className="container mx-auto p-6 space-y-8 animate-in fade-in-0 duration-200 ease-(--ease-ui-out)">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>

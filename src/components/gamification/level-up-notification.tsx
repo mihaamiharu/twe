@@ -51,7 +51,7 @@ export function LevelUpNotification({
     >
       <Card
         className={cn(
-          'max-w-md w-full mx-4 transform transition-all duration-500 border-brand-orange/40',
+          'max-w-md w-full mx-4 transform transition-transform duration-500 ease-(--ease-ui-out) border-brand-orange/40',
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4',
         )}
         onClick={(e) => e.stopPropagation()}
@@ -70,9 +70,9 @@ export function LevelUpNotification({
           {/* Sparkle animation */}
           <div className="flex justify-center mb-4">
             <div className="relative">
-              <Sparkles className="h-16 w-16 text-brand-orange animate-pulse" />
-              <Star className="absolute -right-2 -top-2 h-8 w-8 text-brand-orange animate-bounce" />
-              <Star className="absolute -bottom-1 -left-3 h-6 w-6 text-brand-orange animate-bounce delay-100" />
+              <Sparkles className="h-16 w-16 text-brand-orange animate-pulse motion-reduce:animate-none" />
+              <Star className="absolute -right-2 -top-2 h-8 w-8 text-brand-orange animate-bounce motion-reduce:animate-none" />
+              <Star className="absolute -bottom-1 -left-3 h-6 w-6 text-brand-orange animate-bounce motion-reduce:animate-none delay-100" />
             </div>
           </div>
 
@@ -90,7 +90,7 @@ export function LevelUpNotification({
             </div>
             <div className="text-2xl text-muted-foreground">→</div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-primary animate-pulse">
+              <div className="text-5xl font-bold text-primary animate-pulse motion-reduce:animate-none">
                 {newLevel}
               </div>
               <div className="text-xs text-muted-foreground">New Level</div>

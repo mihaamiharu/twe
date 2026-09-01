@@ -48,7 +48,7 @@ export function AchievementBadge({
   return (
     <Card
       className={cn(
-        'relative overflow-hidden transition-all',
+        'relative overflow-hidden transition-colors duration-200',
         earned
           ? 'border-brand-orange/30 bg-brand-orange/5'
           : 'opacity-70 grayscale',

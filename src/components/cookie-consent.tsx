@@ -51,7 +51,7 @@ export function CookieConsent({ onConsentChange, initialConsent }: CookieConsent
     if (!isVisible) return null;
 
     return (
-        <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-96 animate-in slide-in-from-bottom-4 fade-in duration-500">
+        <div className="fixed bottom-4 left-4 right-4 z-50 md:left-auto md:right-4 md:w-96 animate-in slide-in-from-bottom-4 fade-in duration-500 motion-reduce:animate-none motion-reduce:opacity-100">
             <Card className="border-primary/20 shadow-2xl bg-card/95 backdrop-blur-sm">
                 <CardContent className="p-4 space-y-3">
                     <div className="space-y-2">

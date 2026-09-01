@@ -19,7 +19,6 @@ import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { useState, useMemo, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
-import { motion, AnimatePresence } from 'framer-motion';
 import { DataTablePagination } from '@/components/admin/data-table-pagination';
 import { omitUndefined } from '@/lib/omit-undefined';
 
@@ -87,7 +86,7 @@ function ChallengeManager() {
 
 
   return (
-    <div className="container mx-auto p-6 space-y-8 animate-fade-in relative z-10">
+    <div className="container mx-auto p-6 space-y-8 animate-in fade-in-0 duration-200 ease-(--ease-ui-out) relative z-10">
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-border/40 pb-6">
         <div className="flex items-center gap-4">
@@ -116,7 +115,7 @@ function ChallengeManager() {
             <Search className="absolute left-3 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <Input
               placeholder="Search challenges..."
-              className="pl-10 w-full md:w-[300px] bg-background/80 backdrop-blur-sm border-muted-foreground/20 focus-visible:ring-primary/50 transition-all"
+              className="pl-10 w-full md:w-[300px] bg-background/80 backdrop-blur-sm border-muted-foreground/20 focus-visible:ring-primary/50 transition-[border-color,box-shadow] duration-200 ease-(--ease-ui-out)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -137,7 +136,6 @@ function ChallengeManager() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              <AnimatePresence mode="popLayout">
                 {paginatedChallenges.length === 0 ? (
                   <TableRow>
                     <TableCell
@@ -176,23 +174,12 @@ function ChallengeManager() {
                     };
 
                     return (
-                      <motion.tr
+                      <TableRow
                         key={challenge.id}
-                        layout
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        transition={{ duration: 0.2 }}
                         className="group border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted"
                       >
                         <TableCell>
                           {' '}
-                          {/* Workaround for motion.tr typings if needed, but usually motion.tr works fine as child of tbody if TableBody accepts valid nodes? Actually radix/shadcn TableBody is basically a tbody. Framer motion needs direct direct parent context sometimes or replace TableRow with motion copy of it. */}
-                          {/* Ideally I should use a custom component for motion row or just motion.tr inside standard tbody. 
-                                                     However, shadcn TableRow is a component. I should make it a motion component.
-                                                     Or better: wrap the content of TableRow? No, animation needs to be on the row.
-                                                     Let's try using standard motion.tr but keeping ShadCN classes on it.
-                                                   */}
                           <div className="flex flex-col py-2">
                             <span className="font-medium text-sm group-hover:text-primary transition-colors">
                               {typeof challenge.title === 'object' ? challenge.title?.en : challenge.title}
@@ -248,11 +235,10 @@ function ChallengeManager() {
                             />
                           </div>
                         </TableCell>
-                      </motion.tr>
-                    );
-                  })
+                      </TableRow>
+                  );
+                })
                 )}
-              </AnimatePresence>
             </TableBody>
           </Table>
           <DataTablePagination

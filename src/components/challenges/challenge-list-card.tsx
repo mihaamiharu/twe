@@ -46,7 +46,7 @@ export function ChallengeListCard({
   const CardContentWrapper = (
     <Card
       className={cn(
-        'h-full transition-all duration-200 overflow-hidden border-border/50',
+        'h-full transition-colors duration-200 overflow-hidden border-border/50',
         isComingSoon
           ? 'opacity-60 bg-muted/20'
           : 'hover:border-primary/20 bg-card/50 hover:bg-card',

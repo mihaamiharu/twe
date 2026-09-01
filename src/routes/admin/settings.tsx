@@ -21,7 +21,7 @@ function SettingsPage() {
     };
 
     return (
-        <div className="container mx-auto p-6 space-y-8 animate-fade-in text-card-foreground">
+        <div className="container mx-auto p-6 space-y-8 animate-in fade-in-0 duration-200 ease-(--ease-ui-out) text-card-foreground">
             <div>
                 <h1 className="text-3xl font-bold tracking-tight">System Settings</h1>
                 <p className="text-muted-foreground mt-1">

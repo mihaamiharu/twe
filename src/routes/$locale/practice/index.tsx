@@ -567,7 +567,7 @@ export function ChallengesPage() {
               {[1, 2, 3, 4, 5, 6].map((item) => (
                 <div
                   key={item}
-                  className="h-40 animate-pulse rounded-xl border border-border bg-card/70"
+                  className="h-40 animate-pulse motion-reduce:animate-none rounded-xl border border-border bg-card/70"
                 />
               ))}
             </div>

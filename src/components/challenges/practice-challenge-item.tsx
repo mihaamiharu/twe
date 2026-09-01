@@ -153,7 +153,7 @@ function ChallengeItemContent({
           >
             {actionLabel}
             <ArrowRight
-              className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5"
+              className="motion-hover-arrow-small h-3.5 w-3.5"
               aria-hidden="true"
             />
           </span>
@@ -182,7 +182,7 @@ export function PracticeChallengeRow(props: PracticeChallengeItemProps) {
     <Link
       to="/$locale/practice/$slug"
       params={{ locale: props.locale, slug: props.challenge.slug }}
-      className="group relative block border-b border-border outline-none last:border-b-0 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-orange"
+      className="motion-hover-arrow-small-group group relative block border-b border-border outline-none last:border-b-0 focus-visible:z-10 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-orange"
     >
       {content}
     </Link>

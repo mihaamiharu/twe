@@ -132,9 +132,9 @@ export function PlaygroundDesktopLayout({
         </Tabs>
       </Panel>
 
-      <PanelResizeHandle className="w-3 bg-transparent hover:bg-brand-orange/5 transition-colors focus:outline-none flex items-center justify-center group relative z-10 -mx-1.5 cursor-col-resize">
+      <PanelResizeHandle className="motion-hover-grip-group w-3 bg-transparent hover:bg-brand-orange/5 transition-colors focus:outline-none flex items-center justify-center group relative z-10 -mx-1.5 cursor-col-resize">
         <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-workspace-border group-hover:bg-brand-orange transition-colors" />
-        <div className="h-8 w-4 bg-workspace-elevated border border-workspace-border rounded-md flex items-center justify-center shadow-none z-20 group-hover:border-brand-orange transition-all scale-90 group-hover:scale-100">
+        <div className="motion-hover-grip h-8 w-4 bg-workspace-elevated border border-workspace-border rounded-md flex items-center justify-center shadow-none z-20 group-hover:border-brand-orange">
           <GripVertical className="h-3 w-3 text-workspace-muted group-hover:text-brand-orange transition-colors" />
         </div>
       </PanelResizeHandle>

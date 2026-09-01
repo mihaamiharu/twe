@@ -36,7 +36,7 @@ export function ChallengeTierProgress({
             whileTap={{ scale: 0.98 }}
             onClick={() => onSelectTier(isSelected ? 'all' : item.tier)}
             className={cn(
-              'p-4 rounded-xl border flex flex-col gap-3 cursor-pointer transition-all duration-200',
+              'p-4 rounded-xl border flex flex-col gap-3 cursor-pointer transition-colors duration-200',
               isSelected
                 ? 'bg-primary/5 border-primary ring-1 ring-primary'
                 : 'bg-card border-border hover:border-primary/50',

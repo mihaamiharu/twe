@@ -61,7 +61,7 @@ export function SelectorDemo() {
                         id="submit-btn"
                         className={`
               h-5 w-16 rounded text-[8px] font-medium
-              transition-all duration-300
+              transition-[background-color,color,box-shadow,transform] duration-300 ease-(--ease-ui-out)
               ${isHighlighting
                                 ? 'bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2 ring-offset-background shadow-lg shadow-primary/30 scale-105'
                                 : 'bg-primary/20 text-primary/60'
@@ -76,7 +76,7 @@ export function SelectorDemo() {
             <div className="p-2 font-mono text-[10px]">
                 <span className="text-muted-foreground/60">{'> '}</span>
                 <span className="text-primary">{typedText}</span>
-                <span className="animate-pulse text-primary">|</span>
+                <span className="animate-pulse motion-reduce:animate-none text-primary">|</span>
             </div>
         </div>
     );
