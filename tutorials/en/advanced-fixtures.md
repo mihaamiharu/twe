@@ -79,9 +79,10 @@ export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
 
   workerAccount: [
     async ({}, use, workerInfo) => {
-      const runId = process.env.TEST_RUN_ID ?? `local-${randomUUID()}`;
+      const runNamespace = process.env.TEST_RUN_ID ?? 'local';
+      const workerNonce = randomUUID();
       const account = await createTestAccount({
-        uniqueKey: `${runId}-${workerInfo.project.name}-${workerInfo.workerIndex}`,
+        uniqueKey: `${runNamespace}-${workerInfo.project.name}-${workerInfo.workerIndex}-${workerNonce}`,
       });
 
       try {
@@ -109,7 +110,7 @@ export const test = base.extend<TestOptions & TestFixtures, WorkerFixtures>({
 });
 ```
 
-The worker fixture does not store a password in source code. It requests a unique account from an authorized test-support utility and deletes that account in `finally`. `workerIndex` is unique only within one run, so include a stable CI run ID or another run identifier in `uniqueKey`. The random local fallback prevents ordinary local collisions.
+The worker fixture does not store a password in source code. It requests a unique account from an authorized test-support utility and deletes that account in `finally`. `workerIndex` is unique within one Playwright runner invocation, but another CI shard or job can use the same project name and index. The stable run namespace keeps the account attributable to its run, while the generated nonce prevents collisions across runner processes. An explicit shard or job identifier can serve the same purpose when the CI system provides one.
 
 The test-scoped fixture creates a fresh context and page for each test. Its `finally` block closes the context when page creation or the test fails. Several tests may reuse the worker account only when they do not change account-level state. If they change the profile, permissions, saved addresses, or preferences, give each test its own account.
 
@@ -176,14 +177,14 @@ Keep test scope when you are not sure whether a resource is safe to share. If se
 
 | Observation                                 | Likely problem                               | Check first                                                |
 | ------------------------------------------- | -------------------------------------------- | ---------------------------------------------------------- |
-| Failures occur only with several workers    | Workers change the same server-side account  | Run ID, generated IDs, account per worker, `workerIndex`   |
+| Failures occur only with several workers    | Workers change the same server-side account  | Run namespace, shard/job identity, nonce, `workerIndex`    |
 | A test runs setup it never requested        | Automatic fixture is too broad               | `{ auto: true }` fixtures and imported test object         |
 | Worker restarts leave records behind        | Cleanup is missing or identity is not unique | `finally` block, setup failure path, retained resource IDs |
 | Fixture timeout appears unrelated to a test | Slow fixture owns the time budget            | Fixture duration and configured fixture timeout            |
 | Changing one option rebuilds many workers   | Worker fixture depends on a worker option    | Option scope and worker-fixture signature                  |
 | Nobody can predict setup order              | Dependency graph is deep or implicit         | Draw dependencies and reverse teardown order               |
 
-Worker processes can restart after failures. Use a stable run namespace when available, include the project and worker identity, and design cleanup and later setup to tolerate interrupted runs safely.
+Worker processes can restart after failures. Use a stable run namespace when available, include the project and worker identity, and add a nonce or explicit shard/job identity so separate runner processes cannot collide. Design cleanup and later setup to tolerate interrupted runs safely.
 
 Do not immediately force the entire suite to one worker to remove a race. First find which resource is shared and which tests change it. One worker only hides that problem and makes parallel feedback slower.
 
