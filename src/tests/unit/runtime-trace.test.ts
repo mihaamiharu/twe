@@ -56,6 +56,22 @@ describe('runtime execution trace', () => {
     ]);
   });
 
+  it('records primitive assertion arguments and soft assertion mode', async () => {
+    document.body.innerHTML = '<ul><li>One</li><li>Two</li></ul>';
+    const rawPage = new MockedPlaywrightPage(document);
+    const trace = createRuntimeExecutionTrace();
+    const page = createTracedPlaywrightPage(rawPage, trace);
+    const { expect: tracedExpect } = createExpect({
+      timeout: 20,
+      onAssertion: (assertion) => recordRuntimeAssertion(trace, assertion),
+    });
+
+    await tracedExpect.soft(page.getByRole('listitem')).toHaveCount(2);
+
+    expect(trace.assertions[0]?.arguments).toEqual([2]);
+    expect(trace.assertions[0]?.soft).toBe(true);
+  });
+
   it('preserves composed filters as scope for nested locators', async () => {
     document.body.innerHTML = `
       <article role="article">

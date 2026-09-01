@@ -183,18 +183,21 @@ export interface LocatorEvidenceDefinition
   scope?: LocatorTargetEvidenceDefinition;
 }
 
+export type EvidenceArgument = string | number | boolean;
+
 export type RequiredEvidenceSequenceStep =
   | {
       type: 'method';
       method: string;
       target?: 'page' | 'locator';
-      arguments?: string[];
+      arguments?: EvidenceArgument[];
       locator?: LocatorEvidenceDefinition;
     }
   | {
       type: 'assertion';
       matcher: string;
-      arguments?: string[];
+      arguments?: EvidenceArgument[];
+      soft?: boolean;
       locator?: LocatorEvidenceDefinition;
     };
 
@@ -271,6 +274,8 @@ export interface ChallengeValidationDefinition {
   forbiddenMethods?: string[];
   policy?: ChallengeValidationPolicy;
   interactionSequence?: InteractionSequenceDefinition;
+  /** Require successful runtime evidence without imposing an arbitrary order. */
+  requiredEvidence?: RequiredEvidenceSequenceStep[];
   /** Require successful runtime evidence to occur in this order. */
   requiredEvidenceSequence?: RequiredEvidenceSequenceStep[];
 }

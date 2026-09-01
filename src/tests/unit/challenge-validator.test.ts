@@ -277,6 +277,61 @@ describe('challenge execution validator', () => {
     });
   });
 
+  it('matches unordered evidence with primitive arguments and soft mode', () => {
+    const softCount = {
+      matcher: 'toHaveCount',
+      arguments: [4],
+      soft: true,
+      locator: { method: 'getByRole', value: 'listitem' },
+      passed: true,
+    };
+    const execution = passedExecution({
+      runtimeTrace: {
+        methodCalls: [],
+        assertions: [softCount],
+        events: [{ type: 'assertion', assertion: softCount }],
+      },
+    });
+    const validation = {
+      requiredEvidence: [
+        {
+          type: 'assertion' as const,
+          matcher: 'toHaveCount',
+          arguments: [4],
+          soft: true,
+          locator: { method: 'getByRole', value: 'listitem' },
+        },
+      ],
+    };
+
+    expect(validateChallengeExecution(execution, validation)).toEqual({
+      passed: true,
+    });
+    expect(
+      validateChallengeExecution(
+        passedExecution({
+          runtimeTrace: {
+            methodCalls: [],
+            assertions: [{ ...softCount, soft: false }],
+            events: [
+              {
+                type: 'assertion',
+                assertion: { ...softCount, soft: false },
+              },
+            ],
+          },
+        }),
+        validation,
+      ),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: ['toHaveCount'],
+      },
+    });
+  });
+
   it('distinguishes exact text locator evidence', () => {
     const assertion = {
       matcher: 'toBeVisible',

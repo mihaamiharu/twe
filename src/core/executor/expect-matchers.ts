@@ -676,9 +676,11 @@ export function createExpect(options?: {
 
                 const matcher = value as (...args: unknown[]) => unknown;
                 return async (...args: unknown[]) => {
-                    const stringArguments = args.filter(
-                        (argument): argument is string =>
-                            typeof argument === 'string',
+                    const evidenceArguments = args.filter(
+                        (argument): argument is string | number | boolean =>
+                            typeof argument === 'string' ||
+                            typeof argument === 'number' ||
+                            typeof argument === 'boolean',
                     );
                     const softFailureStart = testResults.length;
                     try {
@@ -689,9 +691,10 @@ export function createExpect(options?: {
                         options?.onAssertion?.({
                             matcher: property,
                             passed: softFailure === undefined,
-                            ...(stringArguments.length === 0
+                            ...(evidenceArguments.length === 0
                                 ? {}
-                                : { arguments: stringArguments }),
+                                : { arguments: evidenceArguments }),
+                            soft: isSoft,
                             ...(locator === undefined ? {} : { locator }),
                             ...(softFailure === undefined
                                 ? {}
@@ -702,9 +705,10 @@ export function createExpect(options?: {
                         options?.onAssertion?.({
                             matcher: property,
                             passed: false,
-                            ...(stringArguments.length === 0
+                            ...(evidenceArguments.length === 0
                                 ? {}
-                                : { arguments: stringArguments }),
+                                : { arguments: evidenceArguments }),
+                            soft: isSoft,
                             ...(locator === undefined ? {} : { locator }),
                             error:
                                 error instanceof Error

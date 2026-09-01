@@ -85,6 +85,8 @@ function evidenceEventMatches(
       event.type === 'assertion' &&
       event.assertion.passed &&
       event.assertion.matcher === expected.matcher &&
+      (expected.soft === undefined ||
+        event.assertion.soft === expected.soft) &&
       (expected.arguments === undefined ||
         JSON.stringify(event.assertion.arguments) ===
           JSON.stringify(expected.arguments)) &&
@@ -135,6 +137,55 @@ function findMissingEvidenceSequenceSteps(
   }
 
   return [];
+}
+
+function findMissingEvidenceSteps(
+  events: RuntimeTraceEvent[] | undefined,
+  expected: RequiredEvidenceSequenceStep[] | undefined,
+): string[] {
+  if (!expected || expected.length === 0) return [];
+
+  const availableEvents = events ?? [];
+  const matchedStepByEvent = new Map<number, number>();
+  const assignStep = (
+    stepIndex: number,
+    visitedEventIndexes: Set<number>,
+  ): boolean => {
+    const step = expected[stepIndex];
+    if (!step) return false;
+
+    for (let eventIndex = 0; eventIndex < availableEvents.length; eventIndex += 1) {
+      const event = availableEvents[eventIndex];
+      if (
+        !event ||
+        visitedEventIndexes.has(eventIndex) ||
+        !evidenceEventMatches(event, step)
+      ) {
+        continue;
+      }
+      visitedEventIndexes.add(eventIndex);
+
+      const previousStepIndex = matchedStepByEvent.get(eventIndex);
+      if (
+        previousStepIndex === undefined ||
+        assignStep(previousStepIndex, visitedEventIndexes)
+      ) {
+        matchedStepByEvent.set(eventIndex, stepIndex);
+        return true;
+      }
+    }
+    return false;
+  };
+
+  const missing: string[] = [];
+  for (let stepIndex = 0; stepIndex < expected.length; stepIndex += 1) {
+    const step = expected[stepIndex];
+    if (!step) continue;
+    if (!assignStep(stepIndex, new Set())) {
+      missing.push(evidenceStepLabel(step));
+    }
+  }
+  return missing;
 }
 
 function normalizeTypeAnnotation(annotation: string): string {
@@ -377,6 +428,10 @@ export function validateChallengeExecution(
     trace?.events,
     validation.requiredEvidenceSequence,
   );
+  const missingEvidenceSteps = findMissingEvidenceSteps(
+    trace?.events,
+    validation.requiredEvidence,
+  );
   if (
     missingAssertions.length > 0 ||
     missingMethods.length > 0 ||
@@ -390,7 +445,8 @@ export function validateChallengeExecution(
     missingTypeScriptEvidence.length > 0 ||
     missingConditionalEvidence.length > 0 ||
     missingTryCatchEvidence.length > 0 ||
-    missingSequenceSteps.length > 0
+    missingSequenceSteps.length > 0 ||
+    missingEvidenceSteps.length > 0
   ) {
     return {
       passed: false,
@@ -411,6 +467,7 @@ export function validateChallengeExecution(
             ...missingConditionalEvidence,
             ...missingTryCatchEvidence,
             ...missingSequenceSteps,
+            ...missingEvidenceSteps,
           ]),
         ],
       },

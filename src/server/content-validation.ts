@@ -123,13 +123,19 @@ const LocatorEvidenceSchema = LocatorTargetEvidenceSchema.extend({
   scope: LocatorTargetEvidenceSchema.optional(),
 }).strict();
 
+const EvidenceArgumentSchema = z.union([
+  z.string(),
+  z.number(),
+  z.boolean(),
+]);
+
 const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
   z
     .object({
       type: z.literal('method'),
       method: z.string().min(1),
       target: z.enum(['page', 'locator']).optional(),
-      arguments: z.array(z.string()).optional(),
+      arguments: z.array(EvidenceArgumentSchema).optional(),
       locator: LocatorEvidenceSchema.optional(),
     })
     .strict(),
@@ -137,7 +143,8 @@ const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
     .object({
       type: z.literal('assertion'),
       matcher: z.string().min(1),
-      arguments: z.array(z.string()).optional(),
+      arguments: z.array(EvidenceArgumentSchema).optional(),
+      soft: z.boolean().optional(),
       locator: LocatorEvidenceSchema.optional(),
     })
     .strict(),
@@ -206,6 +213,10 @@ const ChallengeValidationSchema = z
     minimumTryCatchBlocks: z.number().int().positive().optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
     policy: ChallengeValidationPolicySchema.optional(),
+    requiredEvidence: z
+      .array(RequiredEvidenceSequenceStepSchema)
+      .min(1)
+      .optional(),
     requiredEvidenceSequence: z
       .array(RequiredEvidenceSequenceStepSchema)
       .min(1)
@@ -380,7 +391,11 @@ function normalizeRequiredEvidenceSequence(
       return {
         type: step.type,
         matcher: step.matcher,
-        ...omitUndefined({ arguments: step.arguments, locator }),
+        ...omitUndefined({
+          arguments: step.arguments,
+          soft: step.soft,
+          locator,
+        }),
       };
     }
 
@@ -528,6 +543,9 @@ function normalizeChallengeDefinition(
                 minimumTryCatchBlocks:
                   value.validation.minimumTryCatchBlocks,
                 forbiddenMethods: value.validation.forbiddenMethods,
+                requiredEvidence: normalizeRequiredEvidenceSequence(
+                  value.validation.requiredEvidence,
+                ),
                 requiredEvidenceSequence: normalizeRequiredEvidenceSequence(
                   value.validation.requiredEvidenceSequence,
                 ),

@@ -1,6 +1,7 @@
 import type { MockedPlaywrightPage } from './playwright-shim';
 import type { Locator } from './shim.types';
 import type {
+  EvidenceArgument,
   LocatorEvidenceDefinition,
   LocatorFilterEvidenceDefinition,
   LocatorTargetEvidenceDefinition,
@@ -17,7 +18,7 @@ export type RuntimeTraceTarget = 'page' | 'locator';
 export interface RuntimeMethodCall {
   target: RuntimeTraceTarget;
   method: string;
-  arguments?: string[];
+  arguments?: EvidenceArgument[];
   locator?: LocatorEvidenceDefinition;
   actionOptions?: { force?: unknown };
   succeeded: boolean;
@@ -26,7 +27,8 @@ export interface RuntimeMethodCall {
 
 export interface RuntimeAssertion {
   matcher: string;
-  arguments?: string[];
+  arguments?: EvidenceArgument[];
+  soft?: boolean;
   locator?: LocatorEvidenceDefinition;
   passed: boolean;
   error?: string;
@@ -103,11 +105,14 @@ function isLocatorEvidence(value: unknown): value is LocatorEvidenceDefinition {
   return isObject(value) && typeof value['method'] === 'string';
 }
 
-function getStringArguments(args: unknown[]): string[] | undefined {
-  const stringArguments = args.filter(
-    (argument): argument is string => typeof argument === 'string',
+function getEvidenceArguments(args: unknown[]): EvidenceArgument[] | undefined {
+  const evidenceArguments = args.filter(
+    (argument): argument is EvidenceArgument =>
+      typeof argument === 'string' ||
+      typeof argument === 'number' ||
+      typeof argument === 'boolean',
   );
-  return stringArguments.length > 0 ? stringArguments : undefined;
+  return evidenceArguments.length > 0 ? evidenceArguments : undefined;
 }
 
 function toTargetEvidence(
@@ -244,14 +249,14 @@ export function createTracedPlaywrightPage(
 
         return (...args: unknown[]) => {
           const actionOptions = getActionOptions(property, args);
-          const stringArguments = getStringArguments(args);
+          const evidenceArguments = getEvidenceArguments(args);
           const call: RuntimeMethodCall = {
             target: targetType,
             method: property,
             succeeded: false,
-            ...(stringArguments === undefined
+            ...(evidenceArguments === undefined
               ? {}
-              : { arguments: stringArguments }),
+              : { arguments: evidenceArguments }),
             ...(targetType !== 'locator' || locatorEvidence === undefined
               ? {}
               : { locator: locatorEvidence }),
