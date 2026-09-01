@@ -124,14 +124,13 @@ function LearnPage() {
 
   const updateSearch = (updates: Partial<LearnSearch>) => {
     void navigate({
-      to: '.',
       search: (previous) => ({ ...previous, ...updates }),
       replace: true,
     });
   };
 
   const clearFilters = () => {
-    void navigate({ to: '.', search: {}, replace: true });
+    void navigate({ search: {}, replace: true });
   };
 
   const filteredLessons = useMemo(() => {
