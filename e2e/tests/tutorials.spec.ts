@@ -202,7 +202,7 @@ test.describe('Tutorials', () => {
     );
     await expect(
       page.locator('meta[name="description"]').last(),
-    ).toHaveAttribute('content', /Pahami dasar-dasar ES6/);
+    ).toHaveAttribute('content', /Gunakan JavaScript untuk mengatur test data/);
     await expect(page.getByTestId('related-practice-links')).toContainText(
       'Latihan',
     );
