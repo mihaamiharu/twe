@@ -47,41 +47,41 @@ graph TD
 sequenceDiagram
     participant User
     participant Frontend
-    participant API
+    participant ChallengeServerFunction as Challenge Server Function
     participant CodeExecutor
     participant Database
     participant GamificationEngine
 
     User->>Frontend: Select Challenge
-    Frontend->>API: GET /challenges/:slug
-    API->>Database: Fetch Challenge & Test Cases
-    Database-->>API: Challenge Data
-    API-->>Frontend: Challenge + Starter Code
+    Frontend->>ChallengeServerFunction: getChallenge({ slug, locale })
+    ChallengeServerFunction->>Database: Fetch Challenge & Test Cases
+    Database-->>ChallengeServerFunction: Challenge Data
+    ChallengeServerFunction-->>Frontend: Challenge + Starter Code
     Frontend-->>User: Display Challenge
 
     User->>Frontend: Write Code in Editor
     Frontend->>Frontend: Auto-save to localStorage
 
     User->>Frontend: Click "Run Tests"
-    Frontend->>API: POST /submissions
-    API->>CodeExecutor: Execute(code, testCases)
+    Frontend->>ChallengeServerFunction: createSubmission(submission)
+    ChallengeServerFunction->>CodeExecutor: Execute(code, testCases)
 
     CodeExecutor->>CodeExecutor: Create Sandboxed VM
     CodeExecutor->>CodeExecutor: Run Test Cases
-    CodeExecutor-->>API: Execution Results
+    CodeExecutor-->>ChallengeServerFunction: Execution Results
 
     alt All Tests Passed
-        API->>Database: Save Submission (PASSED)
-        API->>GamificationEngine: Award XP
+        ChallengeServerFunction->>Database: Save Submission (PASSED)
+        ChallengeServerFunction->>GamificationEngine: Award XP
         GamificationEngine->>Database: Update User XP
         GamificationEngine->>GamificationEngine: Check Achievements
         GamificationEngine->>Database: Award New Achievements
-        GamificationEngine-->>API: XP + Achievements Data
-        API-->>Frontend: Success + Rewards
+        GamificationEngine-->>ChallengeServerFunction: XP + Achievements Data
+        ChallengeServerFunction-->>Frontend: Success + Rewards
         Frontend-->>User: Show Success + XP Animation
     else Tests Failed
-        API->>Database: Save Submission (FAILED)
-        API-->>Frontend: Failed Results
+        ChallengeServerFunction->>Database: Save Submission (FAILED)
+        ChallengeServerFunction-->>Frontend: Failed Results
         Frontend-->>User: Show Failed Test Cases
     end
 ```

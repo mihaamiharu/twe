@@ -150,12 +150,12 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
   // Show success message after registration
   if (registrationComplete) {
     return (
-      <Card className="w-full max-w-md glass-card">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
             <Mail className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="text-2xl font-semibold tracking-tight text-foreground">
             {t('auth:verification.title')}
           </CardTitle>
           <CardDescription className="text-base">
@@ -168,15 +168,15 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
 
           <div className="bg-muted/30 rounded-lg p-4 space-y-2 text-sm text-muted-foreground">
             <div className="flex items-start gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+              <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-success" />
               <span>{t('auth:verification.instruction1')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+              <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-success" />
               <span>{t('auth:verification.instruction2')}</span>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 shrink-0" />
+              <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-brand-success" />
               <span>{t('auth:verification.instruction3')}</span>
             </div>
           </div>
@@ -184,7 +184,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
           {/* Resend Email Section */}
           <div className="pt-2 border-t border-border">
             {resendStatus === 'success' ? (
-              <p className="text-sm text-green-500 flex items-center justify-center gap-1">
+              <p className="flex items-center justify-center gap-1 text-sm text-brand-success">
                 <CheckCircle className="h-4 w-4" />
                 {t('auth:verification.resentSuccess')}
               </p>
@@ -200,14 +200,14 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
               className="mt-2 text-muted-foreground hover:text-foreground"
             >
               {isResending ? (
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                <span className="inline-block h-4 w-4 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent mr-2" />
               ) : (
                 <RefreshCw className="h-4 w-4 mr-2" />
               )}
               {resendCooldown > 0
                 ? t('auth:verification.resendCooldown', {
-                  seconds: resendCooldown,
-                })
+                    seconds: resendCooldown,
+                  })
                 : t('auth:verification.resendButton')}
             </Button>
           </div>
@@ -225,9 +225,9 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md glass-card">
+    <Card className="w-full max-w-md">
       <CardHeader className="text-center">
-        <CardTitle className="text-2xl font-bold gradient-text">
+        <CardTitle className="text-2xl font-semibold tracking-tight text-foreground">
           {t('auth:register.title')}
         </CardTitle>
         <CardDescription>{t('auth:register.description')}</CardDescription>
@@ -299,7 +299,7 @@ export function RegisterForm({ onSuccess, onLoginClick }: RegisterFormProps) {
         <CardFooter className="flex flex-col gap-4 pt-4">
           <Button type="submit" className="w-full" disabled={isLoading}>
             {isLoading ? (
-              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              <span className="inline-block h-4 w-4 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent" />
             ) : (
               t('common:actions.signUp')
             )}

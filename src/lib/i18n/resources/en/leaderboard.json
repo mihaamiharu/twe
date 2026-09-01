@@ -1,27 +1,42 @@
 {
+  "seo": {
+    "title": "Leaderboard | TestingWithEkki",
+    "description": "See how the TestingWithEkki community is building stronger automation skills together."
+  },
   "header": {
-    "title": "Hall of Fame",
-    "subtitle": "The elite testers mastering the art of automation."
+    "eyebrow": "Community progress",
+    "title": "Learn together, move forward.",
+    "subtitle": "See how the TestingWithEkki community is building stronger automation skills—one challenge at a time."
   },
   "tabs": {
     "allTime": "All Time",
     "thisMonth": "This Month"
   },
   "table": {
+    "eyebrow": "Community ranking",
+    "title": "Everyone's progress",
+    "rank": "Rank",
+    "learner": "Learner",
+    "activity": "Activity",
+    "score": "Score",
+    "you": "You",
     "hiddenUser": "Hidden User",
     "anonymous": "Anonymous",
     "challengesCount": "{{count}} challenges",
     "challenges": "challenges",
-    "emptyState": "No other runners yet. Invite your friends!"
+    "emptyEyebrow": "A place to grow together",
+    "emptyState": "The community board is ready for its first learners.",
+    "emptyDescription": "Complete a challenge and add your progress to the community."
   },
   "gating": {
-    "title": "Join the Elite",
-    "description": "Sign in to see full rankings, track your own progress, and earn unique badges.",
-    "button": "Sign In to Compete"
+    "eyebrow": "Join the journey",
+    "title": "Keep growing with the community",
+    "description": "Sign in to track your learning, appear on the leaderboard, and collect badges as you practice.",
+    "button": "Sign in to join"
   },
   "monthly": {
-    "comingSoon": "Monthly Rankings Coming Soon",
-    "description": "Compete for the monthly crown in the next season update!"
+    "comingSoon": "This month's progress",
+    "description": "Keep practicing and see your progress grow with the community."
   },
   "error": {
     "description": "Unable to load the leaderboard at this time."

@@ -76,11 +76,11 @@ function UserDetailPage() {
         },
     });
 
-    if (isLoading) return <div className="p-8 text-center animate-pulse">Loading user profile...</div>;
+    if (isLoading) return <div className="p-8 text-center animate-pulse motion-reduce:animate-none">Loading user profile...</div>;
     if (!user) return <div className="p-8 text-center">User not found</div>;
 
     return (
-        <div className="container mx-auto p-6 space-y-8 animate-fade-in text-card-foreground">
+        <div className="container mx-auto p-6 space-y-8 animate-in fade-in-0 duration-200 ease-(--ease-ui-out) text-card-foreground">
             <div className="flex items-center gap-4">
                 <Link to="/admin/users">
                     <Button variant="ghost" size="icon">

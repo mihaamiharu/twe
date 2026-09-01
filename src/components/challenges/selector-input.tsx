@@ -155,7 +155,7 @@ export function SelectorInput({
               onClick={() => handleTypeToggle('css')}
               disabled={disabled}
               className={cn(
-                'text-xs font-medium px-3 py-1 rounded transition-all',
+                'text-xs font-medium px-3 py-1 rounded transition-[background-color,border-color,color] duration-150',
                 selectorType === 'css'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground',
@@ -168,7 +168,7 @@ export function SelectorInput({
               onClick={() => handleTypeToggle('xpath')}
               disabled={disabled}
               className={cn(
-                'text-xs font-medium px-3 py-1 rounded transition-all',
+                'text-xs font-medium px-3 py-1 rounded transition-[background-color,border-color,color] duration-150',
                 selectorType === 'xpath'
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground',
@@ -195,7 +195,7 @@ export function SelectorInput({
               syntaxValidation &&
                 !syntaxValidation.isValid &&
                 'border-destructive',
-              validationResult?.isCorrect && 'border-green-500',
+              validationResult?.isCorrect && 'border-brand-success',
             )}
           />
           {/* Copy button inside input */}
@@ -207,7 +207,7 @@ export function SelectorInput({
             title="Copy selector"
           >
             {copied ? (
-              <Check className="h-4 w-4 text-green-500" />
+              <Check className="h-4 w-4 text-brand-success" />
             ) : (
               <Copy className="h-4 w-4" />
             )}
@@ -229,7 +229,7 @@ export function SelectorInput({
           className={cn(
             'flex items-center gap-2 text-sm p-3 rounded-lg',
             validationResult.isCorrect
-              ? 'bg-green-500/10 text-green-500 border border-green-500/20'
+              ? 'bg-brand-success/10 text-brand-success border border-brand-success/20'
               : 'bg-destructive/10 text-destructive border border-destructive/20',
           )}
         >

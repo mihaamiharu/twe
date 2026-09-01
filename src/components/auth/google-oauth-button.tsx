@@ -44,7 +44,7 @@ export function GoogleOAuthButton({
       disabled={isLoading}
     >
       {isLoading ? (
-        <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        <span className="inline-block h-4 w-4 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent" />
       ) : (
         <>
           <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">

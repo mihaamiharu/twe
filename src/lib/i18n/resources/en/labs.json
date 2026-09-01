@@ -1,0 +1,30 @@
+{
+  "seo": {
+    "title": "Labs — Coming Soon | TestingWithEkki",
+    "description": "Practice QA in real environments with repositories, test frameworks, APIs, and CI pipelines. TestingWithEkki Labs is coming soon."
+  },
+  "hero": {
+    "eyebrow": "LABS · COMING SOON",
+    "title": "Practice QA in real environments",
+    "description": "Some testing skills are better learned outside a browser sandbox. Labs will give you guided projects using real repositories, test frameworks, APIs, CI pipelines, and other tools you would encounter in QA work.",
+    "badge": "COMING SOON",
+    "visualLabel": "LABS",
+    "status": "STATUS"
+  },
+  "note": {
+    "eyebrow": "REAL ENVIRONMENTS",
+    "title": "Practice beyond the sandbox.",
+    "description": "Labs will connect individual testing skills to the tools and handoffs that shape day-to-day QA work.",
+    "steps": {
+      "repository": "Repository",
+      "testFramework": "Test framework",
+      "apiServices": "API / services",
+      "ciPipeline": "CI pipeline",
+      "testDebug": "Test & debug"
+    }
+  },
+  "actions": {
+    "learn": "Explore Learn",
+    "practice": "Explore Practice"
+  }
+}

@@ -22,10 +22,13 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "db:sync": "bun src/scripts/sync-tutorials.ts && bun src/scripts/sync-challenges.ts && bun src/scripts/sync-achievements.ts",
+    "db:reset-curriculum": "bun src/scripts/reset-curriculum-v2.ts",
     "db:docs": "bun src/scripts/generate-solutions-doc.ts",
     "start": "bun run scripts/server.ts"
   },
   "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.3.0",
+    "@fontsource/instrument-sans": "^5.3.0",
     "@hookform/resolvers": "^5.2.2",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-avatar": "^1.1.11",

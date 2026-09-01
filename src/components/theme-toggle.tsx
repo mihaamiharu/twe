@@ -21,8 +21,8 @@ export function ThemeToggle() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="h-9 w-9">
-          <Moon className="h-4 w-4 hidden dark:block transition-all" />
-          <Sun className="h-4 w-4 block dark:hidden transition-all" />
+          <Moon className="h-4 w-4 hidden dark:block" />
+          <Sun className="h-4 w-4 block dark:hidden" />
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>

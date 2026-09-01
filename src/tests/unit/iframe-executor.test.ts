@@ -1,7 +1,10 @@
 import { describe, test, expect, beforeEach } from 'bun:test';
 import { executePlaywrightCode, executeWithTestCases } from '../../core/executor/iframe-executor';
 import { type TestCase } from '../../core/executor/executor.types';
-import type { ExpectedStateRule } from '../../lib/content.types';
+import type {
+  ExpectedStateRule,
+  InteractionSequenceDefinition,
+} from '../../lib/content.types';
 
 // These tests require real iframe DOM behavior (script injection, fetch polyfills, onclick handlers)
 // that HappyDOM cannot replicate on GitHub Actions CI. They pass locally but are structurally
@@ -29,6 +32,24 @@ describe.skipIf(isCI)('Iframe Executor', () => {
     expect(result.status).toBe('PASSED');
     expect(result.returnValue).toBe('Clicked');
     expect('error' in result).toBe(false);
+  });
+
+  test('should keep VFS navigation available to authored page interactions', async () => {
+    const files = {
+      '/index.html': '<a href="/profile.html">Profile</a>',
+      '/profile.html': '<h1>Profile</h1>',
+    };
+    const code = `
+      await page.getByRole('link', { name: 'Profile' }).click();
+      await page.waitForTimeout(100);
+      await expect(page.getByRole('heading')).toHaveText('Profile');
+    `;
+
+    const result = await executePlaywrightCode(code, files['/index.html'], {
+      files,
+    });
+
+    expect(result.status).toBe('PASSED');
   });
 
   test('should handle TypeScript transpilation (mocked)', async () => {
@@ -141,6 +162,95 @@ describe.skipIf(isCI)('Iframe Executor', () => {
     const result = await executePlaywrightCode(code, html, { expectedState });
 
     expect(result.status).toBe('FAILED');
+  });
+
+  test('should validate an ordered interaction sequence across VFS navigation', async () => {
+    const files = {
+      '/index.html': '<a href="/app/checkout.html">Checkout</a>',
+      '/app/checkout.html':
+        "<form id='checkout-form'><label for='quantity'>Quantity</label><input id='quantity' type='number' value='1'><button type='submit'>Place order</button></form><p role='alert' hidden></p><section id='confirmation' role='status' hidden></section><script>document.getElementById('checkout-form').addEventListener('submit',(event)=>{event.preventDefault();const quantity=Number(document.getElementById('quantity').value);const alert=document.querySelector('[role=alert]');const confirmation=document.getElementById('confirmation');if(quantity<1){alert.hidden=false;alert.style.display='';alert.textContent='Quantity must be at least 1';confirmation.hidden=true;return;}alert.hidden=true;alert.style.display='none';confirmation.hidden=false;confirmation.textContent='Order confirmed: '+quantity+' items';});</script>",
+    };
+    const interactionSequence: InteractionSequenceDefinition = {
+      event: 'submit',
+      selector: '#checkout-form',
+      steps: [
+        {
+          inputSelector: '#quantity',
+          inputValue: '0',
+          expectedState: [
+            {
+              selector: '[role=alert]',
+              visible: true,
+              containsText: 'Quantity must be at least 1',
+            },
+            { selector: '#confirmation', hidden: true },
+          ],
+        },
+        {
+          inputSelector: '#quantity',
+          inputValue: '2',
+          expectedState: [
+            { selector: '[role=alert]', hidden: true },
+            {
+              selector: '#confirmation',
+              visible: true,
+              containsText: '2 items',
+            },
+          ],
+        },
+      ],
+    };
+
+    const result = await executePlaywrightCode(
+      `
+        await page.goto('/app/checkout.html');
+        const quantity = page.getByLabel('Quantity');
+        const placeOrder = page.getByRole('button', { name: 'Place order' });
+        await quantity.fill('0');
+        await placeOrder.click();
+        await expect(page.getByRole('alert')).toHaveText('Quantity must be at least 1');
+        await quantity.fill('2');
+        await placeOrder.click();
+        await expect(page.getByRole('alert')).toBeHidden();
+        await expect(page.getByRole('status')).toContainText('2 items');
+      `,
+      files['/index.html'],
+      { files, interactionSequence },
+    );
+
+    expect(result.status).toBe('PASSED');
+  });
+
+  test('should fail when an interaction sequence skips its required boundary', async () => {
+    const files = {
+      '/index.html': '<div></div>',
+      '/app/checkout.html':
+        "<form id='checkout-form'><label for='quantity'>Quantity</label><input id='quantity' type='number' value='1'><button type='submit'>Place order</button></form><p role='alert' hidden></p><section id='confirmation' role='status' hidden></section><script>document.getElementById('checkout-form').addEventListener('submit',(event)=>{event.preventDefault();const quantity=Number(document.getElementById('quantity').value);const alert=document.querySelector('[role=alert]');const confirmation=document.getElementById('confirmation');if(quantity<1){alert.hidden=false;alert.style.display='';alert.textContent='Quantity must be at least 1';confirmation.hidden=true;return;}alert.hidden=true;alert.style.display='none';confirmation.hidden=false;confirmation.textContent='Order confirmed: '+quantity+' items';});</script>",
+    };
+    const interactionSequence: InteractionSequenceDefinition = {
+      event: 'submit',
+      selector: '#checkout-form',
+      steps: [
+        {
+          inputSelector: '#quantity',
+          inputValue: '0',
+          expectedState: [{ selector: '[role=alert]', visible: true }],
+        },
+      ],
+    };
+
+    const result = await executePlaywrightCode(
+      `
+        await page.goto('/app/checkout.html');
+        await page.getByLabel('Quantity').fill('2');
+        await page.getByRole('button', { name: 'Place order' }).click();
+      `,
+      files['/index.html'],
+      { files, interactionSequence },
+    );
+
+    expect(result.status).toBe('FAILED');
+    expect(result.output).toContain("expected '#quantity' to have value '0'");
   });
 
   test('should format error messages healthily', async () => {

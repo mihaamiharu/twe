@@ -70,7 +70,14 @@ void mock.module(
 }));
 
 globalThis.mockSearchParams = {};
-globalThis.mockNavigate = mock(() => Promise.resolve());
+globalThis.mockLoaderData = {
+    success: false,
+    error: 'No mock loader data configured',
+};
+globalThis.mockNavigate = mock((_options?: MockNavigateOptions) => {
+    void _options;
+    return Promise.resolve();
+});
 
 void mock.module(
 '@tanstack/react-router', () => ({
@@ -94,11 +101,13 @@ void mock.module(
         useParams: () => ({ locale: 'en' }),
         useSearch: () => globalThis.mockSearchParams,
         useNavigate: () => globalThis.mockNavigate,
+        useLoaderData: () => globalThis.mockLoaderData,
     }),
     getRouteApi: () => ({
         useParams: () => ({ locale: 'en' }),
         useSearch: () => globalThis.mockSearchParams,
         useNavigate: () => globalThis.mockNavigate,
+        useLoaderData: () => globalThis.mockLoaderData,
     }),
 }));
 

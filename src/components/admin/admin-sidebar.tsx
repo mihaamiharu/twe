@@ -73,7 +73,7 @@ export function AdminSidebar() {
                                         key={item.href}
                                         to={item.href}
                                         className={cn(
-                                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all group relative",
+                                            "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-150 group relative",
                                             isActive
                                                 ? "bg-primary/10 text-primary font-medium"
                                                 : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -85,7 +85,7 @@ export function AdminSidebar() {
                                         )} />
                                         <span className="flex-1">{item.label}</span>
                                         {isActive && (
-                                            <ChevronRight className="h-3 w-3 text-primary animate-in fade-in slide-in-from-left-1" />
+                                            <ChevronRight className="h-3 w-3 text-primary animate-in fade-in slide-in-from-left-1 motion-reduce:animate-none motion-reduce:opacity-100" />
                                         )}
                                         {isActive && (
                                             <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full" />

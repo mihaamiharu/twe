@@ -1,20 +1,19 @@
+'use client';
+
 import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { type AuthSession } from '@/server/auth.fn';
 import { useTranslation } from 'react-i18next';
-import { useState, useEffect, memo } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import {
-  BookOpen,
+  ArrowRight,
   Bug,
-  Code,
   LogOut,
   Menu,
-  Trophy,
   User,
+  Trophy,
   X,
   LayoutDashboard,
-  Info,
 } from 'lucide-react';
-import { ThemeToggle } from './theme-toggle';
 import { Button } from '@/components/ui/button';
 import { UserMenu } from '@/components/user-menu';
 import { signOut } from '@/lib/auth.client';
@@ -23,18 +22,19 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
 
-
 export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const user = session?.user;
   const isAuthenticated = !!user;
   const isAdmin = (user as { role?: string })?.role === 'ADMIN';
 
-  const { t } = useTranslation(['common', 'bugs']);
+  const { t } = useTranslation(['common', 'bugs', 'legal']);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
   const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+  const isContactPage = location.pathname.endsWith('/contact');
   const isAuthPage =
     location.pathname.includes('/login') ||
     location.pathname.includes('/register');
@@ -48,36 +48,57 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
 
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    closeButtonRef.current?.focus();
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
 
-  // Dynamic nav links based on locale
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocused?.focus();
+    };
+  }, [isMobileMenuOpen]);
+
   const navLinks = [
     {
-      to: LocaleRoutes.tutorials,
+      to: LocaleRoutes.learn,
       params: localeParams(locale),
-      label: t('common:navigation.tutorials'),
-      icon: BookOpen,
+      label: t('common:navigation.learn'),
     },
     {
-      to: LocaleRoutes.challenges,
+      to: LocaleRoutes.practice,
       params: localeParams(locale),
-      label: t('common:navigation.challenges'),
-      icon: Code,
-    },
-    {
-      to: LocaleRoutes.leaderboard,
-      params: localeParams(locale),
-      label: t('common:navigation.leaderboard'),
-      icon: Trophy,
-    },
-    {
-      to: LocaleRoutes.about,
-      params: localeParams(locale),
-      label: t('common:navigation.about'),
-      icon: Info,
+      label: t('common:navigation.practice'),
     },
   ];
 
+  const aboutLink = {
+    to: LocaleRoutes.about,
+    params: localeParams(locale),
+    label: t('common:navigation.about'),
+  };
+
+  const primaryCta = isAuthenticated
+    ? {
+        to: LocaleRoutes.learn,
+        params: localeParams(locale),
+      }
+    : {
+        to: LocaleRoutes.register,
+        params: localeParams(locale),
+      };
+  const showPrimaryCta = isAuthenticated || !isAuthPage;
 
   const handleSignOut = async () => {
     try {
@@ -96,88 +117,123 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   return (
     <>
       <header
+        data-shell="header"
         className={cn(
-          'sticky top-0 z-40 w-full transition-all duration-200 border-b',
+          'sticky top-0 z-40 w-full border-b bg-[var(--paper-surface)] transition-colors duration-200',
           scrolled
-            ? 'bg-background/80 backdrop-blur-md border-border/40 shadow-sm'
-            : 'bg-background/0 border-transparent',
+            ? 'border-[var(--soft-border)]'
+            : 'border-[var(--soft-border)]/70',
         )}
         style={{
           paddingRight: 'var(--removed-body-scroll-bar-size, 0px)',
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
+          <div
+            className={cn(
+              'flex items-center justify-between',
+              isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]',
+            )}
+          >
             {/* Logo */}
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-9">
               <Link
                 to={LocaleRoutes.home}
                 params={localeParams(locale)}
-                className="flex items-center gap-2 group"
+                className="group inline-flex min-h-11 items-center"
               >
-                {/* Dark Mode Logo */}
-                <img
-                  src="/logo-dark.svg"
-                  alt="Logo"
-                  className="h-8 w-8 hidden dark:block group-hover:scale-105 transition-all"
-                />
-                {/* Light Mode Logo */}
-                <img
-                  src="/logo-light.svg"
-                  alt="Logo"
-                  className="h-8 w-8 block dark:hidden group-hover:scale-105 transition-all"
-                />
-                <span className="text-xl font-bold font-sans tracking-tight text-foreground group-hover:text-primary transition-colors">
-                  TestingWithEkki
-                  <span className="text-primary animate-pulse">.</span>
+                <span className="text-[1.2rem] font-semibold tracking-[-0.04em] text-[var(--graphite)] group-hover:text-[var(--brand-orange)]">
+                  TestingWith
+                  <span className="twe-wordmark-ekki text-[var(--brand-orange)]">
+                    Ekki
+                  </span>
                 </span>
               </Link>
 
-              <nav className="hidden md:flex items-center gap-1">
+              <nav
+                aria-label="Primary"
+                className="hidden items-center gap-7 lg:flex"
+              >
                 {navLinks.map((link) => (
                   <Link
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium text-muted-foreground transition-all hover:bg-muted/50 hover:text-foreground"
+                    className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                     activeProps={{
                       className:
-                        'text-primary bg-primary/5 hover:bg-primary/10 font-semibold shadow-sm ring-1 ring-border/20',
+                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
                     }}
                   >
-                    <link.icon className="h-4 w-4" />
                     {link.label}
                   </Link>
                 ))}
+                <Link
+                  to={LocaleRoutes.labs}
+                  params={localeParams(locale)}
+                  className="inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                  aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
+                  activeProps={{
+                    className:
+                      'inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
+                  }}
+                >
+                  {t('common:navigation.labs')}
+                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
+                    {t('common:navigation.labsSoon')}
+                  </span>
+                </Link>
+                <Link
+                  to={aboutLink.to}
+                  params={aboutLink.params}
+                  className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-transparent hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                  activeProps={{
+                    className:
+                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:bg-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
+                  }}
+                >
+                  {aboutLink.label}
+                </Link>
               </nav>
             </div>
 
             {/* Right side */}
-            <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-1 mr-2">
+            <div className="flex items-center gap-3">
+              <div className="hidden items-center sm:flex">
                 <LanguageSwitcher />
-                <ThemeToggle />
               </div>
 
               {isAuthenticated && user ? (
                 <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
-                  <div className="hidden md:flex items-center gap-2">
-                    <Button variant="ghost" size="sm" asChild className="text-muted-foreground hover:text-foreground">
-                      <Link
-                        to={LocaleRoutes.login}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:navigation.login')}
-                      </Link>
-                    </Button>
-                    <Button size="sm" asChild className="shadow-sm">
+                  <div className="hidden items-center gap-3 lg:flex">
+                    <Link
+                      to={LocaleRoutes.login}
+                      params={localeParams(locale)}
+                      className={cn(
+                        'inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]',
+                        isContactPage &&
+                          'rounded-md border border-[var(--graphite)] px-5',
+                      )}
+                    >
+                      {t('common:actions.signIn')}
+                    </Link>
+                    <Button
+                      size="sm"
+                      asChild
+                      className="rounded-md bg-[var(--brand-orange)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+                    >
                       <Link
                         to={LocaleRoutes.register}
                         params={localeParams(locale)}
                       >
-                        {t('common:actions.startLearning')}
+                        {t(
+                          isContactPage
+                            ? 'common:actions.startLearning'
+                            : 'common:actions.startWebAutomation',
+                        )}
+                        <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>
                   </div>
@@ -188,9 +244,16 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="md:hidden"
-                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                aria-label="Toggle menu"
+                className="lg:hidden"
+                type="button"
+                onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-navigation"
+                aria-label={
+                  isMobileMenuOpen
+                    ? t('common:actions.closeMenu')
+                    : t('common:actions.openMenu')
+                }
               >
                 {isMobileMenuOpen ? (
                   <X className="h-5 w-5" />
@@ -203,132 +266,201 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         </div>
       </header>
 
-      {/* Scroll Listener Space for Fixed/Sticky Header if needed in future */}
-
       {/* Mobile Navigation */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-50 md:hidden flex flex-col">
-          {/* Backdrop */}
+        <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm"
+            className="fixed inset-0 bg-[var(--graphite)]/15"
             onClick={() => setIsMobileMenuOpen(false)}
+            aria-hidden="true"
           />
 
-          {/* Menu panel */}
-          <nav className="relative flex-1 bg-background border-r border-border/50 max-w-[80vw] w-full p-4 animate-slide-in-left shadow-2xl flex flex-col h-full">
-
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-2">
-                {/* Mobile Logo Rep */}
-                <span className="font-bold text-lg">TestingWithEkki</span>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)}>
+          <nav
+            id="mobile-navigation"
+            aria-label="Mobile navigation"
+            className="relative flex h-full w-full max-w-[22rem] flex-col border-r border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 py-5 animate-in fade-in-0 slide-in-from-left duration-200 ease-(--ease-ui-out) motion-reduce:animate-none motion-reduce:opacity-100"
+          >
+            <div className="mb-7 flex items-center justify-between">
+              <Link
+                to={LocaleRoutes.home}
+                params={localeParams(locale)}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="group inline-flex min-h-11 items-center"
+              >
+                <span className="text-[1.15rem] font-semibold tracking-[-0.04em] text-[var(--graphite)] group-hover:text-[var(--brand-orange)]">
+                  TestingWith
+                  <span className="twe-wordmark-ekki text-[var(--brand-orange)]">
+                    Ekki
+                  </span>
+                </span>
+              </Link>
+              <Button
+                ref={closeButtonRef}
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsMobileMenuOpen(false)}
+                aria-label={t('common:actions.closeMenu')}
+                className="rounded-md text-[var(--graphite)] hover:bg-[var(--orange-tint)]"
+              >
                 <X className="h-5 w-5" />
               </Button>
             </div>
 
-            <div className="space-y-1 flex-1">
-              {navLinks.map((link) => (
+            <div className="flex-1 overflow-y-auto">
+              <div className="space-y-0.5">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    params={link.params}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex min-h-12 items-center border-b border-transparent px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
+                    activeProps={{
+                      className:
+                        'flex min-h-12 items-center border-b-2 border-[var(--brand-orange)] px-1 text-[1rem] font-semibold text-[var(--graphite)]',
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+
                 <Link
-                  key={link.to}
-                  to={link.to}
-                  params={link.params}
+                  to={LocaleRoutes.labs}
+                  params={localeParams(locale)}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all"
+                  className="flex min-h-12 items-center gap-2 px-1 text-[1rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                  aria-label={`${t('common:navigation.labs')}, ${t('common:navigation.labsSoon')}`}
                   activeProps={{
                     className:
-                      'text-primary bg-primary/5 font-medium border-l-2 border-primary rounded-l-none pl-3',
+                      'flex min-h-12 items-center gap-2 px-1 text-[1rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
                   }}
                 >
-                  <link.icon className="h-5 w-5" />
-                  {link.label}
+                  {t('common:navigation.labs')}
+                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
+                    {t('common:navigation.labsSoon')}
+                  </span>
                 </Link>
-              ))}
 
-              <div className="my-6 border-t border-border/50" />
+                <Link
+                  to={aboutLink.to}
+                  params={aboutLink.params}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex min-h-12 items-center border-b border-transparent px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
+                  activeProps={{
+                    className:
+                      'flex min-h-12 items-center border-b-2 border-[var(--brand-orange)] px-1 text-[1rem] font-semibold text-[var(--graphite)]',
+                  }}
+                >
+                  {aboutLink.label}
+                </Link>
+              </div>
 
-              {isAuthenticated && user ? (
-                <>
-                  <Link
-                    to={LocaleRoutes.profile}
-                    params={localeParams(locale)}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex items-center gap-3 p-3 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
-                  >
-                    <User className="h-5 w-5" />
-                    {t('common:navigation.profile')}
-                  </Link>
-                  {isAdmin && (
+              <div className="my-5 border-t border-[var(--soft-border)]" />
+
+              <Link
+                to={LocaleRoutes.contact}
+                params={localeParams(locale)}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex min-h-12 items-center px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]"
+              >
+                {t('legal:contact.title')}
+              </Link>
+
+              <div className="my-5 border-t border-[var(--soft-border)]" />
+
+              <div className="space-y-0.5">
+                <div className="flex min-h-12 items-center px-1">
+                  <LanguageSwitcher />
+                </div>
+
+                {isAuthenticated && user ? (
+                  <>
                     <Link
-                      to="/admin"
+                      to={LocaleRoutes.profile}
+                      params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex items-center gap-3 p-3 rounded-lg text-purple-600 hover:bg-purple-500/10 transition-colors"
+                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
                     >
-                      <LayoutDashboard className="h-5 w-5" />
-                      Admin Dashboard
+                      <User className="h-4 w-4" aria-hidden="true" />
+                      {t('common:navigation.profile')}
                     </Link>
-                  )}
-                  <div className="px-3 py-2">
-                    <BugReportDialog
-                      trigger={
-                        <button className="flex items-center gap-3 w-full py-1 text-muted-foreground hover:text-foreground transition-colors">
-                          <Bug className="h-5 w-5" />
-                          {t('bugs:dialog.trigger')}
-                        </button>
-                      }
-                    />
-                  </div>
-
-                  <div className="mt-auto pt-4">
+                    <Link
+                      to={LocaleRoutes.leaderboard}
+                      params={localeParams(locale)}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
+                    >
+                      <Trophy className="h-4 w-4" aria-hidden="true" />
+                      {t('common:navigation.leaderboard')}
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
+                      >
+                        <LayoutDashboard
+                          className="h-4 w-4"
+                          aria-hidden="true"
+                        />
+                        {t('common:navigation.admin')}
+                      </Link>
+                    )}
+                    <div className="flex min-h-12 items-center px-1">
+                      <BugReportDialog
+                        trigger={
+                          <button className="inline-flex items-center gap-3 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]">
+                            <Bug className="h-4 w-4" aria-hidden="true" />
+                            {t('bugs:dialog.trigger')}
+                          </button>
+                        }
+                      />
+                    </div>
                     <button
                       onClick={() => {
                         setIsMobileMenuOpen(false);
                         void handleSignOut();
                       }}
-                      className="flex items-center gap-3 p-3 rounded-lg w-full text-destructive hover:bg-destructive/10 transition-colors"
+                      className="flex min-h-12 w-full items-center gap-3 px-1 text-left text-[var(--brand-error)] transition-colors hover:text-[var(--brand-error)]/80"
                     >
-                      <LogOut className="h-5 w-5" />
+                      <LogOut className="h-4 w-4" aria-hidden="true" />
                       {t('common:navigation.logout')}
                     </button>
-                  </div>
-                </>
-              ) : (
-                !isAuthPage && (
-                  <div className="space-y-3 mt-4">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-start"
-                      asChild
+                  </>
+                ) : (
+                  !isAuthPage && (
+                    <Link
+                      to={LocaleRoutes.login}
+                      params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex min-h-12 items-center gap-3 px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)]"
                     >
-                      <Link
-                        to={LocaleRoutes.login}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:navigation.login')}
-                      </Link>
-                    </Button>
-                    <Button
-                      className="w-full justify-start"
-                      asChild
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      <Link
-                        to={LocaleRoutes.register}
-                        params={localeParams(locale)}
-                      >
-                        {t('common:actions.startLearning')}
-                      </Link>
-                    </Button>
-                  </div>
-                )
-              )}
+                      <User className="h-4 w-4" aria-hidden="true" />
+                      {t('common:actions.signIn')}
+                    </Link>
+                  )
+                )}
+              </div>
             </div>
 
-            <div className="mt-4 pt-4 border-t border-border/50 flex gap-4">
-              <LanguageSwitcher />
-              <ThemeToggle />
-            </div>
+            {showPrimaryCta && (
+              <div className="mt-5 border-t border-[var(--soft-border)] pt-5">
+                <Button
+                  asChild
+                  className="h-12 w-full rounded-md bg-[var(--brand-orange)] text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                >
+                  <Link to={primaryCta.to} params={primaryCta.params}>
+                    {t(
+                      isContactPage || isAuthenticated
+                        ? 'common:actions.startLearning'
+                        : 'common:actions.startWebAutomation',
+                    )}
+                    <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </Link>
+                </Button>
+              </div>
+            )}
           </nav>
         </div>
       )}

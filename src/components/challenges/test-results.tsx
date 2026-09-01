@@ -133,11 +133,14 @@ export function TestResults({
   if (isRunning) {
     return (
       <div
-        className={cn('p-4 rounded-lg border border-border bg-card', className)}
+        className={cn(
+          'p-4 rounded-md border border-workspace-border bg-workspace-panel',
+          className,
+        )}
       >
-        <div className="flex items-center gap-3 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin" />
-          <span>Running tests...</span>
+        <div className="flex items-center gap-3 text-workspace-muted">
+          <Loader2 className="h-5 w-5 animate-spin motion-reduce:animate-none" />
+          <span className="font-mono text-xs tracking-wide">RUNNING…</span>
         </div>
       </div>
     );
@@ -147,17 +150,17 @@ export function TestResults({
     return (
       <div
         className={cn(
-          'p-8 rounded-xl border-2 border-black bg-muted/10 border-dashed text-center flex flex-col items-center justify-center h-full min-h-[160px] animate-fade-in',
+          'p-8 rounded-md border border-workspace-border bg-workspace-panel border-dashed text-center flex flex-col items-center justify-center h-full min-h-[160px]',
           className,
         )}
       >
-        <div className="bg-brand-teal/20 p-4 rounded-full mb-3 border border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
-          <Clock className="h-6 w-6 text-black" />
+        <div className="bg-workspace-elevated p-3 rounded-md mb-3 border border-workspace-border">
+          <Clock className="h-5 w-5 text-workspace-muted" />
         </div>
         <h3 className="text-base font-bold text-foreground mb-1">
-          Ready to Validate
+          Ready to Run
         </h3>
-        <p className="text-sm text-muted-foreground max-w-[240px] font-medium">
+        <p className="text-sm text-workspace-muted max-w-[240px]">
           Run your solution to see test results and validation details here.
         </p>
       </div>
@@ -167,33 +170,33 @@ export function TestResults({
   return (
     <div
       className={cn(
-        'rounded-xl border-2 border-black bg-white dark:bg-slate-950 overflow-hidden animate-fade-in hard-shadow-sm',
+        'rounded-md border border-workspace-border bg-workspace-panel overflow-hidden',
         className,
       )}
     >
       {/* Header with Summary */}
       <div
         className={cn(
-          'px-4 py-4 border-b-2 border-black flex items-center justify-between',
-          allPassed ? 'bg-green-500/10' : 'bg-destructive/10',
+          'px-4 py-3 border-b border-workspace-border flex items-center justify-between',
+          allPassed ? 'bg-brand-success/10' : 'bg-brand-error/10',
         )}
       >
         <div className="flex items-center gap-3">
           {allPassed ? (
-            <CheckCircle2 className="h-6 w-6 text-green-600" />
+            <CheckCircle2 className="h-5 w-5 text-brand-success" />
           ) : (
-            <XCircle className="h-6 w-6 text-destructive" />
+            <XCircle className="h-5 w-5 text-brand-error" />
           )}
           <div>
             <span
               className={cn(
-                'font-bold text-base',
-                allPassed ? 'text-green-600' : 'text-destructive',
+                'font-mono text-sm font-medium tracking-wide',
+                allPassed ? 'text-brand-success' : 'text-brand-error',
               )}
             >
-              {allPassed ? copy.success : copy.failure}
+              {allPassed ? '✓ PASSED' : '✕ FAILED'}
             </span>
-            <span className="text-muted-foreground ml-2 font-bold font-mono">
+            <span className="text-workspace-muted ml-2 font-mono text-xs">
               [{totalPassed}/{totalTests}]
             </span>
           </div>
@@ -205,7 +208,7 @@ export function TestResults({
               variant="ghost"
               size="sm"
               onClick={expandAll}
-              className="h-8 text-xs font-bold border border-black/10 hover:border-black/20"
+              className="h-8 text-xs font-medium border border-workspace-border text-workspace-muted hover:text-workspace-text hover:bg-workspace-elevated"
             >
               Expand Failed
             </Button>
@@ -215,7 +218,7 @@ export function TestResults({
               variant="ghost"
               size="sm"
               onClick={collapseAll}
-              className="h-8 text-xs font-bold border border-black/10 hover:border-black/20"
+              className="h-8 text-xs font-medium border border-workspace-border text-workspace-muted hover:text-workspace-text hover:bg-workspace-elevated"
             >
               Collapse All
             </Button>
@@ -224,23 +227,23 @@ export function TestResults({
       </div>
 
       {/* Test Results List */}
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-workspace-border">
         {results.map((result, index) => (
           <div key={result.id} className="group">
             {/* Test Header Row */}
             <button
               onClick={() => result.error && toggleExpand(result.id)}
               className={cn(
-                'w-full px-4 py-3 flex items-center gap-3 text-left transition-colors',
-                result.error && 'hover:bg-muted/50 cursor-pointer',
+                'w-full min-h-12 px-4 py-3 flex items-center gap-3 text-left transition-colors',
+                result.error && 'hover:bg-workspace-elevated cursor-pointer',
                 !result.error && 'cursor-default',
               )}
             >
               {/* Pass/Fail Icon */}
               {result.passed ? (
-                <CheckCircle2 className="h-4 w-4 text-green-500 shrink-0" />
+                <CheckCircle2 className="h-4 w-4 text-brand-success shrink-0" />
               ) : (
-                <XCircle className="h-4 w-4 text-destructive shrink-0" />
+                <XCircle className="h-4 w-4 text-brand-error shrink-0" />
               )}
 
               {/* Test Info */}
@@ -288,10 +291,10 @@ export function TestResults({
             {expandedTests.has(result.id) && result.error && (
               <div className="px-4 pb-4 pt-0 ml-7 space-y-4">
                 {/* Error Message */}
-                <div className="p-4 rounded-xl bg-destructive/5 border-2 border-black hard-shadow-xs">
+                <div className="p-4 rounded-md bg-brand-error/10 border border-brand-error/30">
                   <div className="flex items-start gap-2">
-                    <AlertTriangle className="h-4 w-4 text-destructive shrink-0 mt-1" />
-                    <pre className="text-sm text-destructive font-bold font-mono whitespace-pre-wrap break-words leading-relaxed">
+                    <AlertTriangle className="h-4 w-4 text-brand-error shrink-0 mt-1" />
+                    <pre className="text-sm text-brand-error font-mono whitespace-pre-wrap break-words leading-relaxed">
                       {result.error}
                     </pre>
                   </div>
@@ -300,29 +303,29 @@ export function TestResults({
                 {/* Expected vs Actual */}
                 {(result.expected !== undefined ||
                   result.output !== undefined) && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {result.expected !== undefined && (
-                        <div className="p-3 rounded-lg bg-green-500/5 border-2 border-green-500/20">
-                          <div className="text-xs font-bold text-green-600 mb-2 uppercase tracking-tight">
-                            Expected
-                          </div>
-                          <pre className="text-sm font-bold font-mono text-green-600 whitespace-pre-wrap break-words">
-                            {JSON.stringify(result.expected, null, 2)}
-                          </pre>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {result.expected !== undefined && (
+                      <div className="p-3 rounded-md bg-brand-success/10 border border-brand-success/30">
+                        <div className="text-xs font-medium text-brand-success mb-2 uppercase tracking-tight">
+                          Expected
                         </div>
-                      )}
-                      {result.output !== undefined && (
-                        <div className="p-3 rounded-lg bg-destructive/5 border-2 border-destructive/20">
-                          <div className="text-xs font-bold text-destructive mb-2 uppercase tracking-tight">
-                            Received
-                          </div>
-                          <pre className="text-sm font-bold font-mono text-destructive whitespace-pre-wrap break-words">
-                            {JSON.stringify(result.output, null, 2)}
-                          </pre>
+                        <pre className="text-sm font-mono text-brand-success whitespace-pre-wrap break-words">
+                          {JSON.stringify(result.expected, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                    {result.output !== undefined && (
+                      <div className="p-3 rounded-md bg-brand-error/10 border border-brand-error/30">
+                        <div className="text-xs font-medium text-brand-error mb-2 uppercase tracking-tight">
+                          Actual
                         </div>
-                      )}
-                    </div>
-                  )}
+                        <pre className="text-sm font-mono text-brand-error whitespace-pre-wrap break-words">
+                          {JSON.stringify(result.output, null, 2)}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -330,18 +333,18 @@ export function TestResults({
 
         {/* Hidden Tests Summary */}
         {totalHiddenTests > 0 && (
-          <div className="px-4 py-3 flex items-center gap-3 bg-muted/30">
+          <div className="px-4 py-3 flex items-center gap-3 bg-workspace-elevated">
             <div
               className={cn(
                 'h-4 w-4 rounded-full flex items-center justify-center text-[10px] font-bold',
                 hiddenTestsPassed === totalHiddenTests
-                  ? 'bg-green-500 text-white'
-                  : 'bg-muted-foreground text-background',
+                  ? 'bg-brand-success text-workspace-text'
+                  : 'bg-workspace-muted text-workspace-background',
               )}
             >
               ?
             </div>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm text-workspace-muted">
               {hiddenTestsPassed}/{totalHiddenTests} hidden tests passed
             </span>
           </div>

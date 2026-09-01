@@ -51,7 +51,7 @@ export function LevelUpNotification({
     >
       <Card
         className={cn(
-          'glass-card border-yellow-500/50 max-w-md w-full mx-4 transform transition-all duration-500',
+          'max-w-md w-full mx-4 transform transition-transform duration-500 ease-(--ease-ui-out) border-brand-orange/40',
           isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4',
         )}
         onClick={(e) => e.stopPropagation()}
@@ -70,14 +70,16 @@ export function LevelUpNotification({
           {/* Sparkle animation */}
           <div className="flex justify-center mb-4">
             <div className="relative">
-              <Sparkles className="h-16 w-16 text-yellow-400 animate-pulse" />
-              <Star className="h-8 w-8 text-yellow-400 absolute -top-2 -right-2 animate-bounce" />
-              <Star className="h-6 w-6 text-yellow-300 absolute -bottom-1 -left-3 animate-bounce delay-100" />
+              <Sparkles className="h-16 w-16 text-brand-orange animate-pulse motion-reduce:animate-none" />
+              <Star className="absolute -right-2 -top-2 h-8 w-8 text-brand-orange animate-bounce motion-reduce:animate-none" />
+              <Star className="absolute -bottom-1 -left-3 h-6 w-6 text-brand-orange animate-bounce motion-reduce:animate-none delay-100" />
             </div>
           </div>
 
           {/* Level up text */}
-          <h2 className="text-2xl font-bold gradient-text mb-2">Level Up!</h2>
+          <h2 className="mb-2 text-2xl font-semibold tracking-tight text-foreground">
+            Level Up!
+          </h2>
 
           <div className="flex items-center justify-center gap-4 my-6">
             <div className="text-center">
@@ -88,7 +90,7 @@ export function LevelUpNotification({
             </div>
             <div className="text-2xl text-muted-foreground">→</div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-primary animate-pulse">
+              <div className="text-5xl font-bold text-primary animate-pulse motion-reduce:animate-none">
                 {newLevel}
               </div>
               <div className="text-xs text-muted-foreground">New Level</div>
@@ -99,7 +101,7 @@ export function LevelUpNotification({
             {t('challenges:success.levelUpMessage', {
               defaultValue: 'You are now a ',
             })}{' '}
-            <span className="font-semibold text-yellow-400">{newTitle}</span>!
+            <span className="font-semibold text-brand-orange">{newTitle}</span>!
           </p>
 
           <p className="text-muted-foreground text-sm mb-6">

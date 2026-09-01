@@ -1,55 +1,47 @@
-import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
-import { useQuery } from '@tanstack/react-query';
-import { Button } from '@/components/ui/button';
-import { WaveSeparator } from '@/components/ui/wave-separator';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
+import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
 import {
-  Zap,
-  BookOpen,
-  Code2,
-  Trophy,
-  Target,
-  Sparkles,
   ArrowRight,
-  CheckCircle,
+  BookOpen,
+  Check,
+  Code2,
+  FlaskConical,
+  Play,
 } from 'lucide-react';
-import { AnimatedCounter } from '@/components/animated-counter';
-import { SelectorDemo } from '@/components/selector-demo';
-import { PlaywrightDemo } from '@/components/playwright-demo';
-import { getDashboardStats } from '@/server/dashboard.fn';
 import { useTranslation } from 'react-i18next';
-
+import { QaDoodle } from '@/components/qa-illustrations';
+import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
+import { authQueryOptions } from '@/lib/auth.query';
+import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
+import { BASE_URL, createSeoHead, createWebsiteSchema } from '@/lib/seo';
 import i18n from '@/lib/i18n';
-import { createSeoHead, websiteSchema } from '@/lib/seo';
+import { LocaleRoutes, localeParams } from '@/lib/navigation';
 
 export const Route = createFileRoute('/$locale/')({
-  loader: async ({ context }) => {
-    // Prefetch stats for SSR
-    if (context?.queryClient) {
-      await context.queryClient.ensureQueryData({
-        queryKey: ['homepage-stats'],
-        queryFn: async () => {
-          const result = await getDashboardStats();
-          if (!result.success || !result.data) {
-            throw new Error(result.error || 'Failed to fetch stats');
-          }
-          return result.data;
-        },
-        staleTime: 1000 * 60 * 5,
-      });
-    }
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+
+    return context.queryClient.ensureQueryData(
+      tutorialsListQueryOptions({
+        locale: params.locale,
+        viewerId: auth.user?.id,
+      }),
+    );
   },
   component: HomePage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: i18n.t('common:seo.title'),
-      description: i18n.t('common:seo.description'),
+      title: i18n.t('common:seo.title', { lng: locale }),
+      description: i18n.t('common:seo.description', { lng: locale }),
       path: '/',
       locale,
-      jsonLd: [websiteSchema],
+      ogImage: `${BASE_URL}/api/og?type=Home`,
+      jsonLd: [
+        createWebsiteSchema({
+          locale,
+          description: i18n.t('common:seo.description', { lng: locale }),
+        }),
+      ],
     });
   },
 });
@@ -59,497 +51,239 @@ const routeApi = getRouteApi('/$locale/');
 function HomePage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('home');
-  // Fetch real stats from Server Function
-  const { data: statsData, isLoading: statsLoading } = useQuery({
-    queryKey: ['homepage-stats'],
-    queryFn: async () => {
-      const result = await getDashboardStats();
-      if (!result.success || !result.data) {
-        throw new Error(result.error || 'Failed to fetch stats');
-      }
-      return result.data;
-    },
-    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
-  });
+  const params = localeParams(locale);
+  const lessonsResponse = routeApi.useLoaderData();
+  const currentLessons = lessonsResponse.success
+    ? lessonsResponse.data.slice(0, 3)
+    : [];
 
-  const stats = statsData;
-
-  const features = [
-    {
-      icon: <BookOpen className="w-10 h-10 text-primary" />,
-      title: t('features.interactiveTutorials.title'),
-      description: t('features.interactiveTutorials.description'),
-    },
-    {
-      icon: <Code2 className="w-10 h-10 text-primary" />,
-      title: t('features.playwrightChallenges.title'),
-      description: t('features.playwrightChallenges.description'),
-      demo: <PlaywrightDemo />,
-    },
-    {
-      icon: <Target className="w-10 h-10 text-primary" />,
-      title: t('features.selectorChallenges.title'),
-      description: t('features.selectorChallenges.description'),
-      demo: <SelectorDemo />,
-    },
-    {
-      icon: <Trophy className="w-10 h-10 text-primary" />,
-      title: t('features.gamification.title'),
-      description: t('features.gamification.description'),
-    },
-    {
-      icon: <Zap className="w-10 h-10 text-primary" />,
-      title: t('features.instantFeedback.title'),
-      description: t('features.instantFeedback.description'),
-    },
-    {
-      icon: <Sparkles className="w-10 h-10 text-primary" />,
-      title: t('features.trackProgress.title'),
-      description: t('features.trackProgress.description'),
-    },
-  ];
-
-  const learningPath = [
-    {
-      tier: 'basic',
-      emoji: '🟢',
-      title: t('tiers.basic.title'),
-      description: t('tiers.basic.description'),
-      skills: t('tiers.basic.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.basic || 0,
-    },
-    {
-      tier: 'beginner',
-      emoji: '🟡',
-      title: t('tiers.beginner.title'),
-      description: t('tiers.beginner.description'),
-      skills: t('tiers.beginner.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.beginner || 0,
-    },
-    {
-      tier: 'intermediate',
-      emoji: '🟠',
-      title: t('tiers.intermediate.title'),
-      description: t('tiers.intermediate.description'),
-      skills: t('tiers.intermediate.skills', {
-        returnObjects: true,
-      }) as string[],
-      count: stats?.tiers.intermediate || 0,
-    },
-    {
-      tier: 'e2e',
-      emoji: '🟣',
-      title: t('tiers.e2e.title'),
-      description: t('tiers.e2e.description'),
-      skills: t('tiers.e2e.skills', { returnObjects: true }) as string[],
-      count: stats?.tiers.e2e || 0,
-    },
-  ];
-
-  const featuredChallenges = [
-    {
-      title: 'CSS Selector 101',
-      difficulty: 'EASY',
-      type: 'CSS Selector',
-      xp: 15,
-      slug: 'css-selector-101-id-class',
-    },
-    {
-      title: 'Variables & Types',
-      difficulty: 'EASY',
-      type: 'JavaScript',
-      xp: 15,
-      slug: 'js-variables-types',
-    },
-    {
-      title: 'Click Actions',
-      difficulty: 'MEDIUM',
-      type: 'Playwright',
-      xp: 45,
-      slug: 'pw-click-actions',
-    },
+  const methodSteps = [
+    { number: '01', label: t('learnPractice.steps.learn.label'), title: t('learnPractice.steps.learn.title'), description: t('learnPractice.steps.learn.description'), icon: BookOpen },
+    { number: '02', label: t('learnPractice.steps.practice.label'), title: t('learnPractice.steps.practice.title'), description: t('learnPractice.steps.practice.description'), icon: Code2 },
+    { number: '03', label: t('learnPractice.steps.review.label'), title: t('learnPractice.steps.review.title'), description: t('learnPractice.steps.review.description'), icon: Check },
   ];
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section with Technical Grid */}
-      <section className="relative py-24 px-6 text-center overflow-hidden">
-        <div className="absolute inset-0 bg-grid-small [mask-image:linear-gradient(to_bottom,black_40%,transparent)]"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-background/50 via-transparent to-background"></div>
-
-        <div className="relative max-w-5xl mx-auto">
-          {/* Title */}
-          <h1 className="text-5xl md:text-7xl font-bold mb-6">
-            <span className="gradient-text">{t('hero.title')}</span>
-            <br />
-            {t('hero.titleSuffix')}
+    <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
+      <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-4 lg:px-12 lg:pb-28 lg:pt-20">
+        <div className="relative z-10 max-w-2xl">
+          <p className="mb-6 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+            {t('hero.eyebrow')}
+          </p>
+          <h1 className="max-w-[680px] text-[clamp(3rem,6vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
+            {t('hero.title')}
+            <span className="text-[var(--brand-orange)]">.</span>
           </h1>
-
-          {/* Tagline */}
-          <p className="text-xl md:text-2xl text-muted-foreground mb-2 max-w-3xl mx-auto">
-            {t('hero.tagline')}
+          <p className="mt-7 max-w-xl text-lg leading-8 text-[var(--muted-graphite)] sm:text-[1.125rem]">
+            {t('hero.description')}
           </p>
-
-          {/* Authority Statement */}
-          <p className="text-base md:text-lg text-primary/80 font-medium mb-4 max-w-2xl mx-auto">
-            {t('hero.authorityStatement')}
-          </p>
-
-          <p
-            className="text-lg text-muted-foreground/80 max-w-2xl mx-auto mb-6"
-            dangerouslySetInnerHTML={{ __html: t('hero.description') }}
-          />
-
-          {/* Trust Bar - Skills/Tools */}
-          <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🎭 Playwright
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              ⚡ JavaScript
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🎯 CSS Selectors
-            </Badge>
-            <Badge variant="outline" className="px-4 py-1.5 text-sm font-semibold border-2 hover:bg-primary/5 transition-colors">
-              🔍 XPath
-            </Badge>
-          </div>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            <Link to="/$locale/challenges" params={{ locale }}>
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 rounded-xl border-2 border-primary shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-shadow"
-              >
-                {t('hero.startLearning')}
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+          <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
+            <Link
+              to={LocaleRoutes.learn}
+              params={params}
+              className="motion-hover-lift inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+            >
+              {t('hero.startWebAutomation')}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link to="/$locale/tutorials" params={{ locale }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="text-lg px-8 py-6 rounded-xl border-2 hover:bg-muted"
-              >
-                {t('hero.browseTutorials')}
-              </Button>
+            <Link
+              to={LocaleRoutes.practice}
+              params={params}
+              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+            >
+              {t('hero.explorePractice')}
             </Link>
           </div>
-
-          {/* Dynamic Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-16 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.challenges || 0} suffix="+" />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.challenges')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-12 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.tutorials || 0} />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.tutorials')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                {statsLoading ? (
-                  <Skeleton className="h-10 w-12 mx-auto" />
-                ) : (
-                  <AnimatedCounter value={stats?.achievements || 0} />
-                )}
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.achievements')}
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
-                ∞
-              </div>
-              <div className="text-sm text-muted-foreground font-medium">
-                {t('stats.learning')}
-              </div>
-            </div>
+          <div className="mt-9 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
+            <span className="flex -space-x-2" aria-hidden="true">
+              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#d8b5a7]" />
+              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#b9c4c8]" />
+              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#d4c8a7]" />
+            </span>
+            <span>{t('hero.creatorNote')}</span>
           </div>
         </div>
-
-
-
-        {/* Animated Wave Separator */}
-        <WaveSeparator />
+        <HomeHeroVisual />
       </section>
 
-      {/* Learning Path Section */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('careerPath.title')}{' '}
-              <span className="gradient-text">
-                {t('careerPath.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('careerPath.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {learningPath.map((tier, index) => (
-              <Card
-                key={tier.tier}
-                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 relative overflow-hidden group"
-              >
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <CardContent className="p-6">
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-3xl grayscale-[0.5]">{tier.emoji}</span>
-                    <div>
-                      <div className="text-sm text-muted-foreground font-bold">
-                        Phase {index + 1}
-                      </div>
-                      <h3 className="text-xl font-bold">{tier.title}</h3>
-                    </div>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    {tier.description}
-                  </p>
-                  <div className="flex flex-wrap gap-1 mb-4">
-                    {tier.skills.map((skill) => (
-                      <Badge
-                        key={skill}
-                        variant="secondary"
-                        className="text-xs font-medium border border-border"
-                      >
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-                  <div className="text-sm font-bold text-primary">
-                    {tier.count > 0 ? (
-                      `${tier.count} ${t('careerPath.challenges')}`
-                    ) : (
-                      <Badge variant="outline" className="text-xs border-dashed border-muted-foreground text-muted-foreground">
-                        Coming Soon
-                      </Badge>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured Challenges */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('featuredChallenges.title')}{' '}
-              <span className="gradient-text">
-                {t('featuredChallenges.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              {t('featuredChallenges.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredChallenges.map((challenge) => (
-              <Link
-                key={challenge.slug}
-                to="/$locale/challenges/$slug"
-                params={{ locale, slug: challenge.slug }}
-              >
-                <Card className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10 cursor-pointer h-full">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between mb-3">
-                      <Badge
-                        className="font-bold border-2"
-                        variant={
-                          challenge.difficulty === 'EASY'
-                            ? 'secondary'
-                            : challenge.difficulty === 'MEDIUM'
-                              ? 'default'
-                              : 'destructive'
-                        }
-                      >
-                        {challenge.difficulty}
-                      </Badge>
-                      <span className="text-sm text-primary font-bold">
-                        +{challenge.xp} XP
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold mb-2">
-                      {challenge.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground font-medium">
-                      {challenge.type}
-                    </p>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
-
-          <div className="text-center mt-8">
-            <Link to="/$locale/challenges" params={{ locale }}>
-              <Button
-                variant="outline"
-                size="lg"
-                className="rounded-xl border-2"
-              >
-                {t('featuredChallenges.viewAll')}
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="grid gap-10 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:p-9 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:p-12">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('learningPath.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learningPath.title')}</h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learningPath.description')}</p>
+            <Link
+              to={LocaleRoutes.learn}
+              params={params}
+              className="mt-7 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
+            >
+              {t('learningPath.cta')}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-20 px-6 bg-muted/30">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('features.title')}{' '}
-              <span className="gradient-text">
-                {t('features.titleHighlight')}
-              </span>
-            </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              {t('features.subtitle')}
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature, index) => (
-              <Card
-                key={index}
-                className="glass-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/10"
-              >
-                <CardContent className="p-6">
-                  <div className="mb-4 p-3 bg-primary/10 rounded-xl w-fit border-2 border-primary/20">
-                    {feature.icon}
-                  </div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-                  <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: feature.description }} />
-                  {feature.demo && feature.demo}
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-
-
-      {/* How It Works Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('howItWorks.title')}{' '}
-              <span className="gradient-text">
-                {t('howItWorks.titleHighlight')}
-              </span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                step: '1',
-                title: t('howItWorks.step1.title'),
-                description: t('howItWorks.step1.description'),
-              },
-              {
-                step: '2',
-                title: t('howItWorks.step2.title'),
-                description: t('howItWorks.step2.description'),
-              },
-              {
-                step: '3',
-                title: t('howItWorks.step3.title'),
-                description: t('howItWorks.step3.description'),
-              },
-            ].map((item) => (
-              <div key={item.step} className="text-center group">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 border-2 border-primary/20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <span className="text-2xl font-bold text-primary">
-                    {item.step}
+            <div
+              data-testid="current-lessons"
+              className="relative grid gap-3 sm:grid-cols-3"
+            >
+              {currentLessons.map((lesson, index) => (
+                <Link
+                  key={lesson.slug}
+                  to={LocaleRoutes.learnDetail}
+                  params={{ ...params, slug: lesson.slug }}
+                  className="motion-hover-arrow-group group relative flex min-h-44 flex-col rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-4 transition-colors hover:border-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                >
+                  <span className="font-mono text-[11px] text-[var(--brand-orange)]">
+                    {t('learningPath.lessonNumber', { number: index + 1 })}
                   </span>
-                </div>
-                <h3 className="text-xl font-bold mb-2">{item.title}</h3>
-                <p className="text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
-              </div>
-            ))}
+                  <h3 className="mt-4 font-semibold leading-6 group-hover:text-[var(--brand-orange)]">
+                    {lesson.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--muted-graphite)]">
+                    {lesson.description}
+                  </p>
+                  <ArrowRight
+                    className="motion-hover-arrow mt-auto h-4 w-4 self-end text-[var(--brand-orange)]"
+                    aria-hidden="true"
+                  />
+                </Link>
+              ))}
+              {currentLessons.length === 0 && (
+                <p className="rounded-lg border border-dashed border-[var(--soft-border)] p-5 text-sm leading-6 text-[var(--muted-graphite)] sm:col-span-3">
+                  {t('learningPath.noLessons')}
+                </p>
+              )}
+            </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="grid items-start gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('learnPractice.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learnPractice.title')}</h2>
+            <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learnPractice.description')}</p>
+          </div>
+          <div className="grid gap-7 lg:grid-cols-[0.85fr_1.15fr]">
+            <ol className="space-y-5">
+              {methodSteps.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <li key={step.number} className="flex gap-4 border-b border-[var(--soft-border)] pb-5 last:border-b-0">
+                    <span className="font-mono text-xs text-[var(--brand-orange)]">{step.number}</span>
+                    <div>
+                      <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
+                        <Icon className="h-3.5 w-3.5 text-[var(--brand-orange)]" aria-hidden="true" />
+                        {step.label}
+                      </div>
+                      <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
+                      <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">{step.description}</p>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+            <div className="lg:pt-4">
+              <PracticePreview />
+              <Link to={LocaleRoutes.practice} params={params} className="mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+                {t('learnPractice.cta')}
+                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-
-
-      {/* CTA Section */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="glass-card p-12 rounded-3xl border-2 border-primary/20">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              {t('cta.title')}
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-              {t('cta.subtitle')}
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Link to="/$locale/challenges" params={{ locale }}>
-                <Button
-                  size="lg"
-                  className="text-lg px-8 rounded-xl border-2 border-primary shadow-lg shadow-primary/20"
-                >
-                  {t('cta.getStarted')}
-                </Button>
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14">
+          <div className="relative mx-auto w-full max-w-[300px]">
+            <div className="absolute inset-4 rounded-[42%] border border-[var(--brand-orange)]/35" />
+            <img src="/testing-workflow-illustration.jpg" alt="Illustration of a software testing workflow" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-center" width={600} height={600} loading="lazy" />
+            <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] shadow-sm">TEST FLOW / TWE</div>
+          </div>
+          <div>
+            <h2 className="max-w-2xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t('philosophy.title')}</h2>
+            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">{t('philosophy.description')}</p>
+            <div className="mt-8 border-t border-[var(--brand-orange)]/25 pt-6">
+              <p className="font-mono text-xs uppercase tracking-[0.15em] text-[var(--brand-orange)]">{t('creator.eyebrow')}</p>
+              <h3 className="mt-2 text-2xl font-semibold">{t('creator.title')}</h3>
+              <p className="mt-3 max-w-xl text-base leading-7 text-[var(--muted-graphite)]">{t('creator.description')}</p>
+              <Link to={LocaleRoutes.about} params={params} className="mt-5 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+                {t('creator.cta')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
-              <Link to="/$locale/leaderboard" params={{ locale }}>
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-lg px-8 rounded-xl border-2"
-                >
-                  {t('cta.viewLeaderboard')}
-                </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="border-y border-[var(--soft-border)]">
+          <div
+            data-empty-state
+            data-empty-state-illustration="thinking"
+            className="grid items-center gap-10 py-10 sm:py-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16 lg:py-14"
+          >
+            <div className="max-w-xl">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('labs.eyebrow')}</p>
+              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('labs.title')}</h2>
+              <p className="mt-5 text-base leading-7 text-[var(--muted-graphite)]">{t('labs.description')}</p>
+              <Link
+                to={LocaleRoutes.labs}
+                params={params}
+                className="mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
+              >
+                {t('labs.cta')}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
 
-            <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-sm text-muted-foreground font-medium">
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.freeToUse')}
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.noCreditCard')}
-              </span>
-              <span className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-500" />
-                {t('cta.learnAtOwnPace')}
-              </span>
+            <div className="relative overflow-hidden rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:p-7">
+              <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full border border-[var(--brand-orange)]/20" aria-hidden="true" />
+              <div className="absolute -bottom-20 -left-12 h-44 w-44 rounded-full border border-[var(--brand-orange)]/15" aria-hidden="true" />
+              <div className="relative">
+                <div className="flex items-start justify-between gap-4 border-b border-[var(--soft-border)] pb-5">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--orange-tint)]">
+                      <FlaskConical className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+                    </span>
+                    <div>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--brand-orange)]">{t('labs.preview.label')}</p>
+                      <p className="mt-1 text-sm font-semibold">{t('labs.preview.title')}</p>
+                    </div>
+                  </div>
+                  <span className="shrink-0 rounded-full border border-[var(--brand-orange)]/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--brand-orange)]">{t('labs.preview.status')}</span>
+                </div>
+                <div className="mt-6 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2 sm:gap-3">
+                  {[t('labs.preview.steps.observe'), t('labs.preview.steps.try'), t('labs.preview.steps.review')].map((step, index) => (
+                    <div key={step} className="contents">
+                      <div className="rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-3 text-center">
+                        <span className="font-mono text-[10px] text-[var(--brand-orange)]">0{index + 1}</span>
+                        <p className="mt-2 text-xs font-semibold sm:text-sm">{step}</p>
+                      </div>
+                      {index < 2 && <QaDoodle kind="trace" className="h-5 w-5 sm:h-6 sm:w-6" />}
+                    </div>
+                  ))}
+                </div>
+                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--muted-graphite)]">{t('labs.preview.caption')}</p>
+              </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-24 sm:px-8 lg:px-12 lg:pb-32">
+        <div className="rounded-xl bg-[var(--graphite)] px-7 py-12 text-[var(--paper-surface)] sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--orange-tint)]">{t('cta.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('cta.title')}</h2>
+            <p className="mt-4 max-w-xl text-base leading-7 text-[#d2d0c9]">{t('cta.description')}</p>
+          </div>
+          <div className="mt-8 flex shrink-0 flex-col items-start gap-4 sm:flex-row lg:mt-0 lg:flex-col lg:items-start">
+            <Link to={LocaleRoutes.learn} params={params} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
+              {t('cta.primary')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+            </Link>
+            <Link to={LocaleRoutes.practice} params={params} className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
+              {t('cta.secondary')} <Play className="h-3.5 w-3.5" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

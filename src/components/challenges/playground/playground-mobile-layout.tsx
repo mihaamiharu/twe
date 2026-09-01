@@ -1,10 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { BookOpen, Play, Search, Code2, Info, CheckCircle2, Folder } from 'lucide-react';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { BookOpen, Code2, Eye, Folder, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
 import { omitUndefined } from '@/lib/omit-undefined';
+import { cn } from '@/lib/utils';
 import { WebComponentPreview } from '../web-component-preview';
 import { EditorPanel } from './editor-panel';
 import { SelectorPanel } from './selector-panel';
@@ -13,249 +14,254 @@ import { FileExplorer } from '../file-explorer';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
 import type { Challenge, PlaygroundState } from './types';
 import type { SelectorType } from '../selector-input';
-import { useState, useEffect } from 'react';
 import type { ChallengeExecution } from './use-challenge-execution';
 
 interface PlaygroundMobileLayoutProps {
-    challenge: Challenge;
-    state: PlaygroundState;
-    execution: ChallengeExecution;
-    previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
+  challenge: Challenge;
+  state: PlaygroundState;
+  execution: ChallengeExecution;
+  previewIframeRef: React.RefObject<HTMLIFrameElement | null>;
 }
 
 export function PlaygroundMobileLayout({
-    challenge,
-    state,
-    execution,
-    previewIframeRef,
+  challenge,
+  state,
+  execution,
+  previewIframeRef,
 }: PlaygroundMobileLayoutProps) {
-    const { t } = useTranslation(['challenges']);
-    const {
-        activeTab,
-        setActiveTab,
-        currentVfsPath,
-        setCurrentVfsPath,
-        selector,
-        selectorType,
-        isCodeChallenge,
-        isSelectorChallenge,
-        testResults,
-        isRunning
-    } = state;
+  const { t } = useTranslation(['challenges']);
+  const {
+    activeTab,
+    setActiveTab,
+    currentVfsPath,
+    setCurrentVfsPath,
+    selector,
+    selectorType,
+    isCodeChallenge,
+    isSelectorChallenge,
+  } = state;
 
-    const {
-        handleRunCode,
-        handleValidateSelector,
-        handleReset,
-        handleSelectorChange,
-        handleFileChange,
-        handleSelectFile,
-        handleCloseFile,
-        handlePreviewValidation,
-    } = execution;
+  const {
+    handleRunCode,
+    handleValidateSelector,
+    handleReset,
+    handleSelectorChange,
+    handleFileChange,
+    handleSelectFile,
+    handleCloseFile,
+    handlePreviewValidation,
+  } = execution;
 
-    const hasHtml = !!(challenge.htmlContent || challenge.files);
-    const [isResultsSheetOpen, setIsResultsSheetOpen] = useState(false);
-    const [isFileExplorerSheetOpen, setIsFileExplorerSheetOpen] = useState(false);
+  const hasHtml = !!(challenge.htmlContent || challenge.files);
+  const activeMode =
+    activeTab === 'preview' || activeTab === 'code'
+      ? activeTab
+      : 'instructions';
 
-    // Auto-open results sheet when code finishes running or results update
-    useEffect(() => {
-        if (!isRunning && testResults.length > 0) {
-            setIsResultsSheetOpen(true);
-        }
-    }, [isRunning, testResults.length]);
-
-    return (
-        <div className="flex-1 overflow-hidden flex flex-col bg-background">
-            <Tabs
-                value={activeTab === 'instructions' || activeTab === 'results' ? 'workspace' : activeTab}
-                onValueChange={setActiveTab}
-                className="flex-1 flex flex-col overflow-hidden"
+  return (
+    <div className="workspace-panel flex flex-1 min-h-0 min-w-0 flex-col overflow-hidden">
+      <Tabs
+        value={activeMode}
+        onValueChange={setActiveTab}
+        className="flex flex-1 min-h-0 flex-col overflow-hidden"
+      >
+        <div className="shrink-0 border-b border-workspace-border px-3 py-2">
+          <TabsList className="grid h-auto min-h-11 w-full grid-cols-3 gap-1 rounded-md border border-workspace-border bg-workspace-elevated p-1">
+            <TabsTrigger
+              value="instructions"
+              className="min-h-10 gap-1.5 rounded-sm px-2 text-xs text-workspace-muted data-[state=active]:bg-workspace-panel data-[state=active]:text-workspace-text"
             >
-                {/* Simplified Mobile Controls */}
-                <div className="px-4 pt-3 pb-2 flex items-center justify-between gap-3 shrink-0 border-b">
-                    <TabsList className="h-9 bg-muted/50 p-1 border border-border rounded-lg flex-1 grid grid-cols-2">
-                        <TabsTrigger value="workspace" className="text-xs gap-2">
-                            <Code2 className="h-3.5 w-3.5" />
-                            Workspace
-                        </TabsTrigger>
-                        <TabsTrigger value="preview" className="text-xs gap-2">
-                            <Search className="h-3.5 w-3.5" />
-                            Visual
-                        </TabsTrigger>
-                    </TabsList>
-
-                    <div className="flex items-center gap-1.5">
-                        <Sheet>
-                            <SheetTrigger asChild>
-                                <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg">
-                                    <BookOpen className="h-4 w-4" />
-                                </Button>
-                            </SheetTrigger>
-                            <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl px-6 pb-6 pt-2 flex flex-col">
-                                <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6 shrink-0" />
-                                <SheetHeader className="mb-4 shrink-0">
-                                    <SheetTitle className="flex items-center gap-2">
-                                        <Info className="h-5 w-5 text-primary" />
-                                        {t('challenges:playground.instructions')}
-                                    </SheetTitle>
-                                </SheetHeader>
-                                <div className="flex-1 overflow-y-auto min-h-0 pr-2 pb-10 scrollbar-thin">
-                                    <div className="prose prose-sm dark:prose-invert max-w-none">
-                                        <MarkdownRenderer content={challenge.instructions} />
-                                    </div>
-                                </div>
-                            </SheetContent>
-                        </Sheet>
-
-                        {challenge.files && Object.keys(challenge.files).length > 1 && (
-                            <Sheet open={isFileExplorerSheetOpen} onOpenChange={setIsFileExplorerSheetOpen}>
-                                <SheetTrigger asChild>
-                                    <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg">
-                                        <Folder className="h-4 w-4" />
-                                    </Button>
-                                </SheetTrigger>
-                                <SheetContent side="bottom" className="h-[70vh] rounded-t-2xl p-0 overflow-hidden flex flex-col">
-                                    <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mt-2 mb-2 shrink-0" />
-                                    <div className="px-6 py-2 border-b">
-                                        <h3 className="font-semibold flex items-center gap-2">
-                                            <Folder className="h-5 w-5 text-primary" />
-                                            {t('challenges:playground.files')}
-                                        </h3>
-                                    </div>
-                                    <div className="flex-1 overflow-hidden p-2">
-                                        <FileExplorer
-                                            files={challenge.files}
-                                            {...omitUndefined({
-                                                editableFiles: challenge.editableFiles,
-                                            })}
-                                            selectedFile={currentVfsPath}
-                                            onSelectFile={(path) => {
-                                                handleSelectFile(path);
-                                                setIsFileExplorerSheetOpen(false);
-                                            }}
-                                            className="border-none bg-transparent"
-                                        />
-                                    </div>
-                                </SheetContent>
-                            </Sheet>
-                        )}
-
-                        {(isCodeChallenge || isSelectorChallenge) && (
-                            <Sheet open={isResultsSheetOpen} onOpenChange={setIsResultsSheetOpen}>
-                                <SheetTrigger asChild>
-                                    <Button variant="outline" size="icon" className="h-9 w-9 rounded-lg relative">
-                                        <Play className="h-4 w-4" />
-                                        {testResults.length > 0 && (
-                                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
-                                            </span>
-                                        )}
-                                    </Button>
-                                </SheetTrigger>
-                                <SheetContent side="bottom" className="h-[60vh] rounded-t-2xl p-0 overflow-hidden flex flex-col">
-                                    <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mt-2 mb-2" />
-                                    <div className="px-6 py-2 border-b flex items-center justify-between">
-                                        <h3 className="font-semibold flex items-center gap-2">
-                                            <CheckCircle2 className="h-5 w-5 text-green-500" />
-                                            {t('challenges:playground.results')}
-                                        </h3>
-                                        <Button size="sm" onClick={() => { void handleRunCode(); setIsResultsSheetOpen(false); }} className="gap-2 h-8 px-3">
-                                            <Play className="h-3.5 w-3.5" />
-                                            Re-run
-                                        </Button>
-                                    </div>
-                                    <div className="flex-1 overflow-auto p-4 bg-muted/5">
-                                        <ResultsPanel
-                                            challenge={challenge}
-                                            state={state}
-                                            onRunCode={() => { void handleRunCode(); }}
-                                        />
-                                    </div>
-                                </SheetContent>
-                            </Sheet>
-                        )}
-                    </div>
-                </div>
-
-                {/* Tab Contents with Flex Layout to avoid truncation */}
-                <div className="flex-1 flex flex-col min-h-0">
-                    <TabsContent value="workspace" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden overflow-hidden">
-                        <div className="flex-1 flex flex-col min-h-0">
-                            {isSelectorChallenge && (
-                                <div className="px-4 py-2 border-b bg-muted/5 shrink-0">
-                                    <SelectorPanel
-                                        challenge={challenge}
-                                        state={state}
-                                        onSelectorChange={handleSelectorChange}
-                                        onValidate={handleValidateSelector}
-                                    />
-                                </div>
-                            )}
-                            {!isSelectorChallenge && (
-                                <div className="flex-1 min-h-0 flex flex-col">
-                                    <EditorPanel
-                                        challenge={challenge}
-                                        state={state}
-                                        isMobile={true}
-                                        onRunCode={() => { void handleRunCode(); }}
-                                        onReset={handleReset}
-                                        onFileChange={handleFileChange}
-                                        onSelectFile={handleSelectFile}
-                                        onCloseFile={handleCloseFile}
-                                        onCodeChange={(code) => state.setCode(code)}
-                                        onReady={() => state.setIsLayoutReady(true)}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    </TabsContent>
-
-                    <TabsContent value="preview" className="flex-1 flex flex-col min-h-0 m-0 data-[state=inactive]:hidden overflow-hidden">
-                        {hasHtml ? (
-                            <div className="flex-1 flex flex-col p-4 min-h-0">
-                                <div className="flex-1 min-h-0 rounded-xl overflow-hidden border shadow-inner">
-                                    <WebComponentPreview
-                                        htmlContent={
-                                            challenge.files
-                                                ? challenge.files[currentVfsPath] || challenge.files['/index.html'] || '<div></div>'
-                                                : challenge.htmlContent || '<div></div>'
-                                        }
-                                        cssContent={
-                                            challenge.category?.startsWith('e2e')
-                                                ? e2eSelectorStyles
-                                                : defaultSelectorStyles
-                                        }
-                                        {...omitUndefined({
-                                            userSelector: isSelectorChallenge
-                                                ? selector
-                                                : undefined,
-                                        })}
-                                        selectorType={selectorType as SelectorType}
-                                        targetSelector={challenge.targetSelector as string}
-                                        targetSelectorType={
-                                            challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
-                                        }
-                                        onValidationChange={handlePreviewValidation}
-                                        className="h-full border-0"
-                                        showControls={true}
-                                        height="100%"
-                                        iframeRef={previewIframeRef}
-                                        {...omitUndefined({ files: challenge.files })}
-                                        currentPath={currentVfsPath}
-                                        onNavigate={(path) => setCurrentVfsPath(path)}
-                                    />
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="flex-1 flex items-center justify-center p-8 text-center text-muted-foreground italic">
-                                No visual preview available for this challenge type.
-                            </div>
-                        )}
-                    </TabsContent>
-                </div>
-            </Tabs>
+              <Info className="h-3.5 w-3.5" />
+              {t('challenges:playground.instructions')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="preview"
+              className="min-h-10 gap-1.5 rounded-sm px-2 text-xs text-workspace-muted data-[state=active]:bg-workspace-panel data-[state=active]:text-workspace-text"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              {t('challenges:playground.preview')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="code"
+              className="min-h-10 gap-1.5 rounded-sm px-2 text-xs text-workspace-muted data-[state=active]:bg-workspace-panel data-[state=active]:text-workspace-text"
+            >
+              <Code2 className="h-3.5 w-3.5" />
+              {t('challenges:playground.editor')}
+            </TabsTrigger>
+          </TabsList>
         </div>
-    );
+
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <TabsContent
+            value="instructions"
+            forceMount
+            className="m-0 min-h-0 flex-1 overflow-y-auto p-4 focus-visible:ring-0 data-[state=inactive]:hidden"
+          >
+            <div className="flex items-center gap-2 border-b border-workspace-border pb-3 text-xs font-medium uppercase tracking-[0.12em] text-workspace-muted">
+              <BookOpen className="h-4 w-4 text-brand-orange" />
+              {t('challenges:playground.instructions')}
+            </div>
+            <div className="prose prose-sm mt-4 max-w-none prose-headings:text-workspace-text prose-p:text-workspace-text prose-li:text-workspace-text prose-pre:border prose-pre:border-workspace-border">
+              <MarkdownRenderer content={challenge.instructions} />
+            </div>
+          </TabsContent>
+
+          <TabsContent
+            value="preview"
+            forceMount
+            className="m-0 min-h-0 flex-1 overflow-hidden p-3 focus-visible:ring-0 data-[state=inactive]:hidden"
+          >
+            {hasHtml ? (
+              <div className="flex h-full min-h-0 flex-col">
+                <WebComponentPreview
+                  htmlContent={
+                    challenge.files
+                      ? challenge.files[currentVfsPath] ||
+                        challenge.files['/index.html'] ||
+                        '<div></div>'
+                      : challenge.htmlContent || '<div></div>'
+                  }
+                  cssContent={
+                    challenge.category?.startsWith('e2e')
+                      ? e2eSelectorStyles
+                      : defaultSelectorStyles
+                  }
+                  {...omitUndefined({
+                    userSelector: isSelectorChallenge ? selector : undefined,
+                  })}
+                  selectorType={selectorType as SelectorType}
+                  targetSelector={challenge.targetSelector as string}
+                  targetSelectorType={
+                    challenge.type === 'XPATH_SELECTOR' ? 'xpath' : 'css'
+                  }
+                  onValidationChange={handlePreviewValidation}
+                  className="h-full min-h-0 border border-workspace-border rounded-md"
+                  showControls={true}
+                  height="100%"
+                  iframeRef={previewIframeRef}
+                  {...omitUndefined({ files: challenge.files })}
+                  currentPath={currentVfsPath}
+                  onNavigate={(path) => setCurrentVfsPath(path)}
+                />
+              </div>
+            ) : (
+              <div className="flex h-full items-center justify-center p-8 text-center text-sm text-workspace-muted">
+                No visual preview available for this challenge type.
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent
+            value="code"
+            forceMount
+            className={cn(
+              'm-0 flex min-h-0 flex-1 flex-col overflow-hidden focus-visible:ring-0 data-[state=inactive]:hidden',
+              isCodeChallenge && 'technical-surface',
+            )}
+          >
+            <div className="flex shrink-0 items-center justify-between border-b border-workspace-border bg-workspace-panel px-3 py-2">
+              <span className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-workspace-muted">
+                <Code2 className="h-4 w-4 text-brand-orange" />
+                {t('challenges:playground.editor')}
+              </span>
+              <div className="flex items-center gap-1.5">
+                {challenge.files && Object.keys(challenge.files).length > 1 && (
+                  <Sheet>
+                    <SheetTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 rounded-md border-workspace-border text-workspace-muted hover:text-workspace-text"
+                      >
+                        <Folder className="h-4 w-4" />
+                        <span className="sr-only">
+                          {t('challenges:playground.files')}
+                        </span>
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent
+                      side="bottom"
+                      className="h-[70vh] rounded-t-xl border-workspace-border bg-workspace-panel p-0 text-workspace-text"
+                    >
+                      <div className="mx-auto mt-2 mb-2 h-1.5 w-12 rounded-full bg-workspace-border" />
+                      <div className="border-b border-workspace-border px-5 py-3 text-sm font-medium">
+                        {t('challenges:playground.files')}
+                      </div>
+                      <div className="h-[calc(70vh-4rem)] overflow-hidden p-2">
+                        <FileExplorer
+                          files={challenge.files}
+                          {...omitUndefined({
+                            editableFiles: challenge.editableFiles,
+                          })}
+                          selectedFile={currentVfsPath}
+                          onSelectFile={handleSelectFile}
+                          className="border-none bg-transparent"
+                        />
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                )}
+                <Button
+                  size="sm"
+                  onClick={
+                    isCodeChallenge
+                      ? () => void handleRunCode()
+                      : handleValidateSelector
+                  }
+                  disabled={
+                    state.isRunning || (isSelectorChallenge && !state.selector)
+                  }
+                  className="min-h-9 rounded-md bg-brand-orange px-3 text-sm font-medium text-workspace-background hover:bg-brand-orange/90"
+                >
+                  {state.isRunning ? 'RUNNING…' : t('common:actions.run')}
+                </Button>
+              </div>
+            </div>
+
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              {isSelectorChallenge ? (
+                <div className="min-h-0 flex-1 overflow-y-auto p-3">
+                  <SelectorPanel
+                    challenge={challenge}
+                    state={state}
+                    onSelectorChange={handleSelectorChange}
+                    onValidate={handleValidateSelector}
+                  />
+                </div>
+              ) : (
+                <div className="min-h-0 flex-1 overflow-hidden">
+                  <EditorPanel
+                    challenge={challenge}
+                    state={state}
+                    isMobile={true}
+                    onRunCode={() => void handleRunCode()}
+                    onReset={handleReset}
+                    onFileChange={handleFileChange}
+                    onSelectFile={handleSelectFile}
+                    onCloseFile={handleCloseFile}
+                    onCodeChange={(code) => state.setCode(code)}
+                    onReady={() => state.setIsLayoutReady(true)}
+                  />
+                </div>
+              )}
+            </div>
+
+            {(isCodeChallenge || isSelectorChallenge) && (
+              <div className="human-results-surface h-[min(38vh,280px)] min-h-[180px] shrink-0 border-t border-workspace-border">
+                <ResultsPanel
+                  challenge={challenge}
+                  state={state}
+                  onRunCode={
+                    isCodeChallenge
+                      ? () => void handleRunCode()
+                      : handleValidateSelector
+                  }
+                />
+              </div>
+            )}
+          </TabsContent>
+        </div>
+      </Tabs>
+    </div>
+  );
 }

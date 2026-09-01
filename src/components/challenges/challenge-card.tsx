@@ -58,13 +58,12 @@ export interface ChallengeCardProps {
 // Type icons mapping
 const typeIcons: Record<ChallengeType, React.ReactNode> = {
   JAVASCRIPT: <Code2 className="h-4 w-4" />,
-  TYPESCRIPT: <Code2 className="h-4 w-4 text-blue-500" />,
+  TYPESCRIPT: <Code2 className="h-4 w-4 text-brand-orange" />,
   PLAYWRIGHT: <Theater className="h-4 w-4" />,
   CSS_SELECTOR: <Palette className="h-4 w-4" />,
   XPATH_SELECTOR: <Route className="h-4 w-4" />,
   SELECTOR: <Target className="h-4 w-4" />,
 };
-
 
 // Difficulty colors
 const difficultyStyles: Record<
@@ -72,19 +71,19 @@ const difficultyStyles: Record<
   { bg: string; text: string; border: string }
 > = {
   EASY: {
-    bg: 'bg-green-500/10',
-    text: 'text-green-500',
-    border: 'border-green-500/20',
+    bg: 'bg-brand-success/10',
+    text: 'text-brand-success',
+    border: 'border-brand-success/20',
   },
   MEDIUM: {
-    bg: 'bg-yellow-500/10',
-    text: 'text-yellow-500',
-    border: 'border-yellow-500/20',
+    bg: 'bg-brand-warning/10',
+    text: 'text-brand-warning',
+    border: 'border-brand-warning/20',
   },
   HARD: {
-    bg: 'bg-red-500/10',
-    text: 'text-red-500',
-    border: 'border-red-500/20',
+    bg: 'bg-brand-error/10',
+    text: 'text-brand-error',
+    border: 'border-brand-error/20',
   },
 };
 
@@ -107,22 +106,21 @@ export function ChallengeCard({
 
   return (
     <Link
-      to={LocaleRoutes.challengeDetail}
+      to={LocaleRoutes.practiceDetail}
       params={localeSlugParams(locale, slug)}
     >
       <Card
         className={cn(
-          'group relative overflow-hidden transition-all duration-300',
-          'hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5',
-          'hover:-translate-y-1',
-          isCompleted && 'border-green-500/30 bg-green-500/5',
+          'motion-hover-arrow-group group relative overflow-hidden transition-colors duration-200',
+          'hover:border-primary/50',
+          isCompleted && 'border-brand-success/30 bg-brand-success/5',
           className,
         )}
       >
         {/* Completion Badge */}
         {isCompleted && (
           <div className="absolute top-3 right-3 z-10">
-            <div className="flex items-center gap-1 px-2 py-1 rounded-full bg-green-500/20 text-green-500 text-xs font-medium">
+            <div className="flex items-center gap-1 rounded-sm bg-brand-success/10 px-2 py-1 text-xs font-medium text-brand-success">
               <CheckCircle2 className="h-3 w-3" />
               {t('challenges:status.completed')}
             </div>
@@ -214,12 +212,9 @@ export function ChallengeCard({
             </div>
 
             {/* Arrow */}
-            <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+            <ArrowRight className="motion-hover-arrow h-4 w-4 text-muted-foreground group-hover:text-primary" />
           </div>
         </CardFooter>
-
-        {/* Hover Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/5 to-primary/0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       </Card>
     </Link>
   );

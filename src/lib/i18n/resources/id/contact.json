@@ -1,0 +1,49 @@
+{
+  "seo": {
+    "title": "Hubungi Ekki | TestingWithEkki",
+    "description": "Hubungi Ekki untuk mentoring QA, partnership, sponsorship, peluang karier, atau pertanyaan tentang TestingWithEkki."
+  },
+  "hero": {
+    "eyebrow": "KONTAK",
+    "title": "Mari ngobrol",
+    "description": "Mencari mentoring QA, tertarik bekerja sama, atau punya hal lain untuk dibahas? Pilih topik yang ingin kamu bicarakan."
+  },
+  "mentoring": {
+    "title": "Mentoring QA 1:1",
+    "description": "Untuk QA engineer yang membutuhkan bantuan tentang otomasi, perkembangan teknis, desain test, CI/CD, atau masalah testing tertentu.",
+    "cta": "Pesan sesi 1:1"
+  },
+  "partnerships": {
+    "title": "Partnership, Sponsorship & Peluang",
+    "description": "Untuk tool testing dan developer, komunitas, event, kolaborasi edukasi, dan sponsorship yang relevan.",
+    "opportunityNote": "Juga terbuka untuk peluang QA engineering dan test automation.",
+    "cta": "Bicarakan kerja sama",
+    "cvCta": "Lihat CV saya"
+  },
+  "form": {
+    "eyebrow": "PESAN UMUM",
+    "title": "Kirim pesan",
+    "description": "Untuk pertanyaan umum atau hal yang tidak sesuai dengan pilihan di atas.",
+    "name": "Nama",
+    "namePlaceholder": "Nama kamu",
+    "email": "Email",
+    "emailPlaceholder": "kamu@example.com",
+    "topic": "Topik",
+    "topicPlaceholder": "Pilih topik",
+    "topics": {
+      "general": "Pertanyaan umum",
+      "mentoring": "Mentoring",
+      "partnership": "Partnership / sponsorship",
+      "opportunity": "Peluang kerja",
+      "other": "Lainnya"
+    },
+    "message": "Pesan",
+    "messagePlaceholder": "Apa yang bisa saya bantu?",
+    "submit": "Kirim pesan",
+    "sending": "Mengirim...",
+    "successTitle": "Pesan terkirim.",
+    "successMessage": "Terima kasih sudah menghubungi. Saya akan segera membalas.",
+    "sendAnother": "Kirim pesan lain",
+    "errorMessage": "Terjadi kesalahan. Silakan coba lagi nanti."
+  }
+}

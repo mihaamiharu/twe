@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, Link } from '@tanstack/react-router';
 import {
@@ -47,51 +46,43 @@ export function ChallengeSuccessDialog({
   const { t } = useTranslation(['challenges', 'common']);
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
-  useEffect(() => {
-    if (open && levelUp) {
-      const audio = new Audio('/ragnarok_level_up.mp3');
-      audio.volume = 0.4; // Slightly lower volume so it's not too loud
-      audio.play().catch((err) => {
-        console.warn('Failed to play level up sound:', err);
-      });
-    }
-  }, [open, levelUp]);
-
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className={`sm:max-w-md text-center border-2 ${isBoss ? 'border-red-500/50 bg-gradient-to-b from-red-950/20 to-background shadow-[0_0_50px_-12px_rgba(239,68,68,0.25)]' : ''}`}>
+      <DialogContent className="workspace-shell sm:max-w-md border border-workspace-border bg-workspace-panel text-workspace-text">
         <DialogHeader>
-          <div className={`mx-auto p-4 rounded-full w-fit mb-4 ${isBoss ? 'bg-red-500/20 animate-pulse' : 'bg-yellow-500/20'}`}>
+          <div
+            className={`mx-auto mb-4 w-fit rounded-md border p-3 ${isBoss ? 'border-brand-error/30 bg-brand-error/10' : 'border-brand-success/30 bg-brand-success/10'}`}
+          >
             {isBoss ? (
-              <Swords className="h-10 w-10 text-red-500" />
+              <Swords className="h-8 w-8 text-brand-error" />
             ) : (
-              <Trophy className="h-10 w-10 text-yellow-500" />
+              <Trophy className="h-8 w-8 text-brand-success" />
             )}
           </div>
-          <DialogTitle className="text-2xl font-bold text-center">
-            {t('challenges:success.title')}
+          <DialogTitle className="text-center text-xl font-semibold">
+            ✓ {t('challenges:success.title')}
           </DialogTitle>
         </DialogHeader>
         <DialogDescription className="text-center text-muted-foreground">
           {t('challenges:success.description')}
         </DialogDescription>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-5 py-4">
           {/* XP Reward */}
-          <div className="flex flex-col items-center">
-            <span className="text-4xl font-black text-primary animate-in zoom-in spin-in duration-500">
+          <div className="flex flex-col items-center rounded-md border border-workspace-border bg-workspace-elevated p-4">
+            <span className="font-mono text-xl font-medium text-brand-orange">
               +{xpEarned} {t('common:labels.xp')}
             </span>
-            <span className="text-sm text-muted-foreground mt-1">
+            <span className="mt-1 text-sm text-workspace-muted">
               {t('challenges:success.earnedXP')}
             </span>
           </div>
 
           {/* Level Up Alert */}
           {levelUp && (
-            <div className="bg-gradient-to-r from-primary/20 to-purple-500/20 p-4 rounded-lg border border-primary/20 animate-in slide-in-from-bottom duration-700 delay-200">
+            <div className="rounded-md border border-brand-warning/30 bg-brand-warning/10 p-4">
               <div className="flex items-center gap-3 justify-center">
-                <Star className="h-6 w-6 text-yellow-400 fill-yellow-400" />
+                <Star className="h-5 w-5 text-brand-warning" />
                 <div className="text-left">
                   <h4 className="font-bold text-lg">
                     {t('challenges:success.levelUp')}
@@ -109,7 +100,7 @@ export function ChallengeSuccessDialog({
 
           {/* Achievements Unlocked */}
           {achievements.length > 0 && (
-            <div className="space-y-2 animate-in slide-in-from-bottom duration-700 delay-300">
+            <div className="space-y-2">
               <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider text-xs">
                 {t('challenges:success.achievementsUnlocked')}
               </p>
@@ -118,7 +109,7 @@ export function ChallengeSuccessDialog({
                   <Badge
                     key={i}
                     variant="outline"
-                    className="px-3 py-1 flex gap-1 items-center bg-primary/5 border-primary/20 text-primary shadow-sm"
+                    className="flex items-center gap-1 border-workspace-border bg-workspace-elevated px-3 py-1 text-workspace-text"
                   >
                     <span className="text-base">{achievement.icon}</span>
                     <span className="font-semibold">{achievement.name}</span>
@@ -133,7 +124,7 @@ export function ChallengeSuccessDialog({
           {onNextChallenge && (
             <Button onClick={onNextChallenge} className="w-full">
               {t('challenges:success.nextChallenge')}
-              <ArrowRight className="w-4 h-4 ml-2 animate-bounce-x" />
+              <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           )}
 
@@ -143,7 +134,7 @@ export function ChallengeSuccessDialog({
               {t('challenges:success.retry')}
             </Button>
             <Button variant="secondary" asChild className="flex-1">
-              <Link to={LocaleRoutes.challenges} params={localeParams(locale)}>
+              <Link to={LocaleRoutes.practice} params={localeParams(locale)}>
                 {t('challenges:success.browseList')}
               </Link>
             </Button>

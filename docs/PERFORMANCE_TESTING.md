@@ -18,15 +18,15 @@
 ### Scenario 1: Public Tutorial Flow (Unauthenticated)
 
 1. Homepage (`/en`)
-2. Tutorial List (`/en/tutorials`)
-3. View Tutorial (`/en/tutorials/{slug}`)
+2. Learn List (`/en/learn`)
+3. View Lesson (`/en/learn/{slug}`)
 
 ### Scenario 2: Challenge Flow (Authenticated)
 
 1. Homepage (`/en`)
 2. Login (POST to auth endpoint)
-3. Challenge List (`/en/challenges`)
-4. View Challenge (`/en/challenges/{slug}`)
+3. Practice List (`/en/practice`)
+4. View Challenge (`/en/practice/{slug}`)
 
 ---
 

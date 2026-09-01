@@ -42,7 +42,8 @@ export const TRACK_CONFIG: Record<TrackId, Omit<TrackConfig, 'id'>> = {
         (cat.startsWith('playwright-navigation') ||
           cat.startsWith('playwright-locators') ||
           cat.startsWith('playwright-assertions') ||
-          cat.startsWith('playwright-waits'))
+          cat.startsWith('playwright-waits') ||
+          cat.startsWith('playwright-debugging'))
       );
     },
   },

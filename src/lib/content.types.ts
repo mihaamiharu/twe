@@ -25,6 +25,22 @@ export interface LocalizedArray {
   id?: string[];
 }
 
+export type CurriculumItemKind = 'core' | 'optional';
+export type PracticeRole = 'core' | 'additional';
+
+export interface CurriculumModuleDefinition {
+  slug: string;
+  order: number;
+  title: LocalizedString;
+  description: LocalizedString;
+  outcome: LocalizedString;
+}
+
+export interface TutorialPracticeReference {
+  slug: string;
+  role: PracticeRole;
+}
+
 export type JsonValue =
   | string
   | number
@@ -43,10 +59,12 @@ export type JsonValue =
 export interface TutorialRegistryEntry {
   slug: string;
   order: number;
+  moduleSlug: string;
+  moduleOrder: number;
+  kind: CurriculumItemKind;
   estimatedMinutes: number;
   tags: string[];
-  relatedChallenges?: string[];
-  nextTutorialSlug?: string | null;
+  practice?: TutorialPracticeReference[];
   status?: ContentStatus;
 }
 
@@ -54,6 +72,7 @@ export interface TutorialRegistryEntry {
  * Tutorial registry file structure
  */
 export interface TutorialRegistry {
+  modules: CurriculumModuleDefinition[];
   tutorials: TutorialRegistryEntry[];
 }
 
@@ -74,9 +93,12 @@ export interface Tutorial {
   description: string;
   content: string;
   order: number;
+  moduleSlug: string;
+  moduleOrder: number;
+  kind: CurriculumItemKind;
   estimatedMinutes: number;
   tags: string[];
-  relatedChallenges?: string[];
+  practice: TutorialPracticeReference[];
 }
 
 // =============================================================================
@@ -90,7 +112,13 @@ export type ChallengeType =
   | 'TYPESCRIPT'
   | 'PLAYWRIGHT';
 export type ChallengeDifficulty = 'EASY' | 'MEDIUM' | 'HARD';
-export type ChallengeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e' | 'pom' | 'typescript';
+export type ChallengeTier =
+  | 'basic'
+  | 'beginner'
+  | 'intermediate'
+  | 'e2e'
+  | 'pom'
+  | 'typescript';
 
 /**
  * Test case definition in challenge JSON
@@ -114,6 +142,158 @@ export interface ExpectedStateRule {
   count?: number;
 }
 
+export type SerializableExpectedStateRule = Omit<
+  ExpectedStateRule,
+  'hasAttribute'
+> & {
+  hasAttribute?: { name: string; value?: string };
+};
+
+export interface InteractionSequenceStep {
+  inputSelector: string;
+  inputValue: string;
+  expectedState: SerializableExpectedStateRule[];
+}
+
+export interface InteractionSequenceDefinition {
+  event: 'submit';
+  selector: string;
+  steps: InteractionSequenceStep[];
+}
+
+export interface LocatorLeafEvidenceDefinition {
+  method: string;
+  value?: string;
+  name?: string;
+  exact?: boolean;
+}
+
+export interface LocatorFilterEvidenceDefinition {
+  hasText?: string;
+  has?: LocatorLeafEvidenceDefinition;
+}
+
+export interface LocatorTargetEvidenceDefinition extends LocatorLeafEvidenceDefinition {
+  filters?: LocatorFilterEvidenceDefinition[];
+}
+
+export interface LocatorEvidenceDefinition extends LocatorTargetEvidenceDefinition {
+  scope?: LocatorTargetEvidenceDefinition;
+}
+
+export type EvidenceArgument = string | number | boolean;
+
+export type RequiredEvidenceSequenceStep =
+  | {
+      type: 'method';
+      method: string;
+      target?: 'page' | 'locator';
+      arguments?: EvidenceArgument[];
+      locator?: LocatorEvidenceDefinition;
+    }
+  | {
+      type: 'assertion';
+      matcher: string;
+      arguments?: EvidenceArgument[];
+      soft?: boolean;
+      locator?: LocatorEvidenceDefinition;
+    };
+
+export interface ChallengeValidationPolicy {
+  /** Require required methods and assertions to be observed at runtime. */
+  requireExecutedEvidence?: boolean;
+  /** Reject page/locator.locator() structural selector calls. */
+  forbidStructuralLocators?: boolean;
+  /** Reject action options whose runtime force value is truthy. */
+  forbidForcedActions?: boolean;
+  /** Reject direct document/window/globalThis DOM access. */
+  forbidDirectDomAccess?: boolean;
+  /** Reject catch handlers that suppress failures instead of rethrowing. */
+  forbidSwallowedErrors?: boolean;
+}
+
+export type TypeScriptEvidenceDefinition =
+  | {
+      type: 'inferred-variable';
+      name: string;
+    }
+  | {
+      type: 'variable-type';
+      name: string;
+      annotation: string;
+    }
+  | {
+      type: 'interface-property';
+      interface: string;
+      property: string;
+      annotation: string;
+      optional?: boolean;
+    }
+  | {
+      type: 'function-parameter';
+      function: string;
+      parameter: string;
+      annotation: string;
+      optional?: boolean;
+    }
+  | {
+      type: 'function-return';
+      function: string;
+      annotation: string;
+    }
+  | {
+      type: 'operator';
+      operator: 'nullish-coalescing' | 'strict-undefined-check';
+    };
+
+export interface AwaitedFunctionCallCountDefinition {
+  function: string;
+  minimum: number;
+}
+
+export interface FunctionMethodEvidenceDefinition {
+  function: string;
+  methods: string[];
+  /** When listed, these methods may only be called inside the named function. */
+  exclusiveMethods?: string[];
+}
+
+export interface ChallengeValidationDefinition {
+  requiredAssertions?: string[];
+  requiredMethods?: string[];
+  /** Require named free-function calls in learner source. */
+  requiredFunctionCalls?: string[];
+  /** Require named member calls such as Array.prototype.filter. */
+  requiredMemberCalls?: string[];
+  /** Require named functions to be declared with async. */
+  requiredAsyncFunctions?: string[];
+  /** Require named free-function calls to be directly awaited. */
+  requiredAwaitedFunctionCalls?: string[];
+  /** Require a named free function to be directly awaited a minimum number of times. */
+  requiredAwaitedFunctionCallCounts?: AwaitedFunctionCallCountDefinition[];
+  /** Require Playwright methods to be owned by a named helper function. */
+  requiredFunctionMethodEvidence?: FunctionMethodEvidenceDefinition[];
+  /** Require named member calls such as Promise.all to be directly awaited. */
+  requiredAwaitedMemberCalls?: string[];
+  /** Require these free-function calls inside a directly awaited Promise.all. */
+  requiredPromiseAllFunctionCalls?: string[];
+  /** Require these learner bindings to be declared with const. */
+  requiredConstBindings?: string[];
+  /** Require TypeScript-specific source structure without claiming semantic checking. */
+  requiredTypeScriptEvidence?: TypeScriptEvidenceDefinition[];
+  /** Require at least one conditional chain with this many branches. */
+  minimumConditionalBranches?: number;
+  /** Require at least this many try/catch structures. */
+  minimumTryCatchBlocks?: number;
+  forbiddenMethods?: string[];
+  policy?: ChallengeValidationPolicy;
+  interactionSequence?: InteractionSequenceDefinition;
+  /** Require successful runtime evidence without imposing an arbitrary order. */
+  requiredEvidence?: RequiredEvidenceSequenceStep[];
+  /** Require successful runtime evidence to occur in this order. */
+  requiredEvidenceSequence?: RequiredEvidenceSequenceStep[];
+}
+
 /**
  * Challenge definition from tier JSON files
  */
@@ -132,16 +312,20 @@ export interface ChallengeDefinition {
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
   editableFiles?: string[]; // Which files user can edit (default: all)
-  preloadModules?: Record<string, {
-    exports: string[];      // e.g., ["LoginPage", "DashboardPage"]
-    source: string;         // e.g., "/pages/LoginPage.ts"
-  }>;
+  preloadModules?: Record<
+    string,
+    {
+      exports: string[]; // e.g., ["LoginPage", "DashboardPage"]
+      source: string; // e.g., "/pages/LoginPage.ts"
+    }
+  >;
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
   status?: ContentStatus;
   expectedState?: ExpectedStateRule[]; // DOM state validation rules
+  validation?: ChallengeValidationDefinition;
 }
 
 /**
@@ -170,15 +354,19 @@ export interface Challenge {
   htmlContent?: string;
   files?: Record<string, string>; // VFS: multi-page content for E2E
   editableFiles?: string[]; // Which files user can edit (default: all)
-  preloadModules?: Record<string, {
-    exports: string[];      // e.g., ["LoginPage", "DashboardPage"]
-    source: string;         // e.g., "/pages/LoginPage.ts"
-  }>;
+  preloadModules?: Record<
+    string,
+    {
+      exports: string[]; // e.g., ["LoginPage", "DashboardPage"]
+      source: string; // e.g., "/pages/LoginPage.ts"
+    }
+  >;
   starterCode?: string;
   testCases: TestCaseDefinition[];
   solution: string;
   tags?: string[];
   expectedState?: ExpectedStateRule[]; // DOM state validation rules
+  validation?: ChallengeValidationDefinition;
   // Dynamic fields (from DB)
   completionCount?: number;
   isCompleted?: boolean;

@@ -1,16 +1,39 @@
 {
   "page": {
-    "title": "Tantangan",
-    "subtitle": "Latih selektor CSS dan XPath kamu dengan skenario dunia nyata.",
+    "title": "Practice",
+    "subtitle": "Latih kemampuan test automation lewat tantangan CSS, XPath, JavaScript, TypeScript, dan Playwright.",
+    "seo": {
+      "title": "Latihan Test Automation — TestingWithEkki",
+      "description": "Latih kemampuan test automation melalui tantangan selector CSS dan XPath, JavaScript dan TypeScript, serta Playwright yang bisa langsung kamu kerjakan di browser."
+    },
+    "practiceResourceType": "Tantangan praktik",
     "overallProgress": "Progres Keseluruhan",
     "notFound": "Tantangan Tidak Ditemukan",
     "notFoundDescription": "Tantangan yang kamu cari tidak dapat ditemukan.",
     "reviewTutorial": "Tinjau Tutorial: {{title}}",
     "sidebarSubtitle": "Tingkatkan kemampuan otomasi pengujianmu"
   },
+  "library": {
+    "eyebrow": "LATIHAN",
+    "headline": "Latih kemampuanmu lewat tantangan nyata.",
+    "description": "Kerjakan tantangan Practice berdasarkan topik, atau buka pelajaran Learn kalau kamu membutuhkan konteks tambahan.",
+    "discoveryLabel": "Temukan Practice",
+    "showingCount": "{{count}} tantangan",
+    "completedByCount": "{{count}} selesai",
+    "challengeCount_one": "{{count}} tantangan",
+    "challengeCount_other": "{{count}} tantangan",
+    "emptyEyebrow": "TIDAK ADA HASIL",
+    "emptyTitle": "Tantangan tidak ditemukan",
+    "emptyDescription": "Coba ubah pencarian atau filter untuk menemukan tantangan yang ingin kamu kerjakan.",
+    "loading": "Memuat tantangan",
+    "errorEyebrow": "KATALOG TIDAK TERSEDIA",
+    "errorTitle": "Practice sedang memuat",
+    "errorDescription": "Perpustakaan tantangan belum dapat dimuat. Coba lagi sebentar.",
+    "retry": "Coba lagi"
+  },
   "tracks": {
     "all": {
-      "label": "Semua Tantangan",
+      "label": "Semua",
       "description": "Ringkasan semua tantangan yang tersedia"
     },
     "selectors": {
@@ -22,7 +45,7 @@
       "description": "Dasar Pemrograman untuk Otomasi Pengujian"
     },
     "core": {
-      "label": "Inti",
+      "label": "Playwright Core",
       "description": "Navigasi, Locator, Aksi, dan Assertion"
     },
     "e2e": {
@@ -36,11 +59,20 @@
     "playwright": "Playwright"
   },
   "filters": {
+    "search": "Cari tantangan praktik",
+    "track": "Track Practice",
+    "difficulty": "Kesulitan",
     "allDifficulties": "Semua Kesulitan",
+    "tier": "Tingkat",
+    "view": "Mode tampilan",
+    "trackScrollHint": "Geser ke samping untuk melihat semua track",
+    "allTiers": "Semua Tingkat",
     "clear": "Bersihkan",
     "hideCompleted": "Sembunyikan Selesai",
     "showCompleted": "Tampilkan Selesai",
-    "searchPlaceholder": "Cari tantangan..."
+    "searchPlaceholder": "Cari tantangan praktik...",
+    "listView": "Tampilan daftar",
+    "gridView": "Tampilan grid"
   },
   "difficulty": {
     "EASY": "Mudah",
@@ -67,6 +99,17 @@
     "jsUndefined": "Hasil kamu undefined. Pastikan kamu memberikan nilai pada `result`.",
     "jsMismatch": "Hasil kamu tidak sesuai dengan output yang diharapkan. Periksa logika kamu dan coba lagi.",
     "noAssertions": "Tidak ada assertion yang dipanggil. Tulis assertion seperti: await expect(locator).toHaveText('...');",
+    "grading": {
+      "missingEvidence": "Call yang diwajibkan belum dieksekusi di test path: {{methods}}. Jalankan langsung di scenario-nya; declaration atau helper yang nggak dipakai nggak dihitung.",
+      "forbiddenMethods": "Hapus method yang dilarang ini dari test: {{methods}}.",
+      "structuralLocator": "Pakai semantic locator seperti getByRole atau getByLabel, bukan page.locator(...) dengan struktur CSS.",
+      "forcedAction": "Hapus forced action-nya. Biarkan Playwright mengecek actionability dan jalankan action tanpa opsi force yang truthy.",
+      "directDomAccess": "Jangan akses DOM browser langsung dari test. Pakai Playwright locator dan web-first assertion, bukan document, window, globalThis, atau evaluate.",
+      "swallowedError": "Jangan telan failure. Biarkan error dari Playwright action atau assertion menggagalkan test, bukan ditangkap lalu diabaikan.",
+      "failedAssertion": "Assertion {{matcher}} gagal lalu ditelan. Perbaiki expected result dan biarkan assertion menggagalkan test saat hasilnya salah.",
+      "failedAction": "Playwright action {{method}} gagal lalu ditelan. Perbaiki locator atau action-nya dan biarkan error menggagalkan test.",
+      "sourceAnalysisUnavailable": "Test belum bisa dicek dengan aman. Jalankan lagi supaya source policy-nya bisa dianalisis."
+    },
     "selectorMismatch": "Selektor tidak cocok dengan elemen target",
     "executionError": "Kesalahan Eksekusi",
     "alreadyCompleted": "Kamu telah menyelesaikan tantangan ini! Jangan ragu untuk berlatih lagi.",
@@ -143,6 +186,7 @@
     "playwright-locators": "Locator",
     "playwright-assertions": "Assertion",
     "playwright-waits": "Strategi Menunggu",
+    "playwright-debugging": "Debugging & Reliability",
     "playwright-pom": "Page Object Model",
     "playwright-data-driven": "Pengujian Berbasis Data",
     "playwright-infrastructure": "Infrastruktur Pengujian",
@@ -156,10 +200,35 @@
     "allTypes": "Semua Tipe",
     "comingSoon": "Segera Hadir",
     "completed": "selesai",
+    "completedState": "Selesai",
+    "start": "Mulai",
+    "review": "Tinjau",
     "rank": "Peringkat",
     "challenge": "Tantangan",
     "stats": "Statistik",
     "creatingNew": "Membuat tantangan baru...",
     "craftingScenarios": "Saya sedang menyusun skenario baru berdasarkan bug nyata yang saya temukan. Cek kembali segera!"
+  },
+  "howPractice": {
+    "title": "Cara kerja Practice",
+    "description": "Practice berdiri sendiri. Gunakan pelajaran Learn saat membutuhkan konteks, atau langsung pilih topik apa pun.",
+    "steps": {
+      "choose": {
+        "title": "Pilih",
+        "description": "Pilih sebuah tantangan"
+      },
+      "solve": {
+        "title": "Pecahkan",
+        "description": "Tulis dan jalankan kode tesmu"
+      },
+      "run": {
+        "title": "Jalankan",
+        "description": "Eksekusi dan verifikasi"
+      },
+      "review": {
+        "title": "Tinjau",
+        "description": "Periksa hasil dan perbaiki"
+      }
+    }
   }
 }

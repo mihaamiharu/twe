@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 980" role="img" aria-labelledby="title description">
+  <title id="title">Choose assertions from product risk and observable evidence</title>
+  <desc id="description">A four-step chain turns the risk that invalid registration is accepted into a precise claim, user-observable evidence, and matching Playwright assertions. A side path marks click completion, a hidden spinner, and a success CSS class as insufficient evidence for that claim.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="978" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.2">RISK → CLAIM → EVIDENCE → MATCHER</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="116" width="636" height="128" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="88" y="140" width="132" height="32" rx="16" fill="#fce8e1" />
+  <text x="154" y="162" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">PRODUCT RISK</text>
+  <text x="88" y="204" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="23" font-weight="700">Invalid registration data could be accepted</text>
+
+  <line x1="380" y1="256" x2="380" y2="294" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="308" width="636" height="128" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="88" y="332" width="92" height="32" rx="16" fill="#fff7dd" />
+  <text x="134" y="354" fill="#6d5418" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">CLAIM</text>
+  <text x="88" y="396" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Invalid data shows guidance and blocks Register</text>
+
+  <line x1="380" y1="448" x2="380" y2="486" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="500" width="636" height="154" rx="16" fill="#e6f2ec" stroke="#75a38b" stroke-width="2" />
+  </g>
+  <rect x="88" y="524" width="218" height="32" rx="16" fill="#ffffff" />
+  <text x="197" y="546" fill="#2d6249" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">USER-OBSERVABLE EVIDENCE</text>
+  <circle cx="103" cy="590" r="7" fill="#387357" />
+  <text x="126" y="597" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">“Invalid email format” is visible</text>
+  <circle cx="103" cy="626" r="7" fill="#387357" />
+  <text x="126" y="633" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="19" font-weight="700">Register is disabled</text>
+
+  <line x1="380" y1="666" x2="380" y2="704" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="718" width="636" height="112" rx="16" fill="#25231f" />
+  </g>
+  <text x="88" y="752" fill="#f4bd4f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">MATCH THE EVIDENCE TYPE</text>
+  <text x="88" y="790" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="16">toHaveText('Invalid email format')</text>
+  <text x="88" y="816" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="16">toBeDisabled()</text>
+
+  <g filter="url(#shadow)">
+    <rect x="62" y="864" width="636" height="76" rx="16" fill="#fce8e1" stroke="#e65f3a" stroke-width="2" />
+  </g>
+  <text x="88" y="894" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="13" font-weight="700">INSUFFICIENT FOR THIS CLAIM</text>
+  <text x="88" y="922" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16" font-weight="700">Click completed · Spinner hidden · CSS class = success</text>
+
+  <text x="380" y="966" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">Start from the risk—not from a matcher you want to use.</text>
+</svg>

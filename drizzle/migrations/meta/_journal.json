@@ -15,6 +15,34 @@
       "when": 1777518110107,
       "tag": "0001_deep_lord_tyger",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1787382238000,
+      "tag": "0002_contact_message_topic",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1787552612987,
+      "tag": "0003_useful_ben_urich",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1787556373626,
+      "tag": "0004_brief_longshot",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1787789340400,
+      "tag": "0005_living_psynapse",
+      "breakpoints": true
     }
   ]
 }

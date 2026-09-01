@@ -21,14 +21,22 @@ import {
 import { KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
+import { z } from 'zod';
+
+const searchSchema = z.object({
+  token: z.string().optional(),
+  error: z.string().optional(),
+});
 
 export const Route = createFileRoute('/$locale/reset-password')({
+  validateSearch: searchSchema,
   component: ResetPasswordPage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Reset Password | TestingWithEkki',
-      description: 'Set a new password for your TestingWithEkki account.',
+      title: i18n.t('auth:seo.resetPassword.title', { lng: locale }),
+      description: i18n.t('auth:seo.resetPassword.description', { lng: locale }),
       path: '/reset-password',
       locale,
       noIndex: true,
@@ -38,6 +46,7 @@ export const Route = createFileRoute('/$locale/reset-password')({
 
 function ResetPasswordPage() {
   const { locale } = useParams({ from: '/$locale/reset-password' });
+  const { token, error: errorParam } = Route.useSearch();
   const { t } = useTranslation(['auth', 'common']);
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
@@ -46,16 +55,11 @@ function ResetPasswordPage() {
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Get token from URL query params
-  const searchParams = new URLSearchParams(window.location.search);
-  const token = searchParams.get('token');
-  const errorParam = searchParams.get('error');
-
   // Handle error from URL (e.g., INVALID_TOKEN)
   if (errorParam) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+        <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 p-3 rounded-full bg-destructive/10 w-fit">
               <AlertCircle className="h-8 w-8 text-destructive" />
@@ -94,7 +98,7 @@ function ResetPasswordPage() {
   if (!token) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+        <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 p-3 rounded-full bg-destructive/10 w-fit">
               <AlertCircle className="h-8 w-8 text-destructive" />
@@ -176,10 +180,10 @@ function ResetPasswordPage() {
   if (isSuccess) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
-        <Card className="w-full max-w-md glass-card">
+        <Card className="w-full max-w-md">
           <CardHeader className="text-center">
-            <div className="mx-auto mb-4 p-3 rounded-full bg-green-500/10 w-fit">
-              <CheckCircle2 className="h-8 w-8 text-green-500" />
+            <div className="mx-auto mb-4 w-fit rounded-md bg-brand-success/10 p-3">
+              <CheckCircle2 className="h-8 w-8 text-brand-success" />
             </div>
             <CardTitle className="text-2xl font-bold">
               {t('auth:resetPassword.successTitle')}
@@ -202,12 +206,12 @@ function ResetPasswordPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
-      <Card className="w-full max-w-md glass-card">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4 p-3 rounded-full bg-primary/10 w-fit">
             <KeyRound className="h-8 w-8 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold gradient-text">
+          <CardTitle className="text-2xl font-semibold tracking-tight text-foreground">
             {t('auth:resetPassword.title')}
           </CardTitle>
           <CardDescription>
@@ -263,8 +267,8 @@ function ResetPasswordPage() {
                 autoComplete="new-password"
                 className={cn(
                   confirmPassword &&
-                  password !== confirmPassword &&
-                  'border-destructive',
+                    password !== confirmPassword &&
+                    'border-destructive',
                 )}
               />
               {confirmPassword && password !== confirmPassword && (
@@ -278,7 +282,7 @@ function ResetPasswordPage() {
           <CardFooter>
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? (
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <span className="inline-block h-4 w-4 animate-spin motion-reduce:animate-none rounded-full border-2 border-current border-t-transparent" />
               ) : (
                 t('common:actions.resetPassword')
               )}

@@ -11,10 +11,9 @@ import {
     createPlaygroundState,
 } from '@/tests/fixtures/playground';
 
-// These tests use mock.module('@/core/executor') which pollutes Bun's module registry globally
-// and breaks iframe-executor.test.ts. Run with BUN_RUN_SKIPPED=1 to enable.
-const isSkipped = !process.env.BUN_RUN_SKIPPED;
-
+// Keep the executor implementation real here. The execution hook is spied
+// below, so mocking the executor module is unnecessary and pollutes Bun's
+// module registry for iframe-executor.test.ts.
 const renderWithTheme = (ui: React.ReactElement) => {
     return render(
         <ThemeProvider>
@@ -23,7 +22,7 @@ const renderWithTheme = (ui: React.ReactElement) => {
     );
 };
 
-describe.skipIf(isSkipped)('ChallengePlayground', () => {
+describe('ChallengePlayground', () => {
     const mockChallenge = createChallenge({
         starterCode: 'console.log("hello");',
         files: { '/index.js': 'console.log("hello");' },
@@ -115,10 +114,6 @@ describe.skipIf(isSkipped)('ChallengePlayground', () => {
             HintDisplayPanel: () => null
         }));
 
-        void mock.module(
-'@/core/executor', () => ({
-            executePlaywrightCode: mock(() => Promise.resolve({ status: 'PASSED' }))
-        }));
     });
 
     afterEach(() => {

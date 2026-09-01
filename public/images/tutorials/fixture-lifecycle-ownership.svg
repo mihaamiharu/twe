@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 930" role="img" aria-labelledby="title description">
+  <title id="title">A fixture is a dependency and lifecycle contract</title>
+  <desc id="description">Declared dependencies are resolved before verified setup. The fixture hands a named value to a test through await use, then tears down the exact owned resource. Test scope repeats this lifecycle for each test, while worker scope shares one lifecycle across safe consumers in one worker.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="928" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.1">FIXTURE = DEPENDENCY + LIFECYCLE CONTRACT</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <g filter="url(#shadow)">
+    <rect x="78" y="118" width="604" height="108" rx="18" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <text x="104" y="151" fill="#686258" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">1 · DECLARED DEPENDENCIES</text>
+  <text x="104" y="184" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">page · request · workerAccount</text>
+  <text x="104" y="209" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">Only requested, non-automatic fixtures are resolved.</text>
+
+  <line x1="380" y1="238" x2="380" y2="272" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="78" y="286" width="604" height="118" rx="18" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  </g>
+  <text x="104" y="319" fill="#6d5418" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">2 · SETUP</text>
+  <text x="104" y="352" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Create, verify, and record ownership</text>
+  <text x="104" y="381" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">A failed setup should stop with descriptive evidence.</text>
+
+  <line x1="380" y1="416" x2="380" y2="450" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="78" y="464" width="604" height="142" rx="18" fill="#25231f" />
+  </g>
+  <text x="104" y="499" fill="#f4bd4f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">3 · HANDOFF</text>
+  <text x="104" y="536" fill="#ffffff" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="21" font-weight="700">await use(ownedResource)</text>
+  <rect x="104" y="558" width="552" height="30" rx="15" fill="#3b3934" />
+  <text x="380" y="579" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">The test or dependent fixture runs here.</text>
+
+  <line x1="380" y1="618" x2="380" y2="652" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+
+  <g filter="url(#shadow)">
+    <rect x="78" y="666" width="604" height="118" rx="18" fill="#e6f2ec" stroke="#75a38b" stroke-width="2" />
+  </g>
+  <text x="104" y="699" fill="#2d6249" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">4 · TEARDOWN</text>
+  <text x="104" y="732" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Clean up the exact owned resource</text>
+  <text x="104" y="761" fill="#686258" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="15">Reverse dependency order; tolerate interrupted state safely.</text>
+
+  <g filter="url(#shadow)">
+    <rect x="52" y="824" width="314" height="70" rx="16" fill="#fce8e1" stroke="#e65f3a" stroke-width="2" />
+    <rect x="394" y="824" width="314" height="70" rx="16" fill="#ffffff" stroke="#686258" stroke-width="2" />
+  </g>
+  <text x="209" y="851" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">TEST SCOPE · SAFE DEFAULT</text>
+  <text x="209" y="878" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">One lifecycle for every test</text>
+  <text x="551" y="851" fill="#686258" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="12" font-weight="700">WORKER SCOPE · PROVE SAFETY</text>
+  <text x="551" y="878" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="14" font-weight="700">One worker must own safe sharing</text>
+</svg>

@@ -7,6 +7,7 @@ import {
 import { LoginForm } from '@/components/auth';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
 
 export const Route = createFileRoute('/$locale/login')({
   beforeLoad: ({ context, params }) => {
@@ -23,8 +24,8 @@ export const Route = createFileRoute('/$locale/login')({
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Sign In | TestingWithEkki',
-      description: 'Sign in to your TestingWithEkki account to track your progress and earn XP.',
+      title: i18n.t('auth:seo.login.title', { lng: locale }),
+      description: i18n.t('auth:seo.login.description', { lng: locale }),
       path: '/login',
       locale,
       noIndex: true,
@@ -52,7 +53,7 @@ function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
-      <div className="w-full max-w-md space-y-6 animate-fade-in">
+      <div className="w-full max-w-md space-y-6 animate-in fade-in-0 duration-200 ease-(--ease-ui-out)">
         <LoginForm
           onSuccess={handleLoginSuccess}
           onRegisterClick={() => {

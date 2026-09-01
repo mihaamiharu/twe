@@ -20,6 +20,8 @@ declare global {
     expect?: ExpectFunction;
     happyDOM?: unknown;
     page?: MockedPlaywrightPage;
+    /** Raw page reserved for the internal VFS bridge; learner code receives `page`. */
+    __VFS_PAGE__?: MockedPlaywrightPage;
     test?: ExecutorTestFunction;
     console: Console;
     eval: (code: string) => unknown;

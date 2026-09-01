@@ -1,3 +1,5 @@
+'use client';
+
 import {
   HeadContent,
   Outlet,
@@ -11,10 +13,7 @@ import { type AuthSession } from '@/server/auth.fn';
 import { authQueryOptions } from '@/lib/auth.query';
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools';
 import { TanStackDevtools } from '@tanstack/react-devtools';
-import {
-  QueryClient,
-  QueryClientProvider,
-} from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { NotFound } from '@/components/not-found';
 import { Header } from '@/components/header';
 import { Footer } from '@/components/footer';
@@ -23,10 +22,13 @@ import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { CookieConsent } from '@/components/cookie-consent';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
-import i18n from '@/lib/i18n';
 import { organizationSchema } from '@/lib/seo';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
+
+function isLocaleProductPath(pathname: string) {
+  return /^\/(en|id)(?:\/|$)/.test(pathname);
+}
 
 // Export context type for child routes
 export interface RootContext {
@@ -36,7 +38,7 @@ export interface RootContext {
   pathname?: string;
 }
 
-import { DefaultErrorComponent } from "@/components/default-error-component";
+import { DefaultErrorComponent } from '@/components/default-error-component';
 
 export const Route = createRootRouteWithContext<RootContext>()({
   errorComponent: DefaultErrorComponent,
@@ -64,9 +66,10 @@ export const Route = createRootRouteWithContext<RootContext>()({
     return { auth, consent, pathname: location.pathname };
   },
   head: () => {
-    const isQa = typeof window !== 'undefined' 
-      ? window.location.hostname.startsWith('qa.')
-      : false; // Server-side detection handled by header injection in scripts/server.ts
+    const isQa =
+      typeof window !== 'undefined'
+        ? window.location.hostname.startsWith('qa.')
+        : false; // Server-side detection handled by header injection in scripts/server.ts
 
     const meta = [
       {
@@ -77,36 +80,8 @@ export const Route = createRootRouteWithContext<RootContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        name: 'keywords',
-        content: i18n.t('common:seo.keywords'),
-      },
-      {
-        property: 'og:title',
-        content: i18n.t('common:seo.ogTitle'),
-      },
-      {
-        property: 'og:description',
-        content: i18n.t('common:seo.ogDescription'),
-      },
-      {
-        property: 'og:type',
-        content: 'website',
-      },
-      {
         property: 'og:site_name',
         content: 'TestingWithEkki',
-      },
-      {
-        property: 'og:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
-      },
-      {
-        property: 'og:image:width',
-        content: '1200',
-      },
-      {
-        property: 'og:image:height',
-        content: '630',
       },
       {
         name: 'twitter:card',
@@ -121,20 +96,8 @@ export const Route = createRootRouteWithContext<RootContext>()({
         content: '@ekkisyam2310',
       },
       {
-        name: 'twitter:title',
-        content: i18n.t('common:seo.ogTitle'),
-      },
-      {
-        name: 'twitter:description',
-        content: i18n.t('common:seo.ogDescription'),
-      },
-      {
-        name: 'twitter:image',
-        content: 'https://testingwithekki.com/twe-banner.png',
-      },
-      {
         name: 'theme-color',
-        content: '#09090b', // Zinc-950 (background color)
+        content: '#F4F0E8', // Warm Canvas
       },
     ];
 
@@ -157,12 +120,14 @@ export const Route = createRootRouteWithContext<RootContext>()({
         },
         {
           rel: 'icon',
-          href: '/logo-icon.svg',
-          type: 'image/svg+xml',
+          href: '/logo-icon-192.png',
+          type: 'image/png',
+          sizes: '192x192',
         },
         {
           rel: 'apple-touch-icon',
-          href: '/logo-icon.svg',
+          href: '/logo-icon-192.png',
+          sizes: '192x192',
         },
         {
           rel: 'manifest',
@@ -172,14 +137,14 @@ export const Route = createRootRouteWithContext<RootContext>()({
           rel: 'stylesheet',
           href: appCss,
         },
-    ],
-    scripts: [
-      {
-        type: 'application/ld+json',
-        children: JSON.stringify(organizationSchema),
-      },
-    ]
-    }
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(organizationSchema),
+        },
+      ],
+    };
   },
 
   component: RootComponent,
@@ -187,19 +152,29 @@ export const Route = createRootRouteWithContext<RootContext>()({
   notFoundComponent: NotFound,
 });
 
-// RootComponent now just renders the Outlet
-// The layout (Header, Footer) is in RootDocument which is stable
+// RootComponent owns the interactive app shell so Header/Footer event handlers
+// hydrate with the route tree while the document/providers remain stable.
 function RootComponent() {
-  return <Outlet />;
+  return (
+    <AppLayout>
+      <Outlet />
+    </AppLayout>
+  );
 }
 
-// RootDocument is the "shell" that persists during SPA navigation
-// Header, Footer, and layout go here to prevent flicker
+// RootDocument is the document/provider shell that persists during navigation.
 function RootDocument({ children }: { children: React.ReactNode }) {
   const context = Route.useRouteContext();
   const queryClient = context?.queryClient;
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+  const pathname = context?.pathname || '';
+  const forcedTheme = isLocaleProductPath(pathname) ? 'light' : undefined;
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -217,7 +192,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const theme = localStorage.getItem('twe-theme') || 'system';
+                const pathname = window.location.pathname;
+                const isLocaleProduct = ${isLocaleProductPath.toString()}(pathname);
+                const theme = isLocaleProduct
+                    ? 'light'
+                    : (localStorage.getItem('twe-theme') || 'system');
                 let resolved = theme;
                 if (theme === 'system') {
                   resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
@@ -229,10 +208,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
         {/* JSON-LD Organization Schema now managed via head.scripts */}
       </head>
-      <body className="scrollbar-thin" suppressHydrationWarning>
+      <body
+        className="scrollbar-thin"
+        data-app-hydrated={isHydrated ? 'true' : 'false'}
+        suppressHydrationWarning
+      >
         <QueryClientProvider client={queryClient}>
-          <ThemeProvider>
-            <AppLayout>{children}</AppLayout>
+          <ThemeProvider {...(forcedTheme ? { forcedTheme } : {})}>
+            {children}
           </ThemeProvider>
           <TanStackDevtools
             config={{
@@ -259,7 +242,9 @@ function AppLayout({ children }: { children: React.ReactNode }) {
   const auth = context?.auth;
   const location = useLocation();
   const preloadedImageRef = useRef<string | null>(null);
-  const [consent, setConsent] = useState<'granted' | 'denied' | null>(context?.consent || null);
+  const [consent, setConsent] = useState<'granted' | 'denied' | null>(
+    context?.consent || null,
+  );
 
   // Sync consent state if it changes via CookieConsent component
   const handleConsentChange = (newConsent: 'granted' | 'denied' | null) => {
@@ -280,7 +265,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
 
   // Check if current route is a challenge detail page
   const isChallengeDetail =
-    /\/challenges\/[^/]+$/.test(location.pathname) &&
+    /\/practice\/[^/]+$/.test(location.pathname) &&
     !location.pathname.includes('/admin/');
 
   return (
@@ -290,7 +275,10 @@ function AppLayout({ children }: { children: React.ReactNode }) {
           {...omitUndefined({ measurementId: auth?.gaMeasurementId })}
         />
       )}
-      <CookieConsent onConsentChange={handleConsentChange} initialConsent={consent} />
+      <CookieConsent
+        onConsentChange={handleConsentChange}
+        initialConsent={consent}
+      />
       <div className="flex flex-col min-h-screen">
         <Header session={auth || null} />
         <main className="flex-1">

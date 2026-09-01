@@ -1,0 +1,690 @@
+import { createFileRoute, getRouteApi } from '@tanstack/react-router';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { type KeyboardEvent, useEffect, useRef, useState } from 'react';
+import {
+  ArrowRight,
+  Check,
+  ChevronDown,
+  Code2,
+  LayoutGrid,
+  List,
+  ListChecks,
+  Play,
+  Search,
+  SlidersHorizontal,
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+
+import { EmptyState } from '@/components/empty-state';
+import {
+  PracticeChallengeGridCard,
+  PracticeChallengeRow,
+} from '@/components/challenges/practice-challenge-item';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
+import { getTierFromCategory, TIER_ORDER } from '@/lib/constants';
+import { challengeListQueryOptions } from '@/lib/challenges.query';
+import { authQueryOptions } from '@/lib/auth.query';
+import { cn } from '@/lib/utils';
+import { TRACK_CONFIG, TRACK_IDS, type TrackId } from '@/config/tracks';
+import i18n from '@/lib/i18n';
+import { createSeoHead } from '@/lib/seo';
+import { type PracticeChallengeLabels } from '@/components/challenges/practice-challenge-item';
+import {
+  filterPracticeChallenges,
+  groupPracticeChallenges,
+  type PracticeChallenge,
+} from '@/lib/practice-catalog';
+import {
+  PracticeDifficultySchema,
+  PracticeSearchSchema,
+  PracticeTierSchema,
+  type PracticeSearch,
+} from '@/lib/practice-search';
+
+export { PracticeSearchSchema as ChallengesSearchSchema } from '@/lib/practice-search';
+
+export const Route = createFileRoute('/$locale/practice/')({
+  validateSearch: PracticeSearchSchema,
+  loader: async ({ context, params }) => {
+    const auth = await context.queryClient.ensureQueryData(authQueryOptions);
+    return context.queryClient.ensureQueryData(
+      challengeListQueryOptions({
+        locale: params.locale,
+        viewerId: auth.user?.id,
+      }),
+    );
+  },
+  component: ChallengesPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: i18n.t('challenges:page.seo.title', { lng: locale }),
+      description: i18n.t('challenges:page.seo.description', { lng: locale }),
+      path: '/practice',
+      locale,
+    });
+  },
+});
+
+const TRACK_LABEL_KEYS: Record<TrackId, string> = {
+  all: 'tracks.all.label',
+  selectors: 'tracks.selectors.label',
+  scripting: 'tracks.scripting.label',
+  core: 'tracks.core.label',
+  e2e: 'tracks.e2e.label',
+};
+
+const TRACK_DESCRIPTION_KEYS: Record<TrackId, string> = {
+  all: 'tracks.all.description',
+  selectors: 'tracks.selectors.description',
+  scripting: 'tracks.scripting.description',
+  core: 'tracks.core.description',
+  e2e: 'tracks.e2e.description',
+};
+
+const ALL_TRACKS = TRACK_IDS.map((id) => ({
+  ...TRACK_CONFIG[id],
+  id,
+}));
+
+const PRACTICE_STEPS = [
+  { key: 'choose', icon: ListChecks },
+  { key: 'solve', icon: Code2 },
+  { key: 'run', icon: Play },
+  { key: 'review', icon: Check },
+] as const;
+
+const routeApi = getRouteApi('/$locale/practice/');
+
+export function ChallengesPage() {
+  const { locale } = routeApi.useParams();
+  const { t } = useTranslation('challenges');
+  const { data: auth } = useQuery(authQueryOptions);
+  const navigate = routeApi.useNavigate();
+  const searchParams = routeApi.useSearch();
+  const loaderData = routeApi.useLoaderData?.();
+
+  const q = searchParams.q;
+  const tier = searchParams.tier;
+  const difficulty = searchParams.difficulty;
+  const canFilterCompleted = Boolean(auth?.user);
+  const hideCompleted = canFilterCompleted
+    ? (searchParams.hideCompleted ?? false)
+    : false;
+  const activeTrackId: TrackId = searchParams.track || 'all';
+  const viewMode = searchParams.view || 'list';
+  const completionToggleLabel = hideCompleted
+    ? t('filters.showCompleted')
+    : t('filters.hideCompleted');
+
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(
+    () => new Set(),
+  );
+
+  const trackTabRefs = useRef<
+    Partial<Record<TrackId, HTMLButtonElement | null>>
+  >({});
+  const pendingTrackFocus = useRef<TrackId | null>(null);
+
+  useEffect(() => {
+    const trackId = pendingTrackFocus.current;
+    if (!trackId || trackId !== activeTrackId) return;
+
+    trackTabRefs.current[trackId]?.focus();
+    pendingTrackFocus.current = null;
+  }, [activeTrackId]);
+
+  const updateSearch = (
+    updates: Partial<PracticeSearch>,
+    { replace = false }: { replace?: boolean } = {},
+  ) => {
+    void navigate({
+      to: '.',
+      search: (previous) => ({ ...previous, ...updates }),
+      ...(replace ? { replace: true } : {}),
+    });
+  };
+
+  const activeTrack =
+    ALL_TRACKS.find((track) => track.id === activeTrackId) ?? ALL_TRACKS[0];
+
+  if (!activeTrack) {
+    throw new Error(
+      'Challenge track configuration must define at least one track',
+    );
+  }
+
+  const {
+    data: challengesQueryData,
+    isError: isCatalogError,
+    isPending: isCatalogPending,
+    refetch: refetchCatalog,
+  } = useQuery({
+    ...challengeListQueryOptions({
+      locale,
+      viewerId: auth?.user?.id,
+    }),
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
+  });
+  const challengesResponse = challengesQueryData ?? loaderData;
+
+  const challenges = challengesResponse?.success ? challengesResponse.data : [];
+  const hasCatalogResponseError = Boolean(
+    challengesResponse && !challengesResponse.success,
+  );
+  const filteredChallenges = filterPracticeChallenges(challenges, {
+    query: q,
+    track: activeTrackId,
+    tier,
+    difficulty,
+    hideCompleted,
+  });
+  const groupedChallenges = groupPracticeChallenges(filteredChallenges);
+
+  const clearFilters = () => {
+    setCollapsedGroups(new Set());
+    updateSearch({
+      q: undefined,
+      track: undefined,
+      tier: undefined,
+      difficulty: undefined,
+      hideCompleted: undefined,
+    });
+  };
+
+  const hasActiveFilters = Boolean(
+    q || tier || difficulty || hideCompleted || activeTrackId !== 'all',
+  );
+
+  const handleSearchChange = (value: string) => {
+    updateSearch({ q: value || undefined }, { replace: true });
+  };
+
+  const renderChallengeLabels = (
+    challenge: PracticeChallenge,
+  ): PracticeChallengeLabels => ({
+    type: t(`types.${challenge.type.toLowerCase()}`, {
+      defaultValue: challenge.type,
+    }).toUpperCase(),
+    difficulty: t(`difficulty.${challenge.difficulty}`, {
+      defaultValue: challenge.difficulty,
+    }),
+    category: t(`categories.${challenge.category}`, {
+      defaultValue: challenge.category,
+    }),
+    tier: t(`tiers.${getTierFromCategory(challenge.category)}`),
+    completionCount: t('library.completedByCount', {
+      count: challenge.completionCount,
+    }),
+    completed: t('labels.completedState'),
+    comingSoon: t('labels.comingSoon'),
+    start: t('labels.start'),
+    review: t('labels.review'),
+  });
+
+  const renderChallengeProps = (challenge: PracticeChallenge) => ({
+    challenge,
+    locale,
+    labels: renderChallengeLabels(challenge),
+  });
+
+  const emptyStateTitle = t('library.emptyTitle');
+  const showListView = viewMode === 'list';
+  const showGridView = viewMode === 'grid';
+
+  const toggleGroup = (category: string) => {
+    setCollapsedGroups((previous) => {
+      const next = new Set(previous);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  };
+
+  const selectTrack = (trackId: TrackId) => {
+    updateSearch({ track: trackId === 'all' ? undefined : trackId });
+  };
+
+  const handleTrackKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number,
+  ) => {
+    let nextIndex: number | undefined;
+
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (index + 1) % ALL_TRACKS.length;
+        break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (index - 1 + ALL_TRACKS.length) % ALL_TRACKS.length;
+        break;
+      case 'Home':
+        nextIndex = 0;
+        break;
+      case 'End':
+        nextIndex = ALL_TRACKS.length - 1;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    const nextTrack = ALL_TRACKS[nextIndex];
+    if (!nextTrack) return;
+
+    pendingTrackFocus.current = nextTrack.id;
+    selectTrack(nextTrack.id);
+  };
+
+  return (
+    <div className="min-h-screen bg-background" data-testid="practice-library">
+      <div className="mx-auto w-full max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8 lg:pt-12">
+        <section
+          className="max-w-3xl pb-8 lg:pb-10"
+          aria-labelledby="practice-title"
+        >
+          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+            {t('library.eyebrow')}
+          </p>
+          <h1
+            id="practice-title"
+            className="mt-3 text-4xl font-semibold tracking-[-0.045em] text-foreground sm:text-5xl"
+          >
+            {t('library.headline')}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+            {t('library.description')}
+          </p>
+        </section>
+
+        <section
+          aria-labelledby="how-practice-works"
+          className="mb-8 border border-brand-orange/20 bg-brand-orange/8 px-4 py-4 sm:px-5 lg:mb-10 lg:py-3.5"
+        >
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
+            <div className="shrink-0 lg:w-44">
+              <h2
+                id="how-practice-works"
+                className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-brand-orange"
+              >
+                {t('howPractice.title')}
+              </h2>
+              <p className="sr-only">{t('howPractice.description')}</p>
+            </div>
+            <ol className="grid min-w-0 grid-cols-2 gap-x-3 gap-y-4 sm:grid-cols-4 sm:gap-4 lg:flex lg:flex-1 lg:items-center lg:gap-0">
+              {PRACTICE_STEPS.map(({ key, icon: Icon }, index) => (
+                <li
+                  key={key}
+                  className="relative min-w-0 lg:flex lg:flex-1 lg:items-center lg:pr-7"
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-orange/25 bg-background text-brand-orange">
+                      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-foreground">
+                        <span className="mr-1 font-mono text-[10px] text-brand-orange">
+                          0{index + 1}
+                        </span>
+                        {t(`howPractice.steps.${key}.title`)}
+                      </p>
+                      <p className="mt-0.5 hidden text-xs leading-4 text-muted-foreground sm:block">
+                        {t(`howPractice.steps.${key}.description`)}
+                      </p>
+                    </div>
+                  </div>
+                  {index < PRACTICE_STEPS.length - 1 && (
+                    <ArrowRight
+                      className="absolute -right-1 top-1/2 hidden h-3.5 w-3.5 -translate-y-1/2 text-brand-orange/50 lg:block"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section
+          aria-label={t('library.discoveryLabel')}
+          className="relative flex flex-col md:sticky md:top-16 md:z-30 md:-mx-6 md:bg-background/95 md:px-6 md:backdrop-blur-sm lg:-mx-8 lg:px-8"
+        >
+          <div className="order-1 -mx-4 border-b border-border px-4 md:mx-0 md:px-0">
+            <nav
+              aria-label={t('filters.track')}
+              aria-describedby="track-scroll-hint"
+              role="tablist"
+              aria-orientation="horizontal"
+              className="flex snap-x overflow-x-auto"
+            >
+              {ALL_TRACKS.map((track, index) => {
+                const isActive = activeTrack.id === track.id;
+                return (
+                  <button
+                    key={track.id}
+                    type="button"
+                    role="tab"
+                    id={`track-tab-${track.id}`}
+                    ref={(element) => {
+                      trackTabRefs.current[track.id] = element;
+                    }}
+                    tabIndex={isActive ? 0 : -1}
+                    aria-selected={isActive}
+                    aria-controls="challenge-results"
+                    onClick={() => selectTrack(track.id)}
+                    onKeyDown={(event) => handleTrackKeyDown(event, index)}
+                    className={cn(
+                      'min-h-11 shrink-0 snap-start border-b-2 px-4 text-sm font-medium transition-colors first:pl-0 last:pr-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary',
+                      isActive
+                        ? 'border-primary text-primary'
+                        : 'border-transparent text-muted-foreground hover:text-foreground',
+                    )}
+                  >
+                    {t(TRACK_LABEL_KEYS[track.id])}
+                  </button>
+                );
+              })}
+            </nav>
+            <p
+              id="track-scroll-hint"
+              className="flex items-center gap-1 py-1.5 text-[10px] text-muted-foreground md:hidden"
+            >
+              <span aria-hidden="true">↔</span>
+              {t('filters.trackScrollHint')}
+            </p>
+          </div>
+
+          <div className="order-2 flex flex-col gap-3 border-b border-border bg-background/95 py-3 md:bg-transparent lg:flex-row lg:items-center">
+            <div className="relative min-w-0 flex-1">
+              <Search
+                className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden="true"
+              />
+              <Input
+                aria-label={t('filters.search')}
+                placeholder={t('filters.searchPlaceholder')}
+                value={q ?? ''}
+                onChange={(event) => handleSearchChange(event.target.value)}
+                className="h-11 bg-card pl-10 md:border-foreground/25"
+              />
+            </div>
+
+            <div className="grid gap-2 sm:flex sm:items-center lg:shrink-0">
+              <Select
+                value={difficulty ?? 'all'}
+                onValueChange={(value) =>
+                  updateSearch({
+                    difficulty:
+                      value === 'all'
+                        ? undefined
+                        : PracticeDifficultySchema.parse(value),
+                  })
+                }
+              >
+                <SelectTrigger
+                  aria-label={t('filters.difficulty')}
+                  className="h-11 w-full bg-card sm:w-[170px]"
+                >
+                  <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
+                  <SelectValue placeholder={t('filters.allDifficulties')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">
+                    {t('filters.allDifficulties')}
+                  </SelectItem>
+                  <SelectItem value="EASY">{t('difficulty.EASY')}</SelectItem>
+                  <SelectItem value="MEDIUM">
+                    {t('difficulty.MEDIUM')}
+                  </SelectItem>
+                  <SelectItem value="HARD">{t('difficulty.HARD')}</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select
+                value={tier ?? 'all'}
+                onValueChange={(value) =>
+                  updateSearch({
+                    tier:
+                      value === 'all'
+                        ? undefined
+                        : PracticeTierSchema.parse(value),
+                  })
+                }
+              >
+                <SelectTrigger
+                  aria-label={t('filters.tier')}
+                  className="h-11 w-full bg-card sm:w-[170px]"
+                >
+                  <SelectValue placeholder={t('filters.allTiers')} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t('filters.allTiers')}</SelectItem>
+                  {TIER_ORDER.map((tierId) => (
+                    <SelectItem key={tierId} value={tierId}>
+                      {t(`tiers.${tierId}`)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+
+              {canFilterCompleted && (
+                <label
+                  htmlFor="hide-completed"
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-border bg-card px-3 text-sm text-muted-foreground sm:min-w-[170px]"
+                >
+                  <span>{completionToggleLabel}</span>
+                  <Switch
+                    id="hide-completed"
+                    checked={hideCompleted}
+                    onCheckedChange={(checked) =>
+                      updateSearch({ hideCompleted: checked })
+                    }
+                    aria-label={completionToggleLabel}
+                  />
+                </label>
+              )}
+
+              <div
+                className="flex items-center justify-end rounded-lg border border-border bg-card p-1"
+                role="group"
+                aria-label={t('filters.view')}
+              >
+                <Button
+                  type="button"
+                  variant={viewMode === 'list' ? 'secondary' : 'ghost'}
+                  size="icon-sm"
+                  aria-label={t('filters.listView')}
+                  aria-pressed={viewMode === 'list'}
+                  onClick={() => updateSearch({ view: 'list' })}
+                >
+                  <List className="h-4 w-4" aria-hidden="true" />
+                </Button>
+                <Button
+                  type="button"
+                  variant={viewMode === 'grid' ? 'secondary' : 'ghost'}
+                  size="icon-sm"
+                  aria-label={t('filters.gridView')}
+                  aria-pressed={viewMode === 'grid'}
+                  onClick={() => updateSearch({ view: 'grid' })}
+                >
+                  <LayoutGrid className="h-4 w-4" aria-hidden="true" />
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div className="mt-7 flex items-center justify-between gap-4 md:mt-8">
+          <div>
+            <p className="font-mono text-[10px] uppercase tracking-[0.15em] text-muted-foreground">
+              {t(TRACK_DESCRIPTION_KEYS[activeTrack.id])}
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t('library.showingCount', { count: filteredChallenges.length })}
+            </p>
+          </div>
+          {hasActiveFilters && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="shrink-0 text-muted-foreground"
+              onClick={clearFilters}
+            >
+              {t('filters.clear')}
+            </Button>
+          )}
+        </div>
+
+        <div
+          id="challenge-results"
+          role="tabpanel"
+          aria-labelledby={`track-tab-${activeTrack.id}`}
+          className="mt-5"
+          aria-live="polite"
+        >
+          {isCatalogPending && !challengesResponse ? (
+            <div
+              className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+              aria-label={t('library.loading')}
+              aria-busy="true"
+            >
+              {[1, 2, 3, 4, 5, 6].map((item) => (
+                <div
+                  key={item}
+                  className="h-40 animate-pulse motion-reduce:animate-none rounded-xl border border-border bg-card/70"
+                />
+              ))}
+            </div>
+          ) : isCatalogError || hasCatalogResponseError ? (
+            <EmptyState
+              size="compact"
+              className="rounded-xl border border-dashed border-border px-6"
+              eyebrow={t('library.errorEyebrow')}
+              title={t('library.errorTitle')}
+              description={t('library.errorDescription')}
+              action={
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => void refetchCatalog()}
+                >
+                  {t('library.retry')}
+                </Button>
+              }
+            />
+          ) : groupedChallenges.length === 0 ? (
+            <EmptyState
+              size="compact"
+              className="rounded-xl border border-dashed border-border px-6"
+              eyebrow={t('library.emptyEyebrow')}
+              title={emptyStateTitle}
+              description={t('library.emptyDescription')}
+            />
+          ) : (
+            <div className="space-y-6">
+              {groupedChallenges.map(
+                ({
+                  category,
+                  tier: categoryTier,
+                  challenges: categoryChallenges,
+                }) => (
+                  <section
+                    key={category}
+                    aria-labelledby={`category-${category}`}
+                    className="overflow-hidden rounded-xl border border-border bg-card"
+                  >
+                    <div className="border-b border-border">
+                      <button
+                        type="button"
+                        aria-expanded={!collapsedGroups.has(category)}
+                        aria-controls={`category-content-${category}`}
+                        onClick={() => toggleGroup(category)}
+                        className="group flex min-h-14 w-full items-center justify-between gap-4 px-4 text-left outline-none transition-colors hover:bg-foreground/[0.025] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary sm:px-5"
+                      >
+                        <span className="flex min-w-0 items-baseline gap-3">
+                          <span
+                            id={`category-${category}`}
+                            className="truncate font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-foreground"
+                          >
+                            {t(`categories.${category}`, {
+                              defaultValue: category,
+                            })}
+                          </span>
+                          <span className="shrink-0 text-xs text-muted-foreground">
+                            {t('library.challengeCount', {
+                              count: categoryChallenges.length,
+                            })}
+                          </span>
+                          <span className="hidden shrink-0 rounded-full bg-muted px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground sm:inline-flex">
+                            {t(`tiers.${categoryTier}`)}
+                          </span>
+                        </span>
+                        <ChevronDown
+                          className={cn(
+                            'h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200',
+                            !collapsedGroups.has(category) && 'rotate-180',
+                          )}
+                          aria-hidden="true"
+                        />
+                      </button>
+                    </div>
+
+                    <div
+                      id={`category-content-${category}`}
+                      hidden={collapsedGroups.has(category)}
+                    >
+                      {showListView && (
+                        <div
+                          data-testid="challenge-library-list"
+                          className="block"
+                        >
+                          {categoryChallenges.map((challenge) => (
+                            <PracticeChallengeRow
+                              key={challenge.slug}
+                              {...renderChallengeProps(challenge)}
+                            />
+                          ))}
+                        </div>
+                      )}
+
+                      {showGridView && (
+                        <div
+                          data-testid="challenge-library-grid"
+                          className="grid grid-cols-1 gap-px bg-border sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3"
+                        >
+                          {categoryChallenges.map((challenge) => (
+                            <PracticeChallengeGridCard
+                              key={challenge.slug}
+                              {...renderChallengeProps(challenge)}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </section>
+                ),
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

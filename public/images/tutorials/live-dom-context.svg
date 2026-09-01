@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 1120" role="img" aria-labelledby="title description">
+  <title id="title">Meaningful context in a changing DOM</title>
+  <desc id="description">Before an action, a cart list contains Mechanical Keyboard and Wireless Mouse sibling rows, each with a Remove button. The test scopes the action to the keyboard row. After the action, only the mouse row remains.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#e65f3a" />
+    </marker>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#25231f" flood-opacity="0.1" />
+    </filter>
+  </defs>
+
+  <rect x="1" y="1" width="758" height="1118" rx="22" fill="#f7f4ee" stroke="#d9d2c7" stroke-width="2" />
+  <text x="48" y="58" fill="#25231f" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="18" font-weight="700" letter-spacing="1.5">MEANINGFUL CONTEXT IN A LIVE DOM</text>
+  <line x1="48" y1="82" x2="712" y2="82" stroke="#d9d2c7" stroke-width="2" />
+
+  <text x="70" y="130" fill="#e65f3a" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="16" font-weight="700" letter-spacing="1">BEFORE</text>
+  <g filter="url(#shadow)">
+    <rect x="70" y="150" width="620" height="500" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+
+  <rect x="260" y="184" width="240" height="64" rx="12" fill="#25231f" />
+  <text x="380" y="224" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="23" font-weight="700">Cart items · list</text>
+  <path d="M380 248 V282 H212 V314" fill="none" stroke="#9b9488" stroke-width="3" />
+  <path d="M380 282 H548 V314" fill="none" stroke="#9b9488" stroke-width="3" />
+
+  <rect x="100" y="314" width="224" height="210" rx="14" fill="#fce8e1" stroke="#e65f3a" stroke-width="3" />
+  <text x="122" y="350" fill="#9b3e27" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">TARGET LISTITEM</text>
+  <text x="122" y="393" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Mechanical</text>
+  <text x="122" y="420" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Keyboard</text>
+  <rect x="122" y="454" width="126" height="42" rx="9" fill="#e65f3a" />
+  <text x="185" y="481" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Remove</text>
+
+  <rect x="436" y="314" width="224" height="210" rx="14" fill="#f7f4ee" stroke="#9b9488" stroke-width="2" />
+  <text x="458" y="350" fill="#686258" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">SIBLING LISTITEM</text>
+  <text x="458" y="393" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Wireless Mouse</text>
+  <rect x="458" y="454" width="126" height="42" rx="9" fill="#ffffff" stroke="#9b9488" stroke-width="2" />
+  <text x="521" y="481" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="18" font-weight="700">Remove</text>
+
+  <rect x="120" y="554" width="520" height="62" rx="12" fill="#fff7dd" stroke="#e3b13f" stroke-width="2" />
+  <text x="380" y="579" fill="#6d5418" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">Scope by product identity</text>
+  <text x="380" y="602" fill="#6d5418" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="16">then choose Remove inside that row</text>
+
+  <line x1="380" y1="670" x2="380" y2="732" stroke="#e65f3a" stroke-width="4" marker-end="url(#arrow)" />
+  <rect x="213" y="681" width="334" height="42" rx="21" fill="#fce8e1" />
+  <text x="380" y="708" fill="#9b3e27" text-anchor="middle" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="15" font-weight="700">ACTION: REMOVE KEYBOARD</text>
+
+  <text x="70" y="780" fill="#e65f3a" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="16" font-weight="700" letter-spacing="1">AFTER</text>
+  <g filter="url(#shadow)">
+    <rect x="70" y="800" width="620" height="232" rx="16" fill="#ffffff" stroke="#d9d2c7" stroke-width="2" />
+  </g>
+  <rect x="100" y="834" width="220" height="64" rx="12" fill="#25231f" />
+  <text x="210" y="874" fill="#ffffff" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="22" font-weight="700">Cart items · list</text>
+  <line x1="320" y1="866" x2="378" y2="866" stroke="#9b9488" stroke-width="3" />
+  <rect x="378" y="824" width="282" height="148" rx="14" fill="#f7f4ee" stroke="#9b9488" stroke-width="2" />
+  <text x="402" y="862" fill="#686258" font-family="ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace" font-size="14" font-weight="700">REMAINING LISTITEM</text>
+  <text x="402" y="903" fill="#25231f" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="21" font-weight="700">Wireless Mouse</text>
+  <text x="402" y="944" fill="#387357" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="17" font-weight="700">Keyboard row is absent ✓</text>
+
+  <text x="380" y="1074" fill="#25231f" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, sans-serif" font-size="20" font-weight="700">IDENTITY → ACTION IN CONTEXT → OBSERVABLE STATE CHANGE</text>
+</svg>

@@ -3,7 +3,6 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { EditorPanel } from '@/components/challenges/playground/editor-panel';
 import { SelectorPanel } from '@/components/challenges/playground/selector-panel';
 import { ResultsPanel } from '@/components/challenges/playground/results-panel';
-import type { TestResult } from '@/components/challenges/test-results';
 import {
     createChallenge,
     createPlaygroundState,
@@ -53,17 +52,6 @@ void mock.module(
                 onChange={(event) => onChange(event.target.value, defaultType)}
             />
             <button data-testid="validate-btn" onClick={onValidate}>Validate</button>
-        </div>
-    ),
-}));
-
-void mock.module(
-'@/components/challenges/test-results', () => ({
-    TestResults: ({ results }: { results: TestResult[] }) => (
-        <div data-testid="test-results">
-            {results.map((r) => (
-                <div key={r.id} data-testid={`result-${r.id}`}>{r.name}: {r.passed ? 'PASS' : 'FAIL'}</div>
-            ))}
         </div>
     ),
 }));
@@ -190,6 +178,29 @@ describe('Playground Panels', () => {
 
             expect(screen.getByText('challenges:playground.correct')).toBeTruthy();
         });
+
+        it('should expose a busy state while validating', () => {
+            const runningState = createPlaygroundState({
+                ...mockState,
+                selector: '.test',
+                isRunning: true,
+            });
+
+            render(
+                <SelectorPanel
+                    challenge={mockChallenge}
+                    state={runningState}
+                    onSelectorChange={mockHandlers.onSelectorChange}
+                    onValidate={mockHandlers.onValidate}
+                />
+            );
+
+            const validateButton = screen
+                .getByText('challenges:playground.testSelector')
+                .closest('button');
+
+            expect(validateButton?.getAttribute('aria-busy')).toBe('true');
+        });
     });
 
     describe('ResultsPanel', () => {
@@ -207,8 +218,8 @@ describe('Playground Panels', () => {
                 />
             );
 
-            expect(screen.getByTestId('test-results')).toBeTruthy();
-            expect(screen.getByText('Test 1: PASS')).toBeTruthy();
+            expect(screen.getByText('Test 1')).toBeTruthy();
+            expect(screen.getByText('✓ PASSED')).toBeTruthy();
         });
 
         it('should show console output in console tab', () => {
@@ -223,6 +234,27 @@ describe('Playground Panels', () => {
             );
 
             expect(screen.getByTestId('console-output')).toBeTruthy();
+        });
+
+        it('should expose a busy state while running code', () => {
+            const runningState = createPlaygroundState({
+                ...mockState,
+                isRunning: true,
+            });
+
+            render(
+                <ResultsPanel
+                    challenge={mockChallenge}
+                    state={runningState}
+                    onRunCode={mockHandlers.onRunCode}
+                />
+            );
+
+            const runButton = screen
+                .getByText('common:actions.run')
+                .closest('button');
+
+            expect(runButton?.getAttribute('aria-busy')).toBe('true');
         });
     });
 });

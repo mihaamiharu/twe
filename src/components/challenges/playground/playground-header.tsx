@@ -1,329 +1,433 @@
 import { useTranslation } from 'react-i18next';
 import {
-    Play,
-    Send,
-    BookOpen,
-    Lightbulb,
-    Sparkles,
-    Zap,
-    Loader2,
-    ChevronLeft,
-    ChevronRight,
-    Info,
-    Eye
+  Play,
+  Send,
+  BookOpen,
+  Lightbulb,
+  Sparkles,
+  Zap,
+  Loader2,
+  ChevronLeft,
+  ChevronRight,
+  Info,
+  Eye,
+  ArrowLeft,
 } from 'lucide-react';
 import { Link } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
 } from '@/components/ui/tooltip';
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
-import { localeSlugParams, LocaleRoutes } from '@/lib/navigation';
+import { localeParams, localeSlugParams, LocaleRoutes } from '@/lib/navigation';
 import type { Challenge } from './types';
 
 interface PlaygroundHeaderProps {
-    challenge: Challenge;
-    locale: string;
-    userId?: string;
-    isMobile: boolean;
-    isCodeChallenge: boolean;
-    isRunning: boolean;
-    hasPassed: boolean;
-    hintUsed: boolean;
-    isHintPending: boolean;
-    onRunCode: () => void;
-    onOpenHintDialog: () => void;
-    onSubmit: () => void;
-    revealedHintsCount: number;
-    setRevealedHintsCount: (count: number) => void;
+  challenge: Challenge;
+  locale: string;
+  userId?: string;
+  isMobile: boolean;
+  isCodeChallenge: boolean;
+  isRunning: boolean;
+  hasPassed: boolean;
+  hintUsed: boolean;
+  isHintPending: boolean;
+  onRunCode: () => void;
+  onOpenHintDialog: () => void;
+  onSubmit: () => void;
+  revealedHintsCount: number;
+  setRevealedHintsCount: (count: number) => void;
 }
 
 export function PlaygroundHeader({
-    challenge,
-    locale,
-    userId,
-    isMobile,
-    isCodeChallenge,
-    isRunning,
-    hasPassed,
-    hintUsed,
-    isHintPending,
-    onRunCode,
-    onOpenHintDialog,
-    onSubmit,
-    revealedHintsCount,
-    setRevealedHintsCount,
+  challenge,
+  locale,
+  userId,
+  isMobile,
+  isCodeChallenge,
+  isRunning,
+  hasPassed,
+  hintUsed,
+  isHintPending,
+  onRunCode,
+  onOpenHintDialog,
+  onSubmit,
+  revealedHintsCount,
+  setRevealedHintsCount,
 }: PlaygroundHeaderProps) {
-    const { t } = useTranslation(['challenges', 'common']);
+  const { t } = useTranslation(['challenges', 'common']);
 
-    return (
-        <div className="border-b border-border bg-card px-3 md:px-4 py-2 md:py-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
-            <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
-                <div className="min-w-0">
-                    <h1 className="font-bold text-base md:text-xl tracking-tight text-foreground truncate">
-                        {challenge.title}
-                    </h1>
-                    <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-muted-foreground mt-0.5 md:mt-1 flex-wrap">
-                        <Badge
-                            variant="secondary"
-                            className="font-bold border border-border/50"
-                        >
-                            {t(`challenges:difficulty.${challenge.difficulty.toUpperCase()}`)}
-                        </Badge>
-                        <Badge
-                            variant="outline"
-                            className="font-bold border-border/50 bg-background"
-                        >
-                            {t(`challenges:types.${challenge.type?.toLowerCase() || 'unknown'}`)}
-                        </Badge>
-                        <span className="text-accent flex items-center gap-1 font-bold">
-                            <Zap className="h-3 w-3 fill-current" />
-                            {challenge.xp} XP
-                        </span>
-                    </div>
-                    {(challenge.type === 'PLAYWRIGHT' || challenge.type === 'TYPESCRIPT') && (
-                        <TooltipProvider>
-                            <Tooltip>
-                                <TooltipTrigger asChild>
-                                    <div className="flex items-center gap-1 mt-0.5 cursor-help opacity-80 hover:opacity-100 transition-opacity">
-                                        <Info className="h-3 w-3 text-amber-500" />
-                                        <span className="text-[11px] text-muted-foreground border-b border-dotted border-muted-foreground/50">
-                                            {t('challenges:playground.shimNote')}
-                                        </span>
-                                    </div>
-                                </TooltipTrigger>
-                                <TooltipContent side="bottom" align="start" className="max-w-[260px] text-xs">
-                                    <p>{challenge.type === 'TYPESCRIPT' ? t('challenges:playground.shimDescriptionTS') : t('challenges:playground.shimDescription')}</p>
-                                </TooltipContent>
-                            </Tooltip>
-                        </TooltipProvider>
-                    )}
-                </div>
-            </div>
-            <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
-                <div className="flex items-center mr-1 md:mr-2 bg-muted/30 rounded-lg p-0.5 border border-border/50">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        disabled={!challenge.prevChallenge}
-                        onClick={() => {
-                            if (challenge.prevChallenge) {
-                                window.location.href = `/${locale}/challenges/${challenge.prevChallenge.slug}`;
-                            }
-                        }}
-                        className="h-7 w-7 md:h-8 md:w-8 text-muted-foreground hover:text-foreground"
-                        title={challenge.prevChallenge ? t('common:actions.previous') : undefined}
-                    >
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <div className="w-px h-4 bg-border/50 mx-0.5" />
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        disabled={!challenge.nextChallenge}
-                        onClick={() => {
-                            if (challenge.nextChallenge) {
-                                window.location.href = `/${locale}/challenges/${challenge.nextChallenge.slug}`;
-                            }
-                        }}
-                        className="h-7 w-7 md:h-8 md:w-8 text-muted-foreground hover:text-foreground"
-                        title={challenge.nextChallenge ? t('common:actions.next') : undefined}
-                    >
-                        <ChevronRight className="h-4 w-4" />
-                    </Button>
-                </div>
-
-                {isMobile && isCodeChallenge && (
-                    <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={onRunCode}
-                        disabled={isRunning}
-                        className="font-bold border-brand-teal text-brand-teal-dark hover:bg-brand-teal/10"
-                    >
-                        {isRunning ? (
-                            <Loader2 className="h-4 w-4 animate-spin" />
-                        ) : (
-                            <Play className="h-4 w-4" />
-                        )}
-                    </Button>
-                )}
-
-                {challenge.tutorial && (
-                    <Link
-                        to={LocaleRoutes.tutorialDetail}
-                        params={localeSlugParams(locale, challenge.tutorial.slug)}
-                    >
-                        <Button
-                            variant="ghost"
-                            size="sm"
-                            className="hidden md:flex font-bold text-muted-foreground hover:text-foreground"
-                        >
-                            <BookOpen className="h-4 w-4 mr-2" />
-                            {t('common:navigation.tutorials')}
-                        </Button>
-                    </Link>
-                )}
-
-                {challenge.hints && challenge.hints.length > 0 && (
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                className="font-bold border border-border/50 text-muted-foreground hover:text-foreground h-8 md:h-9 px-2 md:px-3"
-                            >
-                                <Lightbulb className="h-4 w-4 md:mr-2 text-yellow-500" />
-                                <span className="hidden md:inline">{t('challenges:hints.title', 'Hints')}</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto">
-                            <DropdownMenuLabel className="flex items-center justify-between">
-                                <span>{t('challenges:hints.availableHints', 'Available Hints')}</span>
-                                <Badge variant="secondary" className="text-[10px] bg-yellow-500/10 text-yellow-700 border-yellow-500/20">
-                                    {revealedHintsCount} / {challenge.hints.length}
-                                </Badge>
-                            </DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-
-                            {/* Revealed Hints */}
-                            {challenge.hints.slice(0, revealedHintsCount).map((hint, i) => (
-                                <DropdownMenuItem key={i} className="text-xs break-words whitespace-normal p-3 items-start focus:bg-accent focus:text-accent-foreground border-b border-border/10 last:border-0">
-                                    <div className="flex flex-col gap-1 w-full">
-                                        <div className="flex items-center gap-2">
-                                            <span className="font-bold text-[10px] uppercase text-amber-600">
-                                                {i === 0 ? 'Concept' : i === 1 ? 'Syntax' : 'Code'}
-                                            </span>
-                                        </div>
-                                        <span className="flex-1 leading-relaxed text-foreground">{hint}</span>
-                                    </div>
-                                </DropdownMenuItem>
-                            ))}
-
-                            {/* Reveal Button */}
-                            {revealedHintsCount < challenge.hints.length && (
-                                <div className="p-2">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="w-full text-xs font-bold bg-amber-500/5 hover:bg-amber-500/10 border-amber-500/20 text-amber-700 h-9"
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            e.stopPropagation();
-                                            setRevealedHintsCount(revealedHintsCount + 1);
-                                        }}
-                                    >
-                                        <Eye className="h-3 w-3 mr-2" />
-                                        {revealedHintsCount === 0
-                                            ? t('challenges:hints.revealFirst', 'Reveal First Tip')
-                                            : t('challenges:hints.revealNext', 'Reveal Next Tip')}
-                                    </Button>
-                                </div>
-                            )}
-
-                            {challenge.hints.length === 0 && (
-                                <div className="p-8 text-center text-muted-foreground text-xs italic">
-                                    {t('challenges:hints.noneAvailable', 'No specific tips available for this challenge.')}
-                                </div>
-                            )}
-
-                            {!challenge.isCompleted && (
-                                <>
-                                    <DropdownMenuSeparator />
-                                    <div className="p-2">
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                e.stopPropagation();
-                                                onOpenHintDialog();
-                                            }}
-                                            disabled={isHintPending || !userId || revealedHintsCount < (challenge.hints?.length || 0)}
-                                            className={cn(
-                                                'w-full justify-start font-bold h-9 px-3 transition-all',
-                                                hintUsed
-                                                    ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20'
-                                                    : !userId
-                                                        ? 'opacity-50 cursor-not-allowed'
-                                                        : revealedHintsCount < (challenge.hints?.length || 0)
-                                                            ? 'opacity-40 cursor-not-allowed'
-                                                            : 'text-amber-600 hover:bg-amber-500/10 hover:text-amber-700',
-                                            )}
-                                        >
-                                            <div className="flex items-center justify-between w-full">
-                                                <div className="flex items-center">
-                                                    {isHintPending ? (
-                                                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                    ) : (
-                                                        <Sparkles className="h-4 w-4 mr-2" />
-                                                    )}
-                                                    <span className="text-xs">
-                                                        {hintUsed ? t('challenges:hints.showAgain', 'Show AI Hint Again') : t('challenges:hints.button')}
-                                                    </span>
-                                                </div>
-                                                {revealedHintsCount < (challenge.hints?.length || 0) ? (
-                                                    <Badge variant="outline" className="text-[9px] uppercase border-muted-foreground/30 text-muted-foreground">
-                                                        Locked
-                                                    </Badge>
-                                                ) : !hintUsed && (
-                                                    <Badge variant="secondary" className="bg-amber-500/20 text-amber-700 text-[10px]">
-                                                        {t('challenges:hints.penalty')}
-                                                    </Badge>
-                                                )}
-                                            </div>
-                                        </Button>
-
-                                        {revealedHintsCount < (challenge.hints?.length || 0) && (
-                                            <p className="text-[10px] text-muted-foreground px-3 mt-1 italic">
-                                                {t('challenges:hints.unlockPrereq', 'Reveal all tips first to unlock AI help.')}
-                                            </p>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                )}
-
-
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                size="sm"
-                                onClick={onSubmit}
-                                disabled={!hasPassed}
-                                className={cn(
-                                    'font-bold border border-border transition-all h-8 md:h-9 px-2 md:px-3',
-                                    hasPassed
-                                        ? 'bg-green-500 hover:bg-green-600 text-black'
-                                        : 'bg-muted text-muted-foreground disabled:opacity-100 cursor-not-allowed',
-                                )}
-                                title={!hasPassed ? t('common:actions.submit') : undefined}
-                            >
-                                <Send className="h-4 w-4 md:mr-2" />
-                                <span className="hidden md:inline">{t('common:actions.submit')}</span>
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Submit solution (⌘/Ctrl + Shift + Enter)</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-            </div>
+  return (
+    <div className="workspace-panel border-b border-workspace-border px-3 md:px-4 py-2 md:py-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
+      <div className="flex items-center gap-2 md:gap-4 min-w-0 flex-1">
+        <Link
+          to={LocaleRoutes.practice}
+          params={localeParams(locale)}
+          aria-label={t('common:actions.backToChallenges')}
+          title={t('common:actions.backToChallenges')}
+          className="inline-flex shrink-0 items-center gap-1 rounded-md p-1.5 text-workspace-muted transition-colors hover:bg-workspace-elevated hover:text-workspace-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+        >
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />
+          <span className="hidden text-xs font-medium md:inline">
+            {t('common:actions.backToChallenges')}
+          </span>
+        </Link>
+        <div className="min-w-0">
+          <h1 className="font-bold text-base md:text-xl tracking-tight text-workspace-text truncate">
+            {challenge.title}
+          </h1>
+          <div className="flex items-center gap-1.5 md:gap-2 text-[10px] md:text-xs text-workspace-muted mt-0.5 md:mt-1 flex-wrap">
+            <Badge
+              variant="secondary"
+              className="font-bold border border-workspace-border bg-workspace-elevated text-workspace-text"
+            >
+              {t(`challenges:difficulty.${challenge.difficulty.toUpperCase()}`)}
+            </Badge>
+            <Badge
+              variant="outline"
+              className="font-bold border-workspace-border bg-workspace-background text-workspace-text"
+            >
+              {t(
+                `challenges:types.${challenge.type?.toLowerCase() || 'unknown'}`,
+              )}
+            </Badge>
+            <span className="text-brand-orange flex items-center gap-1 font-bold">
+              <Zap className="h-3 w-3 fill-current" />
+              {challenge.xp} XP
+            </span>
+          </div>
+          {(challenge.type === 'PLAYWRIGHT' ||
+            challenge.type === 'TYPESCRIPT') && (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    aria-label={t('challenges:playground.shimNote')}
+                    className="flex items-center gap-1 mt-0.5 cursor-help opacity-80 hover:opacity-100 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-orange"
+                  >
+                    <Info className="h-3 w-3 text-brand-warning" />
+                    <span className="text-[11px] text-workspace-muted border-b border-dotted border-workspace-muted/50">
+                      {t('challenges:playground.shimNote')}
+                    </span>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent
+                  side="bottom"
+                  align="start"
+                  className="max-w-[260px] text-xs"
+                >
+                  <p>
+                    {challenge.type === 'TYPESCRIPT'
+                      ? t('challenges:playground.shimDescriptionTS')
+                      : t('challenges:playground.shimDescription')}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
         </div>
-    );
+      </div>
+      <div className="flex items-center gap-1.5 md:gap-3 flex-shrink-0">
+        <div className="flex items-center mr-1 md:mr-2 bg-workspace-elevated rounded-md p-0.5 border border-workspace-border">
+          {challenge.prevChallenge ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <Link
+                to={LocaleRoutes.practiceDetail}
+                params={localeSlugParams(locale, challenge.prevChallenge.slug)}
+                aria-label={t('common:actions.previous')}
+                title={t('common:actions.previous')}
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled
+              aria-label={t('common:actions.previous')}
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
+          <div className="w-px h-4 bg-workspace-border mx-0.5" />
+          {challenge.nextChallenge ? (
+            <Button
+              asChild
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <Link
+                to={LocaleRoutes.practiceDetail}
+                params={localeSlugParams(locale, challenge.nextChallenge.slug)}
+                aria-label={t('common:actions.next')}
+                title={t('common:actions.next')}
+              >
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              disabled
+              aria-label={t('common:actions.next')}
+              className="h-7 w-7 md:h-8 md:w-8 text-workspace-muted hover:text-workspace-text"
+            >
+              <ChevronRight className="h-4 w-4" aria-hidden="true" />
+            </Button>
+          )}
+        </div>
+
+        {isMobile && isCodeChallenge && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onRunCode}
+            disabled={isRunning}
+            aria-busy={isRunning}
+            aria-label={
+              isRunning
+                ? t('common:messages.loading')
+                : t('common:actions.runCode')
+            }
+            className="font-bold border-brand-orange text-brand-orange hover:bg-brand-orange/10"
+          >
+            {isRunning ? (
+              <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" />
+            ) : (
+              <Play className="h-4 w-4" />
+            )}
+          </Button>
+        )}
+
+        {challenge.tutorial && (
+          <Link
+            to={LocaleRoutes.learnDetail}
+            params={localeSlugParams(locale, challenge.tutorial.slug)}
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              className="font-bold text-workspace-muted hover:text-workspace-text"
+            >
+              <BookOpen className="h-4 w-4 mr-2" />
+              <span className="hidden md:inline">
+                {t('common:navigation.learn')}
+              </span>
+            </Button>
+          </Link>
+        )}
+
+        {challenge.hints && challenge.hints.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                aria-label={t('challenges:hints.title', 'Hints')}
+                className="font-bold border border-workspace-border text-workspace-muted hover:text-workspace-text h-8 md:h-9 px-2 md:px-3"
+              >
+                <Lightbulb className="h-4 w-4 md:mr-2 text-yellow-500" />
+                <span className="hidden md:inline">
+                  {t('challenges:hints.title', 'Hints')}
+                </span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="end"
+              className="w-[350px] md:w-[450px] max-h-[450px] overflow-y-auto bg-[var(--paper-surface)] text-[var(--graphite)] border-[var(--soft-border)]"
+            >
+              <DropdownMenuLabel className="flex items-center justify-between">
+                <span>
+                  {t('challenges:hints.availableHints', 'Available Hints')}
+                </span>
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] bg-yellow-500/10 text-yellow-700 border-yellow-500/20"
+                >
+                  {revealedHintsCount} / {challenge.hints.length}
+                </Badge>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+
+              {/* Revealed Hints */}
+              {challenge.hints.slice(0, revealedHintsCount).map((hint, i) => (
+                <DropdownMenuItem
+                  key={i}
+                  className="text-xs break-words whitespace-normal p-3 items-start focus:bg-accent focus:text-accent-foreground border-b border-border/10 last:border-0"
+                >
+                  <div className="flex flex-col gap-1 w-full">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-[10px] uppercase text-brand-warning">
+                        {i === 0 ? 'Concept' : i === 1 ? 'Syntax' : 'Code'}
+                      </span>
+                    </div>
+                    <span className="flex-1 leading-relaxed text-[var(--graphite)]">
+                      {hint}
+                    </span>
+                  </div>
+                </DropdownMenuItem>
+              ))}
+
+              {/* Reveal Button */}
+              {revealedHintsCount < challenge.hints.length && (
+                <div className="p-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-xs font-bold bg-brand-warning/10 hover:bg-brand-warning/20 border-brand-warning/30 text-brand-warning h-9"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setRevealedHintsCount(revealedHintsCount + 1);
+                    }}
+                  >
+                    <Eye className="h-3 w-3 mr-2" />
+                    {revealedHintsCount === 0
+                      ? t('challenges:hints.revealFirst', 'Reveal First Tip')
+                      : t('challenges:hints.revealNext', 'Reveal Next Tip')}
+                  </Button>
+                </div>
+              )}
+
+              {challenge.hints.length === 0 && (
+                <div className="p-8 text-center text-muted-foreground text-xs italic">
+                  {t(
+                    'challenges:hints.noneAvailable',
+                    'No specific tips available for this challenge.',
+                  )}
+                </div>
+              )}
+
+              {!challenge.isCompleted && (
+                <>
+                  <DropdownMenuSeparator />
+                  <div className="p-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onOpenHintDialog();
+                      }}
+                      disabled={
+                        isHintPending ||
+                        !userId ||
+                        revealedHintsCount < (challenge.hints?.length || 0)
+                      }
+                      className={cn(
+                        'w-full justify-start font-bold h-9 px-3 transition-colors duration-150',
+                        hintUsed
+                          ? 'bg-amber-500/10 text-amber-600 hover:bg-amber-500/20'
+                          : !userId
+                            ? 'opacity-50 cursor-not-allowed'
+                            : revealedHintsCount <
+                                (challenge.hints?.length || 0)
+                              ? 'opacity-40 cursor-not-allowed'
+                              : 'text-amber-600 hover:bg-amber-500/10 hover:text-amber-700',
+                      )}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <div className="flex items-center">
+                          {isHintPending ? (
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin motion-reduce:animate-none" />
+                          ) : (
+                            <Sparkles className="h-4 w-4 mr-2" />
+                          )}
+                          <span className="text-xs">
+                            {hintUsed
+                              ? t(
+                                  'challenges:hints.showAgain',
+                                  'Show AI Hint Again',
+                                )
+                              : t('challenges:hints.button')}
+                          </span>
+                        </div>
+                        {revealedHintsCount < (challenge.hints?.length || 0) ? (
+                          <Badge
+                            variant="outline"
+                            className="text-[9px] uppercase border-muted-foreground/30 text-muted-foreground"
+                          >
+                            Locked
+                          </Badge>
+                        ) : (
+                          !hintUsed && (
+                            <Badge
+                              variant="secondary"
+                              className="bg-amber-500/20 text-amber-700 text-[10px]"
+                            >
+                              {t('challenges:hints.penalty')}
+                            </Badge>
+                          )
+                        )}
+                      </div>
+                    </Button>
+
+                    {revealedHintsCount < (challenge.hints?.length || 0) && (
+                      <p className="text-[10px] text-muted-foreground px-3 mt-1 italic">
+                        {t(
+                          'challenges:hints.unlockPrereq',
+                          'Reveal all tips first to unlock AI help.',
+                        )}
+                      </p>
+                    )}
+                  </div>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                size="sm"
+                onClick={onSubmit}
+                disabled={!hasPassed}
+                aria-label={t('common:actions.submit')}
+                className={cn(
+                  'font-bold border border-workspace-border transition-colors duration-150 h-8 md:h-9 px-2 md:px-3',
+                  hasPassed
+                    ? 'bg-brand-success hover:bg-brand-success/90 text-workspace-text'
+                    : 'bg-workspace-elevated text-workspace-muted disabled:opacity-100 cursor-not-allowed',
+                )}
+                title={!hasPassed ? t('common:actions.submit') : undefined}
+              >
+                <Send className="h-4 w-4 md:mr-2" />
+                <span className="hidden md:inline">
+                  {t('common:actions.submit')}
+                </span>
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>Submit solution (⌘/Ctrl + Shift + Enter)</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      </div>
+    </div>
+  );
 }

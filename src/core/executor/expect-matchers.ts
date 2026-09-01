@@ -3,11 +3,17 @@ import type {
     ExpectMatchers,
     ExpectResult,
 } from './executor.types';
+import {
+    getTracedLocatorEvidence,
+    type RuntimeAssertion,
+    unwrapTracedPlaywrightValue,
+} from './runtime-trace';
 
 function getMethod(
     value: unknown,
     name: string,
 ): ((...args: unknown[]) => unknown) | undefined {
+    value = unwrapTracedPlaywrightValue(value);
     if (
         (typeof value !== 'object' && typeof value !== 'function') ||
         value === null
@@ -23,6 +29,7 @@ function getMethod(
 }
 
 function getProperty(value: unknown, name: string): unknown {
+    value = unwrapTracedPlaywrightValue(value);
     if (
         (typeof value !== 'object' && typeof value !== 'function') ||
         value === null
@@ -30,6 +37,14 @@ function getProperty(value: unknown, name: string): unknown {
         return undefined;
     }
     return Reflect.get(value, name);
+}
+
+function getReflectProperty(
+    value: object,
+    property: PropertyKey,
+    receiver: object,
+): unknown {
+    return Reflect.get(value, property, receiver);
 }
 
 function stringifyText(value: unknown): string {
@@ -50,11 +65,25 @@ function stringifyText(value: unknown): string {
     return typeof result === 'string' ? result : '';
 }
 
+function isRegExpValue(value: unknown): value is RegExp {
+    // User code executes in a sandboxed iframe, so `instanceof RegExp` can
+    // fail when the expected value was created by that iframe's realm.
+    return Object.prototype.toString.call(value) === '[object RegExp]';
+}
+
+function matchesExpected(expected: string | RegExp, actual: string): boolean {
+    return isRegExpValue(expected) ? expected.test(actual) : actual === expected;
+}
+
 /**
  * Create a simple expect function for assertions
  * Returns both the expect function and assert count getter
  */
-export function createExpect(options?: { timeout?: number; deadline?: number }): ExpectResult {
+export function createExpect(options?: {
+    timeout?: number;
+    deadline?: number;
+    onAssertion?: (event: RuntimeAssertion) => void;
+}): ExpectResult {
     let assertionCount = 0;
     const testResults: Array<{ message: string; passed: boolean }> = [];
     const defaultTimeout = options?.timeout ?? 5000;
@@ -72,6 +101,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
         isSoft = false,
         isNot = false,
     ): Omit<ExpectMatchers, 'not'> => {
+        const locator = getTracedLocatorEvidence(actual);
         const handleResult = (pass: boolean, message: string) => {
             incrementCount();
             // Invert if isNot is true
@@ -139,7 +169,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
             handleResult(lastResult.pass, lastResult.message);
         };
 
-        return {
+        const matchers = {
             async toHaveText(expected: string | RegExp, options?: { timeout?: number }) {
                 await poll(async () => {
                     let text = '';
@@ -158,7 +188,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         text = '';
                     }
 
-                    const pass = expected instanceof RegExp ? expected.test(text) : text === expected;
+                    const pass = matchesExpected(expected, text);
                     return {
                         pass,
                         message: `Expected text "${text}" ${isNot ? 'NOT ' : ''}to match "${expected}"`
@@ -184,7 +214,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     }
 
                     // Handle RegExp for toContainText (uncommon but possible)
-                    if (expected instanceof RegExp) {
+                    if (isRegExpValue(expected)) {
                         return {
                             pass: expected.test(text),
                             message: `Expected text "${text}" ${isNot ? 'NOT ' : ''}to contain regex "${expected}"`
@@ -218,7 +248,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                         value = '';
                     }
 
-                    const pass = expected instanceof RegExp ? expected.test(value) : value === expected;
+                    const pass = matchesExpected(expected, value);
                     return {
                         pass,
                         message: `Expected value "${value}" ${isNot ? 'NOT ' : ''}to match "${expected}"`
@@ -246,7 +276,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     }
 
                     if (value !== undefined) {
-                        const pass = value instanceof RegExp ? value.test(attrValue) : attrValue === value;
+                        const pass = matchesExpected(value, attrValue);
                         return {
                             pass,
                             message: `Expected attribute "${name}" ${isNot ? 'NOT ' : ''}to have value "${value}", got "${attrValue}"`
@@ -378,7 +408,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                             title = actual;
                         }
                     }
-                    const pass = expected instanceof RegExp ? expected.test(title) : title === expected;
+                    const pass = matchesExpected(expected, title);
                     return {
                         pass,
                         message: `Expected title "${title}" ${isNot ? 'NOT ' : ''}to match "${expected}"`
@@ -396,7 +426,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     } else if (typeof actual === 'string') {
                         url = actual;
                     }
-                    const pass = expected instanceof RegExp ? expected.test(url) : url === expected;
+                    const pass = matchesExpected(expected, url);
                     return {
                         pass,
                         message: `Expected URL "${url}" ${isNot ? 'NOT ' : ''}to match "${expected}"`
@@ -414,7 +444,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     } else if (actual instanceof HTMLElement) {
                         className = actual.className;
                     }
-                    const pass = expected instanceof RegExp ? expected.test(className) : className === expected;
+                    const pass = matchesExpected(expected, className);
                     return {
                         pass,
                         message: `Expected class "${className}" ${isNot ? 'NOT ' : ''}to match "${expected}"`
@@ -434,7 +464,7 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                     } else if (actual instanceof HTMLElement) {
                         cssValue = window.getComputedStyle(actual).getPropertyValue(name);
                     }
-                    const pass = value instanceof RegExp ? value.test(cssValue) : cssValue === value;
+                    const pass = matchesExpected(value, cssValue);
                     return {
                         pass,
                         message: `Expected CSS property "${name}" to be "${value}", got "${cssValue}"`
@@ -603,7 +633,9 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
 
             async toMatch(expected: string | RegExp) {
                 await Promise.resolve();
-                const pass = expected instanceof RegExp ? expected.test(String(actual)) : String(actual).includes(expected);
+                const pass = isRegExpValue(expected)
+                    ? expected.test(String(actual))
+                    : String(actual).includes(expected);
                 handleResult(pass, `Expected "${String(actual)}" ${isNot ? 'NOT ' : ''}to match "${expected}"`);
             },
 
@@ -643,6 +675,63 @@ export function createExpect(options?: { timeout?: number; deadline?: number }):
                 handleResult(JSON.stringify(actual) === JSON.stringify(expected), `Expected equal`);
             },
         };
+
+        return new Proxy(matchers, {
+            get(target, property, receiver) {
+                if (typeof property !== 'string') {
+                    return getReflectProperty(target, property, receiver as object);
+                }
+                const value = getProperty(target, property);
+                if (typeof value !== 'function') {
+                    return value;
+                }
+
+                const matcher = value as (...args: unknown[]) => unknown;
+                return async (...args: unknown[]) => {
+                    const evidenceArguments = args.filter(
+                        (argument): argument is string | number | boolean =>
+                            typeof argument === 'string' ||
+                            typeof argument === 'number' ||
+                            typeof argument === 'boolean',
+                    );
+                    const softFailureStart = testResults.length;
+                    try {
+                        const result: unknown = await matcher(...args);
+                        const softFailure = testResults
+                            .slice(softFailureStart)
+                            .find((testResult) => !testResult.passed);
+                        options?.onAssertion?.({
+                            matcher: property,
+                            passed: softFailure === undefined,
+                            ...(evidenceArguments.length === 0
+                                ? {}
+                                : { arguments: evidenceArguments }),
+                            soft: isSoft,
+                            ...(locator === undefined ? {} : { locator }),
+                            ...(softFailure === undefined
+                                ? {}
+                                : { error: softFailure.message }),
+                        });
+                        return result;
+                    } catch (error) {
+                        options?.onAssertion?.({
+                            matcher: property,
+                            passed: false,
+                            ...(evidenceArguments.length === 0
+                                ? {}
+                                : { arguments: evidenceArguments }),
+                            soft: isSoft,
+                            ...(locator === undefined ? {} : { locator }),
+                            error:
+                                error instanceof Error
+                                    ? error.message
+                                    : String(error),
+                        });
+                        throw error;
+                    }
+                };
+            },
+        }) as Omit<ExpectMatchers, 'not'>;
     };
 
     const createExpectation = (

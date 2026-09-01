@@ -1,7 +1,24 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import satori from 'satori';
 import { Resvg } from '@resvg/resvg-js';
 import { OgImageTemplate } from '../../components/og-image-template'; // Use relative path
+import { HomeOgImageTemplate } from '../../components/home-og-image-template';
+
+let inspectorImageData: string | null = null;
+
+async function loadInspectorImage() {
+    if (inspectorImageData) return inspectorImageData;
+
+    // This path is a fixed, bundled asset; it is not derived from request data.
+    // eslint-disable-next-line security/detect-non-literal-fs-filename
+    const image = await readFile(
+        resolve(process.cwd(), 'public/illustrations/twe-inspector-male-hero.png'),
+    );
+    inspectorImageData = `data:image/png;base64,${image.toString('base64')}`;
+    return inspectorImageData;
+}
 
 async function loadGoogleFont(font: string, weight: number) {
     const url = `https://fonts.googleapis.com/css2?family=${font}:wght@${weight}`;
@@ -40,26 +57,30 @@ export const Route = createFileRoute('/api/og')({
                     console.log(`[OG] Fetching fonts for "${title}"`);
 
                     const [fontData, fontRegularData] = await Promise.all([
-                        loadGoogleFont('Outfit', 700),
-                        loadGoogleFont('Outfit', 400)
+                        loadGoogleFont('Instrument Sans', 700),
+                        loadGoogleFont('Instrument Sans', 400)
                     ]);
 
                     console.log(`[OG] Fonts loaded, generating SVG`);
 
+                    const template = type.toLowerCase() === 'home'
+                        ? HomeOgImageTemplate({ inspectorImage: await loadInspectorImage() })
+                        : OgImageTemplate({ title, type, difficulty, xp });
+
                     const svg = await satori(
-                        OgImageTemplate({ title, type, difficulty, xp }),
+                        template,
                         {
                             width: 1200,
                             height: 630,
                             fonts: [
                                 {
-                                    name: 'Outfit',
+                                    name: 'Instrument Sans',
                                     data: fontData,
                                     weight: 700,
                                     style: 'normal',
                                 },
                                 {
-                                    name: 'Outfit',
+                                    name: 'Instrument Sans',
                                     data: fontRegularData,
                                     weight: 400,
                                     style: 'normal',

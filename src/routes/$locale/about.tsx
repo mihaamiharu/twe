@@ -1,248 +1,153 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
+import { createFileRoute, Link, getRouteApi } from '@tanstack/react-router';
+import {
+  ArrowRight,
+  BookOpen,
+  CheckCircle2,
+  Code2,
+  FlaskConical,
+  Github,
+  Lightbulb,
+  Linkedin,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Github, Linkedin, Mail, Database, Globe, Code2, Milestone, Brain, Activity } from 'lucide-react';
+import { AboutHeroVisual } from '@/components/rebrand-visuals';
+import {
+  createPersonSchema,
+  createProfilePageSchema,
+  createSeoHead,
+} from '@/lib/seo';
+import { LocaleRoutes, localeParams } from '@/lib/navigation';
 import i18n from '@/lib/i18n';
-import { Boop } from '@/components/ui/boop';
-import { createSeoHead } from '@/lib/seo';
 
 export const Route = createFileRoute('/$locale/about')({
-    component: AboutPage,
-    head: ({ params }) => {
-        const locale = params.locale || 'en';
-        return createSeoHead({
-            title: `About Ekki Syam Sugiardi | TestingWithEkki`,
-            description: 'Meet Ekki Syam Sugiardi, the QA Engineer behind TestingWithEkki. A portfolio project demonstrating full-stack engineering skills.',
-            path: '/about',
-            locale,
-            jsonLd: [
-                {
-                    "@context": "https://schema.org",
-                    "@type": "ProfilePage",
-                    "mainEntity": {
-                        "@type": "Person",
-                        "name": "Ekki Syam Sugiardi",
-                        "jobTitle": "QA Engineer",
-                        "url": "https://testingwithekki.com",
-                        "sameAs": [
-                            "https://www.linkedin.com/in/ekkisyamsugiardi",
-                            "https://github.com/mihaamiharu"
-                        ]
-                    }
-                }
-            ],
-        });
-    },
+  component: AboutPage,
+  head: ({ params }) => {
+    const locale = params.locale || 'en';
+    return createSeoHead({
+      title: i18n.t('about:seo.title', { lng: locale }),
+      description: i18n.t('about:seo.description', { lng: locale }),
+      path: '/about',
+      locale,
+      jsonLd: [
+        createProfilePageSchema({
+          locale,
+          title: i18n.t('about:seo.title', { lng: locale }),
+          description: i18n.t('about:seo.description', { lng: locale }),
+        }),
+        createPersonSchema({
+          description: i18n.t('about:seo.description', { lng: locale }),
+        }),
+      ],
+    });
+  },
 });
 
+const routeApi = getRouteApi('/$locale/about');
+
 function AboutPage() {
-    const { t } = useTranslation(['about', 'common']);
-    const milestones = t('about:milestones.items', { returnObjects: true }) as Array<{ year: string; title: string; description: string | string[] }>;
-    // Hardcoded for now as it's personal content, could move to i18n later if needed
+  const { locale } = routeApi.useParams();
+  const { t } = useTranslation('about');
+  const params = localeParams(locale);
 
-    const expertise = [
-        {
-            category: t('about:expertise.automation.title'),
-            icon: <Globe className="h-5 w-5 text-blue-500" />,
-            groups: t('about:expertise.automation.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        },
-        {
-            category: t('about:expertise.backend.title'),
-            icon: <Database className="h-5 w-5 text-green-500" />,
-            groups: t('about:expertise.backend.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        },
-        {
-            category: t('about:expertise.strategy.title'),
-            icon: <Brain className="h-5 w-5 text-purple-500" />,
-            groups: t('about:expertise.strategy.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        },
-        {
-            category: t('about:expertise.devops.title'),
-            icon: <Activity className="h-5 w-5 text-orange-500" />,
-            groups: t('about:expertise.devops.groups', { returnObjects: true }) as { name: string; items: string[] }[]
-        }
-    ];
+  const productItems = [
+    { key: 'learn', icon: BookOpen },
+    { key: 'practice', icon: Code2 },
+    { key: 'labs', icon: FlaskConical },
+  ] as const;
 
-    return (
-        <div className="min-h-screen py-20 px-6">
-            <div className="max-w-4xl mx-auto space-y-16">
+  return (
+    <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
+      <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10 lg:px-12 lg:pb-28 lg:pt-20">
+        <div className="max-w-xl">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('hero.eyebrow')}</p>
+          <h1 className="mt-5 text-[clamp(2.8rem,6vw,4.4rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
+            {t('hero.title')}<span className="text-[var(--brand-orange)]">.</span>
+          </h1>
+          <p className="mt-6 max-w-lg text-xl leading-8 text-[var(--graphite)]">{t('hero.subtitle')}</p>
+          <p className="mt-5 max-w-lg text-base leading-7 text-[var(--muted-graphite)]">{t('hero.description')}</p>
+          <div className="mt-7 flex flex-wrap gap-2">
+            <SocialLink href="https://www.linkedin.com/in/ekkisyamsugiardi/" label={t('hero.linkedin')} icon={<Linkedin className="h-4 w-4" aria-hidden="true" />} />
+            <SocialLink href="https://github.com/mihaamiharu" label={t('hero.github')} icon={<Github className="h-4 w-4" aria-hidden="true" />} />
+          </div>
+        </div>
+        <AboutHeroVisual />
+      </section>
 
-                {/* Hero Section */}
-                <section className="text-center space-y-6">
-                    <div className="mx-auto w-32 h-32 rounded-full overflow-hidden border-4 border-primary/20 shadow-xl mb-8">
-                        {/* Using a placeholder if user image isn't available, or maybe the authenticated user's image if logged in? 
-                 Better to use a generic avatar or just the initials for now if no specific image is provided. 
-                 Actually, let's look for an avatar or just use initials style. 
-                 Since this is "Ekki", maybe I should use a specific asset if it exists, or just a nice placeholder. 
-                 I'll use a text avatar for now to be safe. */}
-                        <img
-                            src="/me.small.jpg"
-                            alt="Ekki"
-                            className="w-full h-full object-cover"
-                            width={128}
-                            height={128}
-                            loading="eager"
-                            fetchPriority="high"
-                        />
-                    </div>
-
-                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight">
-                        <span dangerouslySetInnerHTML={{ __html: t('about:hero.title') }} />
-                    </h1>
-
-                    <h2 className="text-2xl md:text-3xl font-medium text-muted-foreground">
-                        {t('about:hero.subtitle')}
-                    </h2>
-
-                    <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed"
-                        dangerouslySetInnerHTML={{ __html: t('about:hero.description') }}
-                    />
-
-                    <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
-                        <Button asChild size="lg" className="rounded-full group">
-                            <a href="https://www.linkedin.com/in/ekkisyamsugiardi/" target="_blank" rel="noopener noreferrer">
-                                <Linkedin className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.connect')}
-                            </a>
-                        </Button>
-                        <Button asChild variant="outline" size="lg" className="rounded-full group">
-                            <a href="https://github.com/mihaamiharu" target="_blank" rel="noopener noreferrer">
-                                <Github className="mr-2 h-4 w-4 transition-transform group-hover:scale-110" />
-                                {t('about:hero.github')}
-                            </a>
-                        </Button>
-                    </div>
-                </section>
-
-                {/* The "Why" Section */}
-                <section className="glass-card p-8 md:p-12 rounded-3xl border border-primary/10 bg-gradient-to-br from-card to-primary/5">
-                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                        <Code2 className="h-6 w-6 text-primary" />
-                        {t('about:philosophy.title')}
-                    </h3>
-                    <div className="space-y-4 text-muted-foreground leading-relaxed">
-                        <p dangerouslySetInnerHTML={{ __html: t('about:philosophy.intro') }} />
-                        <p>
-                            {t('about:philosophy.listIntro')}
-                        </p>
-                        <ul className="list-disc list-inside space-y-2 ml-4">
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.integration') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.shiftLeft') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.agility') }} />
-                            <li dangerouslySetInnerHTML={{ __html: t('about:philosophy.list.multiplier') }} />
-                        </ul>
-                        <p className="mt-4">
-                            {t('about:philosophy.conclusion')}
-                        </p>
-                    </div>
-                </section>
-
-                {/* Milestones / Journey */}
-                <section>
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl font-bold mb-2 flex items-center justify-center gap-2">
-                            <Milestone className="h-6 w-6 text-primary" />
-                            {t('about:milestones.title')}
-                        </h3>
-                        <p className="text-muted-foreground">{t('about:milestones.subtitle')}</p>
-                    </div>
-
-                    <div className="relative border-l border-border ml-3.5 md:ml-1/2 space-y-12 pb-4">
-                        {milestones.map((milestone, index) => (
-                            <div key={index} className="relative pl-8 md:pl-0">
-                                {/* Dot on the line */}
-                                <div className="absolute -left-[5px] top-1.5 h-3 w-3 rounded-full bg-primary ring-4 ring-background" />
-
-                                <div className="flex flex-col md:flex-row gap-4 md:gap-12 group">
-                                    {/* Year - distinct styling */}
-                                    <div className="md:w-32 md:text-right shrink-0">
-                                        <span className="inline-block px-3 py-1 rounded-full bg-primary/10 text-primary font-bold text-sm">
-                                            {milestone.year}
-                                        </span>
-                                    </div>
-
-                                    {/* Content card */}
-                                    <Card className="flex-1 transition-all hover:bg-card/50 hover:border-primary/50 relative -top-4 md:-top-5">
-                                        <CardHeader>
-                                            <CardTitle className="text-lg">{milestone.title}</CardTitle>
-                                        </CardHeader>
-                                        <CardContent>
-                                            {Array.isArray(milestone.description) ? (
-                                                <ul className="list-disc list-outside ml-4 space-y-2 text-muted-foreground leading-relaxed">
-                                                    {milestone.description.map((point, i) => (
-                                                        <li key={i}>{point}</li>
-                                                    ))}
-                                                </ul>
-                                            ) : (
-                                                <p className="text-muted-foreground leading-relaxed">
-                                                    {milestone.description}
-                                                </p>
-                                            )}
-                                        </CardContent>
-                                    </Card>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </section>
-
-                {/* Tech Stack */}
-                <section>
-                    <div className="text-center mb-10">
-                        <h3 className="text-2xl font-bold mb-2">{t('about:expertise.title')}</h3>
-                        <p className="text-muted-foreground">{t('about:expertise.subtitle')}</p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {expertise.map((stack, index) => (
-                            <Card key={index} className="bg-card/50 backdrop-blur-sm hover:border-primary/50 transition-colors h-full">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-3 text-lg">
-                                        <Boop rotation={15} scale={1.2} timing={200}>
-                                            {stack.icon}
-                                        </Boop>
-                                        {stack.category}
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-6">
-                                    {stack.groups.map((group, groupIndex) => (
-                                        <div key={groupIndex}>
-                                            <h4 className="text-sm font-medium text-muted-foreground mb-3 uppercase tracking-wider">
-                                                {group.name}
-                                            </h4>
-                                            <div className="flex flex-wrap gap-2">
-                                                {group.items.map((skill) => (
-                                                    <Badge key={skill} variant="secondary" className="hover:bg-primary/20">
-                                                        {skill}
-                                                    </Badge>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    ))}
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                </section>
-
-
-
-                {/* Contact/Ending */}
-                <section className="text-center pt-10 border-t border-border">
-                    <p className="text-xl font-medium mb-6">
-                        {t('about:contact.title')}
-                    </p>
-                    <Button asChild size="lg" className="h-12 px-8 text-lg">
-                        <Link to="/$locale/contact" params={{ locale: i18n.language }}>
-                            <Mail className="mr-2 h-5 w-5" />
-                            {t('about:contact.cta')}
-                        </Link>
-                    </Button>
-                </section>
-
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16 lg:p-14">
+          <div className="relative mx-auto min-h-[250px] w-full max-w-[380px]">
+            <div className="absolute left-[8%] top-[22%] h-28 w-28 rounded-full border border-[var(--brand-orange)]/35 bg-[var(--paper-surface)] p-8">
+              <Lightbulb className="h-full w-full text-[var(--brand-orange)]" strokeWidth={1.3} aria-hidden="true" />
             </div>
-        </div >
-    );
+            <div className="absolute bottom-[6%] right-0 w-[68%] rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 shadow-sm">
+              <div className="mb-3 flex items-center gap-2 font-mono text-[10px] text-[var(--muted-graphite)]"><Code2 className="h-3.5 w-3.5 text-[var(--brand-orange)]" aria-hidden="true" /> thinking-through-the-test.ts</div>
+              <div className="space-y-2 font-mono text-[11px] text-[var(--graphite)]">
+                <div><span className="text-[var(--muted-graphite)]">01 </span>understand(system)</div>
+                <div><span className="text-[var(--muted-graphite)]">02 </span>practice(concept)</div>
+                <div><span className="text-[var(--muted-graphite)]">03 </span>review(result)</div>
+              </div>
+              <div className="mt-4 flex items-center gap-2 border-t border-[var(--soft-border)] pt-3 font-mono text-[10px] text-[var(--brand-orange)]"><CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" /> learning by doing</div>
+            </div>
+          </div>
+          <div>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('why.eyebrow')}</p>
+            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('why.title')}</h2>
+            <p className="mt-5 text-xl font-medium leading-8 text-[var(--graphite)]">{t('why.quote')}</p>
+            <p className="mt-5 text-base leading-7 text-[var(--muted-graphite)]">{t('why.paragraph1')}</p>
+            <p className="mt-4 text-base leading-7 text-[var(--muted-graphite)]">{t('why.paragraph2')}</p>
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto grid max-w-7xl gap-8 px-6 pb-20 sm:px-8 lg:grid-cols-[0.72fr_1.28fr] lg:gap-20 lg:px-12 lg:pb-28">
+        <div>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('background.eyebrow')}</p>
+          <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('background.title')}</h2>
+        </div>
+        <div className="max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">
+          <p>{t('background.paragraph1')}</p>
+          <p className="mt-5">{t('background.paragraph2')}</p>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
+        <div className="rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-7 sm:p-10 lg:p-12">
+          <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('find.title')}</h2>
+          <div className="mt-9 grid gap-8 md:grid-cols-3 md:gap-0">
+            {productItems.map(({ key, icon: Icon }, index) => (
+              <div key={key} className="flex gap-4 border-[var(--soft-border)] md:px-8 md:first:pl-0 md:last:pr-0 md:not-first:border-l">
+                <Icon className="mt-1 h-6 w-6 shrink-0 text-[var(--brand-orange)]" strokeWidth={1.5} aria-hidden="true" />
+                <div>
+                  <div className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">0{index + 1}</div>
+                  <h3 className="mt-2 text-xl font-semibold">{t(`find.${key}.title`)}</h3>
+                  <p className="mt-2 text-base leading-7 text-[var(--muted-graphite)]">{t(`find.${key}.description`)}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-24 sm:px-8 lg:px-12 lg:pb-32">
+        <div className="flex flex-col gap-7 rounded-xl bg-[var(--graphite)] px-7 py-10 text-[var(--paper-surface)] sm:flex-row sm:items-center sm:justify-between sm:px-12 sm:py-12">
+          <div>
+            <h2 className="text-3xl font-semibold tracking-[-0.035em]">{t('contact.title')}</h2>
+            <p className="mt-3 max-w-xl text-base leading-7 text-[#d2d0c9]">{t('contact.description')}</p>
+          </div>
+          <Link to={LocaleRoutes.contact} params={params} className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b]">
+            {t('contact.cta')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function SocialLink({ href, label, icon }: { href: string; label: string; icon: React.ReactNode }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-10 items-center gap-2 rounded-full border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3.5 text-sm font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)]">
+      {icon}
+      {label}
+    </a>
+  );
 }

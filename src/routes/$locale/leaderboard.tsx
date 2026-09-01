@@ -2,20 +2,20 @@ import { createFileRoute, Link, useParams } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { z } from 'zod';
+import { UsersRound } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Trophy, Crown, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { leaderboardQueryOptions } from '@/lib/leaderboard.query';
 import { createSeoHead } from '@/lib/seo';
-import { omitUndefined } from '@/lib/omit-undefined';
+import i18n from '@/lib/i18n';
 
 interface LeaderboardEntry {
   id: string;
   name: string | null;
   image: string | null;
   xp: number;
-  monthlyXp?: number; // Added monthly XP
+  monthlyXp?: number;
   level: number;
   createdAt: Date | null;
   challengesCompleted: number;
@@ -28,7 +28,6 @@ interface LeaderboardEntry {
   }[];
 }
 
-// --- Search Params Schema ---
 const LeaderboardSearchSchema = z.object({
   period: z.enum(['all', 'monthly']).optional(),
 });
@@ -37,7 +36,6 @@ export const Route = createFileRoute('/$locale/leaderboard')({
   validateSearch: LeaderboardSearchSchema,
   loaderDeps: ({ search: { period } }) => ({ period }),
   loader: async ({ context, params, deps: { period } }) => {
-    // Prefetch specific period first (priority)
     const activePromise = context.queryClient.ensureQueryData(
       leaderboardQueryOptions({
         period: period ?? 'all',
@@ -47,7 +45,6 @@ export const Route = createFileRoute('/$locale/leaderboard')({
       }),
     );
 
-    // Prefetch the other one in background for instant tab switch
     const otherPeriod = period === 'all' ? 'monthly' : 'all';
     void context.queryClient.prefetchQuery(
       leaderboardQueryOptions({
@@ -64,8 +61,8 @@ export const Route = createFileRoute('/$locale/leaderboard')({
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Leaderboard | TestingWithEkki',
-      description: 'See who tops the charts! View the all-time and monthly leaderboard for TestingWithEkki challenges.',
+      title: i18n.t('leaderboard:seo.title', { lng: locale }),
+      description: i18n.t('leaderboard:seo.description', { lng: locale }),
       path: '/leaderboard',
       locale,
     });
@@ -76,11 +73,9 @@ function LeaderboardPage() {
   const { locale } = useParams({ from: '/$locale/leaderboard' });
   const { t } = useTranslation(['leaderboard', 'common']);
   const { auth } = Route.useRouteContext();
-  const session = auth;
-  const isAuthenticated = !!session?.user;
+  const currentUserId = auth?.user?.id;
+  const isAuthenticated = !!currentUserId;
   const navigate = Route.useNavigate();
-
-  // URL-based State
   const searchParams = Route.useSearch();
   const period = searchParams.period ?? 'all';
 
@@ -89,56 +84,92 @@ function LeaderboardPage() {
   );
 
   const users: LeaderboardEntry[] = leaderboardData?.data ?? [];
-
-  const TopThree = users.slice(0, 3);
-  const RestUsers = users.slice(3);
-  const firstUser = TopThree[0];
-
-  // Animation delay utility
-  const getDelay = (index: number) => ({ animationDelay: `${index * 50}ms` });
-  const getDisplayXpProps = (user: LeaderboardEntry) => {
-    const displayXp = period === 'monthly' ? user.monthlyXp : user.xp;
-    return omitUndefined({ displayXp });
-  };
+  const formatXp = (user: LeaderboardEntry) =>
+    ((period === 'monthly' ? user.monthlyXp : user.xp) || 0).toLocaleString(
+      locale,
+    );
+  const getDelay = (index: number) => ({
+    animationDelay: `${index * 45}ms`,
+  });
 
   return (
-    <div className="min-h-screen p-4 md:p-8 relative overflow-hidden bg-background">
-      {/* Background decoration - softer gradient */}
-      <div className="absolute top-0 left-0 w-full h-[400px] bg-gradient-to-b from-primary/5 to-transparent -z-10" />
+    <div
+      data-testid="leaderboard-page"
+      className="min-h-screen overflow-hidden bg-[var(--warm-canvas)] px-4 py-8 text-[var(--graphite)] sm:px-6 md:py-12 lg:px-8"
+    >
+      <main className="mx-auto max-w-6xl">
+        <header
+          data-testid="leaderboard-header"
+          className="grid items-center gap-8 border-b border-[var(--soft-border)] pb-9 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)] lg:gap-12"
+        >
+          <div className="max-w-2xl">
+            <p className="flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+              <UsersRound className="h-4 w-4" aria-hidden="true" />
+              {t('leaderboard:header.eyebrow')}
+            </p>
+            <h1 className="mt-4 max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl">
+              {t('leaderboard:header.title')}
+            </h1>
+            <p className="mt-5 max-w-xl text-base leading-7 text-[var(--muted-graphite)] sm:text-lg">
+              {t('leaderboard:header.subtitle')}
+            </p>
+          </div>
 
-      <div className="max-w-4xl mx-auto space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-black tracking-tight flex items-center justify-center gap-3 animate-in fade-in slide-in-from-top-4 duration-700">
-            <span className="text-primary">~</span>
-            {t('leaderboard:header.title')}
-          </h1>
-          <p className="text-muted-foreground text-lg animate-in fade-in slide-in-from-top-4 duration-700 delay-100">
-            {t('leaderboard:header.subtitle')}
-          </p>
-        </div>
+          <div className="flex justify-center lg:justify-end">
+            <img
+              data-testid="leaderboard-illustration"
+              src="/illustrations/twe-leaderboard-community.png"
+              alt=""
+              aria-hidden="true"
+              width="1536"
+              height="1024"
+              className="h-auto w-full max-w-[280px] object-contain"
+              loading="eager"
+            />
+          </div>
+        </header>
 
         <Tabs
+          data-testid="leaderboard-tabs-root"
           value={period === 'all' ? 'all-time' : 'monthly'}
-          className="space-y-8"
-          onValueChange={(val) => {
+          className="mt-8 space-y-6"
+          onValueChange={(value) => {
             void navigate({
-              to: '.',
-              search: { period: val === 'monthly' ? 'monthly' : 'all' },
+              to: '/$locale/leaderboard',
+              params: { locale },
+              search: (previous) => ({
+                ...previous,
+                period: value === 'monthly' ? 'monthly' : 'all',
+              }),
               replace: true,
             });
           }}
         >
-          <div className="flex justify-center">
-            <TabsList className="bg-muted/30 p-1 h-12 rounded-2xl animate-in fade-in zoom-in-50 duration-500 delay-200">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.16em] text-[var(--muted-graphite)]">
+                {t('leaderboard:table.eyebrow')}
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                {t('leaderboard:table.title')}
+              </h2>
+            </div>
+
+            <TabsList
+              data-testid="leaderboard-tabs"
+              className="h-11 w-full rounded-lg border-[var(--soft-border)] bg-[var(--paper-surface)] p-1 sm:w-fit"
+            >
               <TabsTrigger
+                data-testid="leaderboard-tab-all-time"
                 value="all-time"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                className="h-full flex-1 rounded-md px-4 font-mono text-xs uppercase tracking-[0.08em] text-[var(--muted-graphite)] data-[state=active]:bg-[var(--graphite)] data-[state=active]:text-[var(--paper-surface)] sm:flex-none"
               >
                 {t('leaderboard:tabs.allTime')}
               </TabsTrigger>
               <TabsTrigger
+                data-testid="leaderboard-tab-monthly"
                 value="monthly"
-                className="px-6 h-10 rounded-xl font-bold data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all"
+                className="h-full flex-1 rounded-md px-4 font-mono text-xs uppercase tracking-[0.08em] text-[var(--muted-graphite)] data-[state=active]:bg-[var(--graphite)] data-[state=active]:text-[var(--paper-surface)] sm:flex-none"
               >
                 {t('leaderboard:tabs.thisMonth')}
               </TabsTrigger>
@@ -146,275 +177,196 @@ function LeaderboardPage() {
           </div>
 
           <TabsContent
+            data-testid="leaderboard-panel"
             value={period === 'all' ? 'all-time' : 'monthly'}
-            className="space-y-8"
+            className="space-y-6"
           >
-            {users.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center animate-in fade-in zoom-in-95 duration-500">
-                <div className="h-20 w-20 rounded-3xl bg-muted/50 flex items-center justify-center mb-4">
-                  <Trophy className="h-10 w-10 text-muted-foreground/30" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">
-                  {t('leaderboard:table.emptyState')}
-                </h3>
-                <p className="text-muted-foreground max-w-xs">
-                  {t('leaderboard:table.emptyDescription', {
-                    defaultValue: 'No one has climbed the leaderboard yet. Be the first!',
-                  })}
-                </p>
-              </div>
-            ) : (
-              <>
-                {/* Top 3 Podium - Compact & Floating */}
-                {TopThree.length > 0 && firstUser && (
-                  <div className="relative pt-10 pb-4">
-                    {/* Glow effect for rank 1 */}
-                    <div className="absolute left-1/2 top-4 -translate-x-1/2 w-64 h-64 bg-accent/20 blur-[80px] rounded-full -z-10" />
-
-                    <div
-                      className={cn(
-                        'flex flex-col md:flex-row gap-4 items-end justify-center',
-                        TopThree.length === 1 ? 'max-w-xs mx-auto' : ''
-                      )}
-                    >
-                      {TopThree.length === 1 ? (
-                        <div className="animate-in fade-in zoom-in-75 duration-500 delay-300">
-                          <PodiumCard
-                            user={firstUser}
-                            rank={1}
-                            isCenter
-                            isAuthenticated={isAuthenticated}
-                            {...getDisplayXpProps(firstUser)}
-                          />
-                        </div>
-                      ) : (
-                        <>
-                          {/* Rank 2 (Left) */}
-                          <div className="order-2 md:order-1 w-full md:w-auto flex justify-center animate-in fade-in slide-in-from-right-8 duration-500 delay-400">
-                            {TopThree[1] ? (
-                              <PodiumCard
-                                user={TopThree[1]}
-                                rank={2}
-                                isAuthenticated={isAuthenticated}
-                                {...getDisplayXpProps(TopThree[1])}
-                              />
-                            ) : (
-                              <div className="w-[200px]" />
-                            )}
-                          </div>
-
-                          {/* Rank 1 (Center) */}
-                          <div className="order-1 md:order-2 w-full md:w-auto flex justify-center -mt-8 mb-4 md:mb-8 z-10 animate-in fade-in zoom-in-75 duration-500 delay-300">
-                            <PodiumCard
-                              user={firstUser}
-                              rank={1}
-                              isCenter
-                              isAuthenticated={isAuthenticated}
-                              {...getDisplayXpProps(firstUser)}
-                            />
-                          </div>
-
-                          {/* Rank 3 (Right) */}
-                          <div className="order-3 w-full md:w-auto flex justify-center animate-in fade-in slide-in-from-left-8 duration-500 delay-500">
-                            {TopThree[2] ? (
-                              <PodiumCard
-                                user={TopThree[2]}
-                                rank={3}
-                                isAuthenticated={isAuthenticated}
-                                {...getDisplayXpProps(TopThree[2])}
-                              />
-                            ) : (
-                              <div className="hidden md:block w-[200px]" />
-                            )}
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Rest of Leaderboard - List View */}
+            <section
+              data-testid="leaderboard-list"
+              aria-label={t('leaderboard:table.title')}
+              className="overflow-hidden rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)]"
+            >
+              {users.length === 0 ? (
                 <div
-                  className="bg-muted/10 rounded-3xl p-2 md:p-6 space-y-2"
-                  data-testid="leaderboard-list"
+                  data-testid="leaderboard-empty-state"
+                  className="flex flex-col items-center justify-center px-6 py-20 text-center"
                 >
-                  {RestUsers.map((user, index) => (
-                    <div
-                      key={user.id}
-                      data-testid="leaderboard-item"
-                      style={getDelay(index)}
-                      className={cn(
-                        'group flex items-center gap-4 p-3 md:p-4 rounded-2xl bg-card border border-border/40 hover:border-border transition-all hover:translate-x-1 hover:shadow-md animate-in fade-in slide-in-from-bottom-2 fill-mode-backwards',
-                        !isAuthenticated && 'opacity-60 blur-[1px]'
-                      )}
-                    >
-                      {/* Rank */}
-                      <div className="flex-none w-8 md:w-12 flex justify-center">
-                        <div className="h-8 w-8 rounded-full bg-accent/10 text-accent font-black flex items-center justify-center text-sm transition-transform group-hover:scale-110">
-                          {index + 4}
-                        </div>
-                      </div>
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-orange)]/30 bg-[var(--orange-tint)] text-[var(--brand-orange)]">
+                    <UsersRound className="h-6 w-6" aria-hidden="true" />
+                  </div>
+                  <p className="mt-6 font-mono text-xs font-medium uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+                    {t('leaderboard:table.emptyEyebrow')}
+                  </p>
+                  <h3 className="mt-3 text-xl font-semibold">
+                    {t('leaderboard:table.emptyState')}
+                  </h3>
+                  <p className="mt-3 max-w-md text-sm leading-6 text-[var(--muted-graphite)]">
+                    {t('leaderboard:table.emptyDescription')}
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div className="hidden grid-cols-[72px_minmax(0,1fr)_180px_120px] items-center gap-4 border-b border-[var(--soft-border)] px-5 py-3 font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-[var(--muted-graphite)] md:grid">
+                    <span>{t('leaderboard:table.rank')}</span>
+                    <span>{t('leaderboard:table.learner')}</span>
+                    <span className="text-right">
+                      {t('leaderboard:table.activity')}
+                    </span>
+                    <span className="text-right">
+                      {t('leaderboard:table.score')}
+                    </span>
+                  </div>
 
-                      {/* Avatar */}
-                      <div className="flex-none">
-                        <div className="h-10 w-10 md:h-12 md:w-12 rounded-xl bg-muted overflow-hidden transition-transform group-hover:rotate-3">
-                          {isAuthenticated ? (
-                            user.image ? (
-                              <img
-                                src={user.image}
-                                alt={user.name || ''}
-                                className="h-full w-full object-cover"
-                              />
-                            ) : (
-                              <div className="h-full w-full flex items-center justify-center bg-primary/5 text-primary font-bold">
-                                (user.name || 'A').charAt(0).toUpperCase()
-                              </div>
-                            )
-                          ) : (
-                            <div className="h-full w-full flex items-center justify-center bg-muted text-muted-foreground">?</div>
+                  <div className="divide-y divide-[var(--soft-border)]">
+                    {users.map((user, index) => {
+                      const isCurrentUser = currentUserId === user.id;
+                      const displayName =
+                        user.name || t('leaderboard:table.anonymous');
+
+                      return (
+                        <div
+                          key={user.id}
+                          data-testid="leaderboard-item"
+                          data-current-user={isCurrentUser ? 'true' : undefined}
+                          style={getDelay(index)}
+                          className={cn(
+                            'group grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 transition-colors animate-in fade-in slide-in-from-bottom-1 fill-mode-backwards motion-reduce:animate-none motion-reduce:opacity-100 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:gap-4 sm:px-5 md:grid-cols-[72px_minmax(0,1fr)_180px_120px]',
+                            isCurrentUser
+                              ? 'bg-[var(--orange-tint)]/55'
+                              : 'bg-[var(--paper-surface)] hover:bg-[var(--warm-canvas)]/60',
                           )}
-                        </div>
-                      </div>
+                        >
+                          <div className="flex items-center justify-center">
+                            <span
+                              className={cn(
+                                'font-mono text-sm font-medium',
+                                isCurrentUser
+                                  ? 'text-[var(--brand-orange)]'
+                                  : 'text-[var(--muted-graphite)]',
+                              )}
+                            >
+                              {user.rank || index + 1}
+                            </span>
+                          </div>
 
-                      {/* Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-bold truncate">
-                            {isAuthenticated ? user.name || t('leaderboard:table.anonymous') : t('leaderboard:table.hiddenUser')}
-                          </span>
-                          {/* Badges inline on mobile, hidden on very small screens */}
-                          <div className="flex -space-x-1">
-                            {user.badges.slice(0, 3).map((badge, i) => (
-                              <div key={i} className="h-5 w-5 rounded-full bg-background border border-border flex items-center justify-center text-[10px]" title={badge.name}>
-                                {badge.icon}
+                          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                            <div className="h-11 w-11 flex-none overflow-hidden rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] sm:h-12 sm:w-12">
+                              {user.image ? (
+                                <img
+                                  src={user.image}
+                                  alt={displayName}
+                                  className="h-full w-full object-cover"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center font-semibold text-[var(--brand-orange)]">
+                                  {displayName.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                            <div className="flex min-w-0 items-center gap-2">
+                              <span className="truncate font-semibold">
+                                {displayName}
+                              </span>
+                              {isCurrentUser && (
+                                <span
+                                  data-testid="leaderboard-current-user"
+                                  className="flex-none rounded-full bg-[var(--brand-orange)] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-white"
+                                >
+                                  {t('leaderboard:table.you')}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-[var(--muted-graphite)]">
+                              <span>
+                                {t('common:labels.level')} {user.level}
+                              </span>
+                              <span
+                                className="h-1 w-1 rounded-full bg-[var(--soft-border)] md:hidden"
+                                aria-hidden="true"
+                              />
+                              <span className="md:hidden">
+                                {user.challengesCompleted}{' '}
+                                {t('leaderboard:table.challenges')}
+                              </span>
+                            </div>
+
+                            {user.badges.length > 0 && (
+                              <div className="mt-2 flex -space-x-1">
+                                {user.badges.slice(0, 3).map((badge) => (
+                                  <span
+                                    key={badge.slug}
+                                    title={badge.name}
+                                    aria-label={badge.name}
+                                    className="flex h-5 w-5 items-center justify-center rounded-full border border-[var(--soft-border)] bg-[var(--paper-surface)] text-[10px]"
+                                  >
+                                    {badge.icon}
+                                  </span>
+                                ))}
                               </div>
-                            ))}
+                            )}
+                            </div>
+                          </div>
+
+                          <div className="hidden flex-none text-right md:block">
+                            <p className="font-semibold">
+                              {user.challengesCompleted}
+                            </p>
+                            <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--muted-graphite)]">
+                              {t('leaderboard:table.challenges')}
+                            </p>
+                          </div>
+
+                          <div className="flex-none text-right">
+                            <p className="font-semibold text-[var(--brand-orange)]">
+                              {formatXp(user)}
+                            </p>
+                            <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--muted-graphite)]">
+                              XP
+                            </p>
                           </div>
                         </div>
-                        <div className="text-xs text-muted-foreground font-medium flex items-center gap-2">
-                          <span>{t('common:labels.level')} {user.level}</span>
-                          <span className="w-1 h-1 rounded-full bg-border" />
-                          <span>{user.challengesCompleted} {t('leaderboard:table.challenges')}</span>
-                        </div>
-                      </div>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
+            </section>
 
-                      {/* XP */}
-                      <div className="flex-none text-right">
-                        <div className="font-black text-primary">
-                          {((period === 'monthly' ? user.monthlyXp : user.xp) || 0).toLocaleString()} <span className="text-xs text-muted-foreground font-medium">XP</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-
-                  {RestUsers.length === 0 && (
-                    <div className="text-center p-8 text-muted-foreground animate-in fade-in zoom-in-95 duration-500">
-                      {t('leaderboard:table.emptyState')}
-                    </div>
-                  )}
-
-                  {!isAuthenticated && (
-                    <div className="mt-8 text-center p-8 bg-card/50 backdrop-blur-sm rounded-3xl border border-dashed border-border relative overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-                      <div className="relative z-10 max-w-md mx-auto space-y-4">
-                        <Shield className="h-12 w-12 text-primary mx-auto opacity-50" />
-                        <h3 className="text-xl font-bold">{t('leaderboard:gating.title')}</h3>
-                        <p className="text-muted-foreground">{t('leaderboard:gating.description')}</p>
-                        <Link to="/$locale/login" params={{ locale }} search={{ redirect: '/leaderboard' }}>
-                          <Button size="lg" className="rounded-xl px-8 font-bold hover:scale-105 transition-transform">
-                            {t('leaderboard:gating.button')}
-                          </Button>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
+            {!isAuthenticated && (
+              <div
+                data-testid="leaderboard-sign-in"
+                className="flex flex-col gap-5 rounded-xl border border-[var(--brand-orange)]/25 bg-[var(--orange-tint)]/45 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7"
+              >
+                <div className="max-w-xl">
+                  <p className="font-mono text-xs font-medium uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+                    {t('leaderboard:gating.eyebrow')}
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold">
+                    {t('leaderboard:gating.title')}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">
+                    {t('leaderboard:gating.description')}
+                  </p>
                 </div>
-              </>
+                <Link
+                  to="/$locale/login"
+                  params={{ locale }}
+                  search={{ redirect: '/leaderboard' }}
+                  className="flex-none"
+                >
+                  <Button className="h-11 w-full rounded-lg bg-[var(--brand-orange)] px-5 text-white hover:bg-[#d9502d] sm:w-auto">
+                    {t('leaderboard:gating.button')}
+                  </Button>
+                </Link>
+              </div>
             )}
           </TabsContent>
         </Tabs>
-      </div>
-    </div>
-  );
-}
-
-function PodiumCard({
-  user,
-  rank,
-  isCenter = false,
-  isAuthenticated = false,
-  displayXp,
-}: {
-  user: LeaderboardEntry;
-  rank: number;
-  isCenter?: boolean;
-  isAuthenticated?: boolean;
-  displayXp?: number;
-}) {
-  const { t } = useTranslation(['leaderboard', 'common']);
-
-  // Compact styling
-  // Rank 1 gets special teal accent, others are more muted
-  const accentColor = rank === 1 ? 'text-teal-400' : rank === 2 ? 'text-slate-400' : 'text-amber-700';
-
-  const displayName = isAuthenticated
-    ? user.name || t('leaderboard:table.anonymous')
-    : t('leaderboard:table.hiddenUser');
-  const displayAvatar = isAuthenticated ? user.image : null;
-  const xpToShow = displayXp !== undefined ? displayXp : user.xp;
-
-  return (
-    <div
-      data-testid="leaderboard-podium-item"
-      className={cn(
-        'relative bg-card rounded-3xl p-4 flex flex-row items-center gap-4 transition-all hover:-translate-y-1',
-        isCenter ? 'ring-2 ring-teal-500/20 shadow-lg shadow-teal-500/10 min-w-[280px]' : 'border border-border/50 min-w-[240px] opacity-90',
-      )}
-    >
-      {/* Rank Badge */}
-      <div className={cn(
-        "absolute -top-3 -left-3 h-8 w-8 rounded-full flex items-center justify-center font-black text-sm shadow-sm z-10",
-        rank === 1 ? "bg-teal-500 text-black" : "bg-card border border-border text-muted-foreground"
-      )}>
-        {rank}
-      </div>
-
-      {isCenter && (
-        <div className="absolute -top-6 left-1/2 -translate-x-1/2 animate-bounce">
-          <Crown className="h-8 w-8 text-teal-400 drop-shadow-[0_0_10px_rgba(45,212,191,0.5)]" />
-        </div>
-      )}
-
-      {/* Avatar - Compact */}
-      <div className={cn(
-        "h-16 w-16 rounded-2xl overflow-hidden flex-none",
-        rank === 1 ? "ring-2 ring-offset-2 ring-offset-card ring-teal-500" : ""
-      )}>
-        {displayAvatar ? (
-          <img src={displayAvatar} alt={displayName} className="h-full w-full object-cover" />
-        ) : (
-          <div className="h-full w-full bg-muted flex items-center justify-center text-xl font-bold">
-            {isAuthenticated ? (user.name?.[0] || '?') : '?'}
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className={cn("font-bold text-lg truncate", !isAuthenticated && "blur-[2px]")}>
-          {displayName}
-        </div>
-        <div className="text-sm font-medium text-muted-foreground flex items-center gap-1">
-          <span className={cn("font-bold", accentColor)}>{xpToShow.toLocaleString()}</span> XP
-        </div>
-        {/* Badges */}
-        <div className="flex -space-x-1 mt-1">
-          {user.badges.slice(0, 2).map((b, i) => (
-            <div key={i} className="h-4 w-4 bg-background rounded-full border border-border flex items-center justify-center text-[8px]">
-              {b.icon}
-            </div>
-          ))}
-        </div>
-      </div>
+      </main>
     </div>
   );
 }

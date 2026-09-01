@@ -8,17 +8,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Globe } from 'lucide-react';
 import { supportedLngs, type Locale } from '@/lib/i18n/settings';
 
 const languageNames: Record<Locale, string> = {
   en: 'English',
   id: 'Bahasa Indonesia',
-};
-
-const languageFlags: Record<Locale, string> = {
-  en: '🇺🇸',
-  id: '🇮🇩',
 };
 
 export function LanguageSwitcher() {
@@ -51,12 +45,31 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2 px-2">
-          <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">
-            {languageFlags[currentLocale]}
+        <Button
+          variant="ghost"
+          size="default"
+          className="min-w-[5rem] gap-1 rounded-md px-2 font-mono text-xs tracking-wide text-[var(--graphite)] shadow-none hover:bg-[var(--orange-tint)] hover:text-[var(--graphite)]"
+          aria-label={`Switch language, currently ${languageNames[currentLocale]}`}
+        >
+          <span
+            className={
+              currentLocale === 'en'
+                ? 'text-foreground'
+                : 'text-muted-foreground'
+            }
+          >
+            EN
           </span>
-          <span className="sr-only">Switch language</span>
+          <span className="text-muted-foreground">/</span>
+          <span
+            className={
+              currentLocale === 'id'
+                ? 'text-foreground'
+                : 'text-muted-foreground'
+            }
+          >
+            ID
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
@@ -66,7 +79,6 @@ export function LanguageSwitcher() {
             onClick={() => handleLanguageChange(locale)}
             className={currentLocale === locale ? 'bg-accent' : ''}
           >
-            <span className="mr-2">{languageFlags[locale]}</span>
             {languageNames[locale]}
           </DropdownMenuItem>
         ))}

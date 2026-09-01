@@ -85,7 +85,7 @@ describe('generateIframeTemplate', () => {
     });
 
     expect(html).toContain('__VFS_NAVIGATE__');
-    expect(html).toContain('page.goto');
+    expect(html).toContain('__VFS_PAGE__.goto');
   });
 
   test('should include block navigation when filesEnabled is false', () => {
@@ -151,7 +151,7 @@ describe('generateVfsNavigationTemplate', () => {
     });
 
     expect(html).toContain('__VFS_NAVIGATE__');
-    expect(html).toContain('window.page.goto');
+    expect(html).toContain('window.__VFS_PAGE__.goto');
   });
 
   test('should include simplified fetch polyfill', () => {

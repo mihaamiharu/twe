@@ -1,13 +1,18 @@
 {
+  "seo": {
+    "title": "Profile | TestingWithEkki",
+    "description": "Manage your TestingWithEkki profile, progress, and achievements."
+  },
   "header": {
     "title": "Your Profile",
     "level": "Level {{level}}",
     "progressTo": "Progress to Level {{level}}",
+    "xpEarned": "{{xp}} XP earned",
     "settings": "Settings"
   },
   "stats": {
-    "tutorials": "Tutorials",
-    "challenges": "Challenges",
+    "learn": "Learn",
+    "practice": "Practice",
     "totalXp": "Total XP",
     "achievements": "Achievements"
   },
@@ -31,10 +36,17 @@
   "activity": {
     "title": "Recent Activity",
     "description": "Your latest learning progress",
+    "emptyEyebrow": "NO ACTIVITY YET",
     "empty": "No recent activity yet. Start learning!"
   },
   "achievements": {
+    "emptyEyebrow": "NOT STARTED YET",
     "empty": "No achievements yet. Complete challenges to earn badges!",
-    "available": "{{count}} badges available to unlock"
+    "earned": "Earned {{date}} · +{{xp}} XP"
+  },
+  "danger": {
+    "title": "Danger Zone",
+    "description": "Once you delete your account, there is no going back. Please be certain.",
+    "requestDeletion": "Request Account Deletion"
   }
 }

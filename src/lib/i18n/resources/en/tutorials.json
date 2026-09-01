@@ -1,35 +1,73 @@
 {
-  "page": {
-    "title": "Tutorials",
-    "subtitle": "Walk through core concepts with me, step-by-step.",
-    "seo": {
-      "title": "Interactive Playwright Tutorials | TestingWithEkki",
-      "description": "Step-by-step guides for mastering software testing. Learn Playwright, end-to-end testing strategies, and best practices."
+  "learn": {
+    "eyebrow": "LEARN",
+    "eyebrowNote": "CURRENT LESSONS",
+    "title": "Build the skills behind web automation.",
+    "description": "Start with how the web works, build the programming knowledge you need, and move into practical Playwright automation through lessons and hands-on practice.",
+    "primaryCta": "Start Learning",
+    "metadata": {
+      "webFundamentals": "Web fundamentals",
+      "handsOnPractice": "Hands-on practice",
+      "builtForQa": "Built for QA"
     },
-    "searchPlaceholder": "Search tutorials...",
-    "noResults": "No tutorials found",
-    "tryDifferentSearch": "Try a different search term",
-    "checkBackSoon": "Check back soon for new tutorials!",
-    "failedToLoad": "Failed to load tutorials",
-    "pleaseTryAgain": "Please try again later",
-    "notFound": "Tutorial not found",
-    "notFoundDescription": "The tutorial you are looking for does not exist"
+    "visual": {
+      "inspect": "INSPECT",
+      "execute": "EXECUTE",
+      "verify": "VERIFY",
+      "target": "DOM target",
+      "artifact": "Playwright artifact",
+      "result": "Assertion passed"
+    },
+    "stack": {
+      "note": "Current lessons",
+      "lessonLabel": "Lesson {{number}}",
+      "moduleLabel": "Module {{number}}",
+      "cardLesson": "Open lesson",
+      "noLessons": "The current lesson catalog is unavailable right now."
+    },
+    "path": {
+      "progress": "Core: {{lessons}}/{{lessonTotal}} lessons · {{practice}}/{{practiceTotal}} practice",
+      "completed": "Learning path complete",
+      "moduleProgress": "{{lessons}}/{{lessonTotal}} lessons · {{practice}}/{{practiceTotal}} practice",
+      "coreLesson": "Core",
+      "optionalLesson": "Optional"
+    },
+    "lessons": {
+      "eyebrow": "WEB AUTOMATION / LESSONS",
+      "title": "Lessons",
+      "description": "Move through the material in order, then use linked Practice challenges to apply what you have learned.",
+      "practiceLink": "Explore Practice challenges",
+      "searchLabel": "Search lessons",
+      "searchPlaceholder": "Search lessons...",
+      "clearSearch": "Clear lesson search",
+      "results": "{{count}} lessons",
+      "lessonNumber": "Lesson {{number}}",
+      "emptyEyebrow": "NO MATCHES",
+      "noResults": "No lessons found",
+      "tryDifferentSearch": "Try a different search term",
+      "checkBackSoon": "New lessons will appear here when they are ready.",
+      "errorEyebrow": "LOAD ERROR",
+      "errorTitle": "Lessons are unavailable",
+      "errorDescription": "We couldn't load the lesson catalog. Please try again later."
+    },
+    "detailError": {
+      "title": "This lesson is unavailable",
+      "description": "We couldn't load this lesson. Please return to Learn and try again."
+    },
+    "future": {
+      "eyebrow": "NEXT",
+      "title": "More lesson areas will come later.",
+      "description": "Web Automation is the first. New areas will be added when the material is ready."
+    },
+    "seo": {
+      "title": "Learn Web Automation — TestingWithEkki",
+      "description": "Build the foundations behind web automation through guided lessons, hands-on practice, and Playwright testing."
+    }
   },
   "filters": {
-    "all": "All",
-    "foundations": "Foundations",
-    "beginner": "Beginner",
-    "intermediate": "Intermediate",
-    "advanced": "E2E Testing",
-    "hideCompleted": "Hide Completed",
-    "showCompleted": "Show Completed"
-  },
-  "tracks": {
-    "foundations": "Foundations Track",
-    "beginner": "Beginner Track",
-    "intermediate": "Intermediate Track",
-    "advanced": "E2E Track",
-    "other": "Additional Tutorials"
+    "clear": "Clear filters",
+    "showRemaining": "Show remaining only",
+    "showAll": "Show all lessons"
   },
   "table": {
     "title": "Title",
@@ -41,28 +79,36 @@
   "card": {
     "estimatedTime": "{{minutes}} min read",
     "estimatedTimeShort": "{{minutes}} min",
-    "startTutorial": "Start Tutorial",
-    "continueTutorial": "Continue",
-    "completed": "Done"
-  },
-  "view": {
-    "grid": "Grid View",
-    "list": "List View"
+    "startLesson": "Start lesson",
+    "continueLesson": "Continue lesson",
+    "completed": "Done",
+    "reviewLesson": "Review lesson"
   },
   "sidebar": {
-    "progress": "Your Progress",
-    "reading": "Reading",
-    "readToComplete": "Read to Complete",
-    "completeAndContinue": "Complete & Continue",
+    "status": "Lesson status",
+    "markComplete": "Mark lesson complete",
     "completedTitle": "Completed! 🎉",
     "nextLabel": "Next: {{title}}",
     "duration": "Duration",
+    "statusIncomplete": "Not completed",
     "statusCompleted": "Completed",
     "challengesTitle": "Practice Challenges",
-    "challengesDescription": "Reinforce what you've learned with these related challenges."
+    "challengesDescription": "Reinforce what you've learned with these related challenges.",
+    "corePractice": "Core Practice",
+    "additionalPractice": "Additional Practice"
+  },
+  "detail": {
+    "breadcrumbLabel": "Lesson breadcrumbs",
+    "contentLabel": "Lesson content",
+    "tagsLabel": "Lesson topics",
+    "tocTitle": "On this page",
+    "completionTitle": "Finished reading?",
+    "completionDescription": "Mark this lesson as complete before moving on.",
+    "completionCompletedDescription": "This lesson is complete. Continue with the lesson navigation below.",
+    "lessonNavigationLabel": "Lesson navigation"
   },
   "toasts": {
-    "completed": "Tutorial completed! 🎉",
-    "failed": "Failed to mark as complete"
+    "completed": "Lesson completed! 🎉",
+    "failed": "Failed to mark the lesson as complete"
   }
 }

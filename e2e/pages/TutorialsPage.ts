@@ -6,26 +6,34 @@ export class TutorialsPage extends BasePage {
   readonly tutorialCards: Locator;
   readonly completeButton: Locator;
   readonly hideCompletedToggle: Locator;
+  readonly currentLessonsPreview: Locator;
 
   constructor(page: Page) {
     super(page);
-    this.tutorialCards = page.locator('a[href*="/tutorials/"][class*="group"]');
-    this.completeButton = page.getByRole('button', {
-      name: /Read to Complete|Complete & Continue|Baca untuk Menyelesaikan|Selesai & Lanjutkan/i,
-    });
+    this.tutorialCards = page.locator('a[href*="/learn/"][class*="group"]');
+    this.completeButton = page.getByTestId('complete-tutorial-footer');
     this.hideCompletedToggle = page.getByRole('button', {
-      name: /Hide Completed|Sembunyikan Selesai/i,
+      name: /Show remaining only|Show all lessons|Tampilkan yang belum selesai saja|Tampilkan semua pelajaran|Hide Completed|Show Completed|Sembunyikan Selesai|Tampilkan Selesai/i,
     });
+    this.currentLessonsPreview = page.getByTestId('current-lessons-preview');
   }
 
   async gotoList(locale: string = 'en') {
-    await this.goto(`/${locale}/tutorials`);
-    await this.page.waitForLoadState('networkidle');
+    await this.goto(`/${locale}/learn`);
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.page.waitForLoadState('load');
+    await expect(this.currentLessonsPreview).toBeVisible();
+    await expect(this.page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
+      { timeout: 20_000 },
+    );
   }
 
   async gotoTutorial(slug: string, locale: string = 'en') {
-    await this.goto(`/${locale}/tutorials/${slug}`);
-    await this.page.waitForLoadState('networkidle');
+    await this.goto(`/${locale}/learn/${slug}`);
+    await this.page.waitForLoadState('domcontentloaded');
+    await this.verifyTutorialContent();
   }
 
   async verifyTutorialContent() {
@@ -35,8 +43,8 @@ export class TutorialsPage extends BasePage {
 
   async completeTutorial() {
     await this.completeButton.click();
-    await expect(
-      this.page.getByText('Completed! 🎉', { exact: true }),
-    ).toBeVisible();
+    await expect(this.page.getByTestId('lesson-status-value')).toHaveText(
+      'Completed',
+    );
   }
 }

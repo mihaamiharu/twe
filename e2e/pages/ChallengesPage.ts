@@ -43,7 +43,7 @@ export class ChallengesPage extends BasePage {
     this.testSelectorButton = page.getByRole('button', {
       name: 'Test Selector',
     });
-    this.hideCompletedToggle = page.getByRole('button', {
+    this.hideCompletedToggle = page.getByRole('switch', {
       name: /Hide (Completed|Done)|Show Completed|Tampilkan Selesai|Sembunyikan Selesai/i,
     });
 
@@ -56,12 +56,12 @@ export class ChallengesPage extends BasePage {
   }
 
   async gotoList(locale: string = 'en') {
-    await this.goto(`/${locale}/challenges`);
+    await this.goto(`/${locale}/practice`);
     await this.page.waitForLoadState('networkidle');
   }
 
   async gotoChallenge(slug: string, locale: string = 'en') {
-    await this.goto(`/${locale}/challenges/${slug}`);
+    await this.goto(`/${locale}/practice/${slug}`);
   }
 
   async solveChallenge(codeOrSelector: string, slug?: string) {
@@ -205,11 +205,10 @@ export class ChallengesPage extends BasePage {
     await expect(this.submitButton).toBeEnabled({ timeout: 5000 });
     await this.submitButton.click();
 
-    await expect(this.page.getByRole('dialog')).toContainText(
-      /Challenge Complete!/i,
-      {
-        timeout: 20000,
-      },
-    );
+    // A previously completed challenge is intentionally submitted in Practice
+    // mode and returns a toast instead of the reward dialog.
+    await expect(
+      this.page.getByText(/Challenge Complete!|Practice complete!/i).first(),
+    ).toBeVisible({ timeout: 20000 });
   }
 }

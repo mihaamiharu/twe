@@ -1,31 +1,73 @@
 {
-  "page": {
-    "title": "Tutorial",
-    "subtitle": "Pelajari konsep inti bersama saya, langkah demi langkah.",
-    "searchPlaceholder": "Cari tutorial...",
-    "noResults": "Tutorial tidak ditemukan",
-    "tryDifferentSearch": "Coba kata kunci pencarian lain",
-    "checkBackSoon": "Cek lagi nanti untuk tutorial baru!",
-    "failedToLoad": "Gagal memuat tutorial",
-    "pleaseTryAgain": "Silakan coba lagi nanti",
-    "notFound": "Tutorial tidak ditemukan",
-    "notFoundDescription": "Tutorial yang kamu cari tidak ada"
+  "learn": {
+    "eyebrow": "BELAJAR",
+    "eyebrowNote": "PELAJARAN SAAT INI",
+    "title": "Bangun keterampilan di balik otomasi web.",
+    "description": "Mulai dari cara kerja web, bangun pengetahuan pemrograman yang kamu butuhkan, lalu berlatih otomasi Playwright melalui pelajaran dan latihan langsung.",
+    "primaryCta": "Mulai Belajar",
+    "metadata": {
+      "webFundamentals": "Dasar web",
+      "handsOnPractice": "Latihan langsung",
+      "builtForQa": "Dibuat untuk QA"
+    },
+    "visual": {
+      "inspect": "INSPEKSI",
+      "execute": "EKSEKUSI",
+      "verify": "VERIFIKASI",
+      "target": "Target DOM",
+      "artifact": "Artefak Playwright",
+      "result": "Assertion berhasil"
+    },
+    "stack": {
+      "note": "Pelajaran saat ini",
+      "lessonLabel": "Pelajaran {{number}}",
+      "moduleLabel": "Modul {{number}}",
+      "cardLesson": "Buka pelajaran",
+      "noLessons": "Katalog pelajaran saat ini tidak tersedia."
+    },
+    "path": {
+      "progress": "Inti: {{lessons}}/{{lessonTotal}} pelajaran · {{practice}}/{{practiceTotal}} latihan",
+      "completed": "Learning path selesai",
+      "moduleProgress": "{{lessons}}/{{lessonTotal}} pelajaran · {{practice}}/{{practiceTotal}} latihan",
+      "coreLesson": "Inti",
+      "optionalLesson": "Opsional"
+    },
+    "lessons": {
+      "eyebrow": "OTOMASI WEB / PELAJARAN",
+      "title": "Pelajaran",
+      "description": "Ikuti materi secara berurutan, lalu gunakan tantangan Practice terkait untuk menerapkan apa yang sudah kamu pelajari.",
+      "practiceLink": "Lihat tantangan Practice",
+      "searchLabel": "Cari pelajaran",
+      "searchPlaceholder": "Cari pelajaran...",
+      "clearSearch": "Hapus pencarian pelajaran",
+      "results": "{{count}} pelajaran",
+      "lessonNumber": "Pelajaran {{number}}",
+      "emptyEyebrow": "TIDAK ADA HASIL",
+      "noResults": "Pelajaran tidak ditemukan",
+      "tryDifferentSearch": "Coba kata kunci pencarian lain",
+      "checkBackSoon": "Pelajaran baru akan muncul di sini saat sudah siap.",
+      "errorEyebrow": "GAGAL MEMUAT",
+      "errorTitle": "Pelajaran tidak tersedia",
+      "errorDescription": "Katalog pelajaran tidak dapat dimuat. Silakan coba lagi nanti."
+    },
+    "detailError": {
+      "title": "Pelajaran ini tidak tersedia",
+      "description": "Pelajaran ini tidak dapat dimuat. Kembali ke Belajar dan coba lagi."
+    },
+    "future": {
+      "eyebrow": "BERIKUTNYA",
+      "title": "Area pelajaran lainnya akan hadir nanti.",
+      "description": "Otomasi Web adalah yang pertama. Area baru akan ditambahkan saat materinya sudah siap."
+    },
+    "seo": {
+      "title": "Belajar Otomasi Web — TestingWithEkki",
+      "description": "Bangun dasar otomasi web melalui pelajaran terarah, latihan langsung, dan pengujian Playwright."
+    }
   },
   "filters": {
-    "all": "Semua",
-    "foundations": "Pondasi",
-    "beginner": "Pemula",
-    "intermediate": "Menengah",
-    "advanced": "E2E Testing",
-    "hideCompleted": "Sembunyikan Selesai",
-    "showCompleted": "Tampilkan Selesai"
-  },
-  "tracks": {
-    "foundations": "Jalur Pondasi",
-    "beginner": "Jalur Pemula",
-    "intermediate": "Jalur Menengah",
-    "advanced": "Jalur E2E",
-    "other": "Tutorial Tambahan"
+    "clear": "Hapus filter",
+    "showRemaining": "Tampilkan yang belum selesai saja",
+    "showAll": "Tampilkan semua pelajaran"
   },
   "table": {
     "title": "Judul",
@@ -37,28 +79,36 @@
   "card": {
     "estimatedTime": "{{minutes}} menit baca",
     "estimatedTimeShort": "{{minutes}} mnt",
-    "startTutorial": "Mulai Tutorial",
-    "continueTutorial": "Lanjutkan",
-    "completed": "Selesai"
-  },
-  "view": {
-    "grid": "Tampilan Grid",
-    "list": "Tampilan Daftar"
+    "startLesson": "Mulai pelajaran",
+    "continueLesson": "Lanjutkan pelajaran",
+    "completed": "Selesai",
+    "reviewLesson": "Tinjau pelajaran"
   },
   "sidebar": {
-    "progress": "Progres Kamu",
-    "reading": "Membaca",
-    "readToComplete": "Baca untuk Menyelesaikan",
-    "completeAndContinue": "Selesai & Lanjutkan",
+    "status": "Status pelajaran",
+    "markComplete": "Tandai pelajaran selesai",
     "completedTitle": "Selesai! 🎉",
     "nextLabel": "Berikutnya: {{title}}",
     "duration": "Durasi",
+    "statusIncomplete": "Belum selesai",
     "statusCompleted": "Selesai",
     "challengesTitle": "Tantangan Latihan",
-    "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini."
+    "challengesDescription": "Perkuat apa yang telah kamu pelajari dengan tantangan terkait ini.",
+    "corePractice": "Latihan Inti",
+    "additionalPractice": "Latihan Tambahan"
+  },
+  "detail": {
+    "breadcrumbLabel": "Breadcrumb pelajaran",
+    "contentLabel": "Konten pelajaran",
+    "tagsLabel": "Topik pelajaran",
+    "tocTitle": "Di halaman ini",
+    "completionTitle": "Selesai membaca?",
+    "completionDescription": "Tandai pelajaran ini sebagai selesai sebelum melanjutkan.",
+    "completionCompletedDescription": "Pelajaran ini sudah selesai. Lanjutkan melalui navigasi pelajaran di bawah.",
+    "lessonNavigationLabel": "Navigasi pelajaran"
   },
   "toasts": {
-    "completed": "Tutorial selesai! 🎉",
-    "failed": "Gagal menandai sebagai selesai"
+    "completed": "Pelajaran selesai! 🎉",
+    "failed": "Gagal menandai pelajaran sebagai selesai"
   }
 }

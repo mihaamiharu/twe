@@ -21,39 +21,36 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
 
   test('ID Dashboard: should display Indonesian content', async ({ page }) => {
     await dashboardPage.goto('id');
-    // The current Indonesian homepage copy starts with "Bangun Test Automation Modern".
+    // The rebranded Indonesian homepage starts with the Phase 3 source-of-truth copy.
     await expect(dashboardPage.heroTitle).toContainText(
-      /Bangun Test Automation Modern/i,
+      /Tingkatkan skill testing kamu/i,
     );
-
-    // Stats in ID usually remain 'Challenges' etc if not localized in stats section yet,
-    // but we verify the page loaded.
     await expect(page).toHaveURL(/\/id\/?$/);
   });
 
   test('ID Tutorials: should list tutorials in ID', async () => {
     await tutorialsPage.gotoList('id');
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
-    // Check for "Mulai Belajar" or similar ID-specific text if applicable
+    await expect(tutorialsPage.currentLessonsPreview).toContainText(
+      'Fondasi Web Automation & QA Judgment',
+    );
   });
 
   test('ID Challenges: should list challenges in ID', async ({ page }) => {
     await challengesPage.gotoList('id');
     await expect(
-      page.getByRole('heading', { level: 1, name: 'Semua Tantangan' }),
+      page.getByRole('heading', {
+        level: 1,
+        name: 'Latih kemampuanmu lewat tantangan nyata.',
+      }),
     ).toBeVisible();
     await expect(
-      page.locator('a[href*="/id/challenges/"]').first(),
+      page.locator('a[href*="/id/practice/"]').first(),
     ).toBeVisible();
 
-    await page.getByRole('button', { name: /Selektor/ }).click();
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'Selektor' }),
-    ).toBeVisible();
+    await page.getByRole('tab', { name: /Selektor/ }).click();
+    await expect(page.getByRole('tab', { name: /Selektor/ })).toBeVisible();
     await expect(page.getByText('Kuasai Selektor CSS dan XPath')).toBeVisible();
-    await expect(
-      page.getByRole('heading', { level: 3, name: 'Keahlian Inti' }),
-    ).toBeVisible();
   });
 
   test('ID Profile: should display profile in ID context', async ({ page }) => {

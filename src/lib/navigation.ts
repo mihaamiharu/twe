@@ -48,15 +48,17 @@ export const LocaleRoutes = {
   register: '/$locale/register',
   forgotPassword: '/$locale/forgot-password',
   resetPassword: '/$locale/reset-password',
-  tutorials: '/$locale/tutorials',
-  tutorialDetail: '/$locale/tutorials/$slug',
-  challenges: '/$locale/challenges',
-  challengeDetail: '/$locale/challenges/$slug',
+  learn: '/$locale/learn',
+  learnDetail: '/$locale/learn/$slug',
+  practice: '/$locale/practice',
+  practiceDetail: '/$locale/practice/$slug',
+  labs: '/$locale/labs',
   leaderboard: '/$locale/leaderboard',
   profile: '/$locale/profile',
 
   privacy: '/$locale/privacy',
   terms: '/$locale/terms',
+  contact: '/$locale/contact',
   about: '/$locale/about',
 } as const;
 

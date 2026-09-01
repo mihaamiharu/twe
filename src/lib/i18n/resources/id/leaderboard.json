@@ -1,27 +1,42 @@
 {
+  "seo": {
+    "title": "Papan Peringkat | TestingWithEkki",
+    "description": "Lihat bagaimana komunitas TestingWithEkki membangun kemampuan automasi yang lebih kuat bersama."
+  },
   "header": {
-    "title": "Para Suhu",
-    "subtitle": "Barisan para suhu yang berhasil menaklukkan tantangan."
+    "eyebrow": "Progres komunitas",
+    "title": "Belajar bersama, maju bersama.",
+    "subtitle": "Lihat bagaimana komunitas TestingWithEkki membangun kemampuan automasi yang lebih kuat—satu tantangan setiap kali."
   },
   "tabs": {
     "allTime": "All Time",
     "thisMonth": "Bulan Ini"
   },
   "table": {
+    "eyebrow": "Ranking komunitas",
+    "title": "Progres bersama",
+    "rank": "Peringkat",
+    "learner": "Peserta",
+    "activity": "Aktivitas",
+    "score": "Skor",
+    "you": "Kamu",
     "hiddenUser": "User Privat",
     "anonymous": "Anonim",
     "challengesCount": "{{count}} tantangan",
     "challenges": "tantangan",
-    "emptyState": "Belum ada runner di sini. Ajak temanmu buat berkompetisi!"
+    "emptyEyebrow": "Tempat untuk tumbuh bersama",
+    "emptyState": "Papan komunitas ini siap diisi oleh peserta pertama.",
+    "emptyDescription": "Selesaikan sebuah tantangan dan tambahkan progresmu ke komunitas."
   },
   "gating": {
-    "title": "Masuk Circle Para Suhu",
-    "description": "Login untuk akses ranking lengkap, pantau progress, dan klaim badge eksklusif.",
-    "button": "Login untuk Adu Skill"
+    "eyebrow": "Ikuti perjalanan",
+    "title": "Terus tumbuh bersama komunitas",
+    "description": "Masuk untuk melacak progresmu, tampil di leaderboard, dan mengumpulkan badge saat berlatih.",
+    "button": "Masuk untuk ikut"
   },
   "monthly": {
-    "comingSoon": "Ranking Bulanan Segera Hadir",
-    "description": "Siapkan strategi terbaik untuk rebut posisi puncak di season depan!"
+    "comingSoon": "Progres bulan ini",
+    "description": "Terus berlatih dan lihat progresmu tumbuh bersama komunitas."
   },
   "error": {
     "description": "Leaderboard gagal dimuat. Coba cek koneksi internet atau balik lagi nanti."

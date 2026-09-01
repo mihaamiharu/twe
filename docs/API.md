@@ -42,7 +42,7 @@ export const getChallengeDetails = createServerFn({ method: 'GET' })
   });
 ```
 
-**Client Usage (`src/routes/$locale/challenges/$slug.tsx`)**
+**Client Usage (`src/routes/$locale/practice/$slug.tsx`)**
 ```ts
 import { useQuery } from '@tanstack/react-query';
 import { getChallengeDetails } from '@/server/challenges.fn';

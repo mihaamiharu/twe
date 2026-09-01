@@ -3,174 +3,104 @@ import { z } from 'zod';
 import { getRequest } from '@tanstack/react-start/server';
 import { db } from '@/db';
 import { challenges, progress, submissions } from '@/db/schema';
-import { eq, and, asc, desc, sql, or } from 'drizzle-orm';
+import { and, eq, inArray } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { obfuscate } from '@/lib/obfuscator';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { auth } from './auth.server';
 import {
-  getChallengeContent,
-  getChallengeList,
-  getTutorialContent,
-} from './content.server';
+  getChallengeCatalogDetail,
+  getChallengeCatalogList,
+  getTutorialCatalogDetail,
+} from './content-catalog.server';
+import { mergeChallengeCatalogOverlay } from '@/lib/catalog-overlays';
+import type { ChallengeListResponse } from '@/lib/catalog.types';
+import {
+  practiceDetailNotFoundFailure,
+  practiceDetailOperationalFailure,
+} from '@/lib/practice-detail-errors';
 
 // ----------------------------------------------------------------------------
-// GET CHALLENGES (LIST) - NOW USING FILESYSTEM
+// GET CHALLENGES (LIST) - FILESYSTEM CATALOG + EXPLICIT DB OVERLAY
 // ----------------------------------------------------------------------------
 
-const ChallengeFiltersSchema = z.object({
-  locale: z.string().default('en'),
-  type: z
-    .enum([
-      'JAVASCRIPT',
-      'PLAYWRIGHT',
-      'CSS_SELECTOR',
-      'XPATH_SELECTOR',
-      'SELECTOR',
-    ])
-    .optional(),
-  difficulty: z.enum(['EASY', 'MEDIUM', 'HARD']).optional(),
-  category: z.string().optional(),
-  search: z.string().optional(),
-  page: z.number().default(1),
-  limit: z.number().max(1000).default(50),
-  sortBy: z
-    .enum(['order', 'difficulty', 'xpReward', 'completionCount'])
-    .default('order'),
-  sortOrder: z.enum(['asc', 'desc']).default('asc'),
+const ChallengeCatalogListSchema = z.object({
+  locale: z.string().min(1).default('en'),
 });
 
 export const getChallenges = createServerFn({ method: 'GET' })
-  .inputValidator((data: unknown) => ChallengeFiltersSchema.parse(data))
-  .handler(async ({ data: filters }) => {
+  .inputValidator((data: unknown) => ChallengeCatalogListSchema.parse(data))
+  .handler(async ({ data: { locale } }): Promise<ChallengeListResponse> => {
     try {
+      const catalog = await getChallengeCatalogList(locale);
+      const slugs = catalog.map((challenge) => challenge.slug);
+      const dbRecords = slugs.length
+        ? await db
+            .select({
+              slug: challenges.slug,
+              id: challenges.id,
+              isPublished: challenges.isPublished,
+              completionCount: challenges.completionCount,
+            })
+            .from(challenges)
+            .where(inArray(challenges.slug, slugs))
+        : [];
+      const dbBySlug = new Map(
+        dbRecords.map((record) => [record.slug, record]),
+      );
+
       const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
-      const userId = session?.user?.id;
-      const locale = filters.locale;
+      const progressByChallengeId = new Map<string, boolean>();
 
-      // Build WHERE conditions
-      const conditions = [eq(challenges.isPublished, true)];
-
-      if (filters.difficulty) {
-        conditions.push(eq(challenges.difficulty, filters.difficulty));
-      }
-
-      if (filters.type) {
-        if (filters.type === 'SELECTOR') {
-          // Non-null assertion safe: or() always has two conditions here
-          conditions.push(
-            or(
-              eq(challenges.type, 'CSS_SELECTOR'),
-              eq(challenges.type, 'XPATH_SELECTOR'),
-            )!,
+      if (session?.user?.id && dbRecords.length > 0) {
+        const progressRecords = await db
+          .select({
+            challengeId: progress.challengeId,
+            isCompleted: progress.isCompleted,
+          })
+          .from(progress)
+          .where(
+            and(
+              eq(progress.userId, session.user.id),
+              inArray(
+                progress.challengeId,
+                dbRecords.map((record) => record.id),
+              ),
+            ),
           );
-        } else {
-          conditions.push(eq(challenges.type, filters.type));
+
+        for (const record of progressRecords) {
+          if (record.challengeId) {
+            progressByChallengeId.set(record.challengeId, record.isCompleted);
+          }
         }
       }
 
-      if (filters.category) {
-        conditions.push(eq(challenges.category, filters.category));
-      }
-
-      if (filters.search) {
-        const searchPattern = `%${filters.search}%`;
-        // Search in localized title or description (checking both current locale and en fallback)
-        // Non-null assertion safe: or() always has four conditions here
-        conditions.push(
-          or(
-            sql`${challenges.title}->>${locale} ILIKE ${searchPattern}`,
-            sql`${challenges.title}->>'en' ILIKE ${searchPattern}`,
-          )!,
-        );
-      }
-
-      // Calculate Offset
-      const offset = (filters.page - 1) * filters.limit;
-
-      // Build Query with $dynamic() for proper TypeScript support
-      // This enables dynamic chaining (joins, orderBy, limit) without type errors
-      const query = db
-        .select({
-          id: challenges.id,
-          slug: challenges.slug,
-          title: sql<string>`COALESCE(${challenges.title}->>${locale}, ${challenges.title}->>'en', '')`,
-          description: sql<string>`''`,
-          type: challenges.type,
-          difficulty: challenges.difficulty,
-          category: challenges.category,
-          xpReward: challenges.xpReward,
-          order: challenges.order,
-          tags: challenges.tags,
-          completionCount: challenges.completionCount,
-          isCompleted: userId
-            ? sql<boolean>`${progress.isCompleted} IS TRUE`
-            : sql<boolean>`false`,
-        })
-        .from(challenges)
-        .where(and(...conditions))
-        .$dynamic();
-
-      // Join Progress if user is logged in
-      if (userId) {
-        query.leftJoin(
-          progress,
-          and(eq(progress.challengeId, challenges.id), eq(progress.userId, userId)),
-        );
-      }
-
-      // Apply Sort - determine orderBy clause
-      const orderByClause = (() => {
-        switch (filters.sortBy) {
-          case 'xpReward':
-            return filters.sortOrder === 'desc'
-              ? desc(challenges.xpReward)
-              : asc(challenges.xpReward);
-          case 'difficulty':
-            return filters.sortOrder === 'desc'
-              ? desc(challenges.difficulty)
-              : asc(challenges.difficulty);
-          case 'completionCount':
-            return filters.sortOrder === 'desc'
-              ? desc(challenges.completionCount)
-              : asc(challenges.completionCount);
-          default:
-            return filters.sortOrder === 'desc'
-              ? desc(challenges.order)
-              : asc(challenges.order);
-        }
-      })();
-
-      query.orderBy(orderByClause);
-
-      // Apply Pagination
-      query.limit(filters.limit).offset(offset);
-
-      const data = await query;
-
-      // Get Total Count for Pagination (separate efficient query)
-      const countQuery = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(challenges)
-        .where(and(...conditions));
-
-      const total = Number(countQuery[0]?.count ?? 0);
+      const publishedCatalog = catalog.filter(
+        (challenge) => dbBySlug.get(challenge.slug)?.isPublished !== false,
+      );
+      const data = publishedCatalog.map((challenge) => {
+        const dbRecord = dbBySlug.get(challenge.slug);
+        return mergeChallengeCatalogOverlay(challenge, {
+          slug: challenge.slug,
+          ...(dbRecord ? { id: dbRecord.id } : {}),
+          isPublished: dbRecord?.isPublished ?? true,
+          completionCount: dbRecord?.completionCount ?? 0,
+          isCompleted: dbRecord
+            ? (progressByChallengeId.get(dbRecord.id) ?? false)
+            : false,
+        });
+      });
 
       return {
         success: true,
-        data: data.map((c) => ({
-          ...c,
-          // Ensure tags is array
-          tags: c.tags || [],
-          // UI expects explicit boolean
-          isCompleted: Boolean(c.isCompleted),
-        })),
+        data,
         pagination: {
-          page: filters.page,
-          limit: filters.limit,
-          total,
-          totalPages: Math.ceil(total / filters.limit),
+          page: 1,
+          limit: publishedCatalog.length,
+          total: publishedCatalog.length,
+          totalPages: 1,
         },
       };
     } catch (error) {
@@ -183,106 +113,127 @@ export const getChallenges = createServerFn({ method: 'GET' })
   });
 
 // ----------------------------------------------------------------------------
-// GET CHALLENGE (DETAIL) - NOW USING FILESYSTEM
+// GET CHALLENGE (DETAIL) - FILESYSTEM CATALOG + EXPLICIT DB OVERLAY
 // ----------------------------------------------------------------------------
 
 const ChallengeDetailSchema = z.object({
-  slug: z.string(),
-  locale: z.string().default('en'),
+  slug: z.string().min(1),
+  locale: z.string().min(1).default('en'),
 });
+
+function getSelectorInput(
+  value: unknown,
+): { selector?: string; xpath?: string } | undefined {
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    return undefined;
+  }
+
+  const selector = 'selector' in value ? value.selector : undefined;
+  const xpath = 'xpath' in value ? value.xpath : undefined;
+  return {
+    ...omitUndefined({
+      selector: typeof selector === 'string' ? selector : undefined,
+      xpath: typeof xpath === 'string' ? xpath : undefined,
+    }),
+  };
+}
 
 export const getChallenge = createServerFn({ method: 'GET' })
   .inputValidator((data: unknown) => ChallengeDetailSchema.parse(data))
   .handler(async ({ data: { slug, locale } }) => {
     try {
-      // Load challenge content from filesystem
-      const challengeContent = await getChallengeContent(slug, locale);
+      const challengeContent = await getChallengeCatalogDetail(slug, locale);
+      if (!challengeContent) return practiceDetailNotFoundFailure();
 
-      if (!challengeContent) {
-        throw new Error('Challenge not found');
+      if (challengeContent.tags.includes('coming-soon')) {
+        return practiceDetailOperationalFailure(
+          'This challenge is coming soon!',
+        );
       }
 
-      // Security Check
-      if (challengeContent.tags?.includes('coming-soon')) {
-        throw new Error('This challenge is coming soon!');
-      }
-
-      // Get DB record for dynamic data
       const dbChallenge = await db.query.challenges.findFirst({
-        where: and(eq(challenges.slug, slug), eq(challenges.isPublished, true)),
+        where: eq(challenges.slug, slug),
         columns: {
           id: true,
+          isPublished: true,
           completionCount: true,
         },
       });
+      if (dbChallenge && !dbChallenge.isPublished) {
+        return practiceDetailNotFoundFailure();
+      }
 
-      // Prepare test cases from filesystem
-      // Obfuscate sensitive inputs for selector challenges
-      const processedTestCases = (challengeContent.testCases || []).map(
-        (tc, index) => ({
+      const processedTestCases = challengeContent.testCases.map(
+        (testCase, index) => ({
           id: `tc-${index}`,
-          description: tc.description,
-          input: tc.expectedOutput, // For display purposes
-          expectedOutput: tc.expectedOutput,
+          description: testCase.description,
+          input: testCase.expectedOutput,
+          expectedOutput: testCase.expectedOutput,
           order: index,
-          ...omitUndefined({ isHidden: tc.isHidden }),
+          ...omitUndefined({ isHidden: testCase.isHidden }),
         }),
       );
 
-      // Filter visible test cases and obfuscate
       const visibleTestCases = processedTestCases
-        .filter((tc) => !tc.isHidden)
-        .map((tc) => {
+        .filter((testCase) => !testCase.isHidden)
+        .map((testCase) => {
           if (
-            challengeContent.type === 'CSS_SELECTOR' ||
-            challengeContent.type === 'XPATH_SELECTOR'
+            challengeContent.type !== 'CSS_SELECTOR' &&
+            challengeContent.type !== 'XPATH_SELECTOR'
           ) {
-            const output = tc.expectedOutput as {
-              selector?: string;
-              xpath?: string;
-            };
-            if (output?.selector) {
-              return { ...tc, input: { selector: obfuscate(output.selector) } };
-            }
-            if (output?.xpath) {
-              return { ...tc, input: { xpath: obfuscate(output.xpath) } };
-            }
+            return testCase;
           }
-          return tc;
+
+          const output = getSelectorInput(testCase.expectedOutput);
+          if (output?.selector) {
+            return {
+              ...testCase,
+              input: { selector: obfuscate(output.selector) },
+            };
+          }
+          if (output?.xpath) {
+            return { ...testCase, input: { xpath: obfuscate(output.xpath) } };
+          }
+          return testCase;
         });
 
       const hiddenTestCaseCount = processedTestCases.filter(
-        (tc) => tc.isHidden,
+        (testCase) => testCase.isHidden,
       ).length;
 
-      // Get related tutorial if specified
-      let tutorialData = null;
+      let tutorialData: { slug: string; title: string } | null = null;
       if (challengeContent.tutorialSlug) {
-        const tutorial = await getTutorialContent(
+        const tutorial = await getTutorialCatalogDetail(
           challengeContent.tutorialSlug,
           locale,
         );
-        if (tutorial) {
-          tutorialData = {
-            slug: tutorial.slug,
-            title: tutorial.title,
-          };
-        }
+        if (tutorial)
+          tutorialData = { slug: tutorial.slug, title: tutorial.title };
       }
 
-      // Get user progress & best submission
-      let userProgressData = null;
-      let bestSubmissionData = null;
+      let userProgressData: {
+        isCompleted: boolean;
+        attempts: number | null;
+        lastAccessedAt: Date;
+        usedHint: boolean;
+        hintContent: string | null;
+      } | null = null;
+      let bestSubmissionData: {
+        code: string;
+        isPassed: boolean;
+        xpEarned: number;
+        testsPassed: number;
+        testsTotal: number;
+        executionTime: number | null;
+      } | null = null;
 
       const headers = getRequest().headers;
       const session = await auth.api.getSession({ headers });
 
       if (session?.user?.id && dbChallenge) {
-        const userId = session.user.id;
-
         const progressRecord = await db.query.progress.findFirst({
           where: and(
-            eq(progress.userId, userId),
+            eq(progress.userId, session.user.id),
             eq(progress.challengeId, dbChallenge.id),
           ),
         });
@@ -315,35 +266,29 @@ export const getChallenge = createServerFn({ method: 'GET' })
         }
       }
 
-      // Next Challenge Logic (from filesystem)
-      const allChallenges = await getChallengeList(locale);
+      const allChallenges = await getChallengeCatalogList(locale);
       const currentOrder = challengeContent.order;
       const currentCategory = challengeContent.category;
-
-      // Try same category first
-      let nextChallenge = allChallenges
-        .filter((c) => c.category === currentCategory && c.order > currentOrder)
-        .sort((a, b) => a.order - b.order)[0];
-
-      // Fallback to any category
-      if (!nextChallenge) {
-        nextChallenge = allChallenges
-          .filter((c) => c.order > currentOrder)
-          .sort((a, b) => a.order - b.order)[0];
-      }
-
-      // Previous Challenge Logic
-      // Try same category first
-      let prevChallenge = allChallenges
-        .filter((c) => c.category === currentCategory && c.order < currentOrder)
-        .sort((a, b) => b.order - a.order)[0];
-
-      // Fallback to any category
-      if (!prevChallenge) {
-        prevChallenge = allChallenges
-          .filter((c) => c.order < currentOrder)
-          .sort((a, b) => b.order - a.order)[0];
-      }
+      const sameCategory = (candidate: (typeof allChallenges)[number]) =>
+        candidate.category === currentCategory;
+      const nextChallenge =
+        allChallenges.find(
+          (candidate) =>
+            sameCategory(candidate) && candidate.order > currentOrder,
+        ) ??
+        allChallenges.find((candidate) => candidate.order > currentOrder) ??
+        null;
+      const prevChallenge =
+        [...allChallenges]
+          .reverse()
+          .find(
+            (candidate) =>
+              sameCategory(candidate) && candidate.order < currentOrder,
+          ) ??
+        [...allChallenges]
+          .reverse()
+          .find((candidate) => candidate.order < currentOrder) ??
+        null;
 
       return {
         success: true,
@@ -358,14 +303,17 @@ export const getChallenge = createServerFn({ method: 'GET' })
           category: challengeContent.category,
           xpReward: challengeContent.xpReward,
           order: challengeContent.order,
+          hints: challengeContent.hints,
           ...omitUndefined({
-            hints: challengeContent.hints,
+            tutorialSlug: challengeContent.tutorialSlug,
             htmlContent: challengeContent.htmlContent,
             files: challengeContent.files,
             editableFiles: challengeContent.editableFiles,
             preloadModules: challengeContent.preloadModules,
             starterCode: challengeContent.starterCode,
             tags: challengeContent.tags,
+            expectedState: challengeContent.expectedState,
+            validation: challengeContent.validation,
           }),
           completionCount: dbChallenge?.completionCount || 0,
           tutorial: tutorialData,
@@ -374,24 +322,15 @@ export const getChallenge = createServerFn({ method: 'GET' })
           userProgress: userProgressData,
           bestSubmission: bestSubmissionData,
           nextChallenge: nextChallenge
-            ? {
-              slug: nextChallenge.slug,
-              title: nextChallenge.title,
-            }
+            ? { slug: nextChallenge.slug, title: nextChallenge.title }
             : null,
           prevChallenge: prevChallenge
-            ? {
-              slug: prevChallenge.slug,
-              title: prevChallenge.title,
-            }
+            ? { slug: prevChallenge.slug, title: prevChallenge.title }
             : null,
         },
       };
     } catch (error) {
       logger.error('Error fetching challenge detail:', error);
-      return {
-        success: false,
-        error: 'An error occurred while processing your request.',
-      };
+      return practiceDetailOperationalFailure();
     }
   });

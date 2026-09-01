@@ -1,5 +1,9 @@
 {
   "privacy": {
+    "seo": {
+      "title": "Privacy Policy | TestingWithEkki",
+      "description": "Read how TestingWithEkki collects, uses, and protects personal data."
+    },
     "title": "Privacy Policy",
     "lastUpdated": "Last updated: January 2026",
     "intro": "TestingWithEkki (\"we\", \"us\", or \"our\") is committed to protecting your personal data in compliance with the Indonesian Personal Data Protection Law (UU PDP) and other applicable regulations. This policy explains how we collect, use, process, and protect your information.",
@@ -64,6 +68,10 @@
     }
   },
   "terms": {
+    "seo": {
+      "title": "Terms and Conditions | TestingWithEkki",
+      "description": "Read the terms for using the TestingWithEkki interactive test automation learning platform."
+    },
     "title": "Terms and Conditions",
     "lastUpdated": "Last Updated: January 2026",
     "intro": "Welcome to TestingWithEkki. By accessing or using our website, you agree to be bound by these Terms and Conditions.",

@@ -11,24 +11,30 @@ interface TableOfContentsProps {
   headers: TOCItem[];
   activeId?: string;
   className?: string;
+  showTitle?: boolean;
 }
 
 export function TableOfContents({
   headers,
   activeId,
   className,
+  showTitle = true,
 }: TableOfContentsProps) {
   const { t } = useTranslation('tutorials');
-  // State removed as it was unused
 
   if (!headers.length) return null;
 
   return (
-    <div className={cn('hidden xl:block space-y-4', className)}>
-      <div className="font-semibold text-sm text-foreground/80 tracking-tight flex items-center gap-2">
-        {t('common:toc.title', 'On this page')}
-      </div>
-      <nav className="text-sm">
+    <div className={cn('space-y-4', className)}>
+      {showTitle && (
+        <div className="font-semibold text-sm text-foreground/80 tracking-tight flex items-center gap-2">
+          {t('common:toc.title', 'On this page')}
+        </div>
+      )}
+      <nav
+        aria-label={t('common:toc.title', 'On this page')}
+        className="text-sm"
+      >
         <ul className="space-y-2.5 border-l border-border/50 pl-0.5">
           {headers.map((item) => (
             <li
@@ -50,7 +56,7 @@ export function TableOfContents({
                   }
                 }}
                 className={cn(
-                  'block pl-4 -ml-px border-l-2 transition-all duration-200 hover:text-foreground no-underline',
+                  'block pl-4 -ml-px border-l-2 transition-colors duration-150 hover:text-foreground no-underline',
                   activeId === item.id
                     ? 'border-primary text-primary font-medium'
                     : 'border-transparent text-muted-foreground hover:border-border',

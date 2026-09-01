@@ -1,20 +1,39 @@
 {
   "page": {
-    "title": "Challenges",
-    "subtitle": "Practice your CSS and XPath selectors with real-world scenarios.",
+    "title": "Practice",
+    "subtitle": "Build test automation skills with CSS, XPath, JavaScript, TypeScript, and Playwright challenges.",
     "seo": {
-      "title": "Coding Challenges | TestingWithEkki",
-      "description": "Practice your Playwright, Selenium, and Cypress skills with real-world coding scenarios. Master selectors, automation authentication, and more."
+      "title": "Practice Test Automation — TestingWithEkki",
+      "description": "Build test automation skills with CSS and XPath selectors, JavaScript and TypeScript, and Playwright challenges you can solve in the browser."
     },
+    "practiceResourceType": "Practice challenge",
     "overallProgress": "Overall Progress",
     "notFound": "Challenge Not Found",
     "notFoundDescription": "The requested challenge could not be found.",
     "reviewTutorial": "Review Tutorial: {{title}}",
     "sidebarSubtitle": "Level up your automation skills"
   },
+    "library": {
+    "eyebrow": "PRACTICE",
+    "headline": "Practice what you know.",
+    "description": "Work through standalone practice challenges by topic, or open Learn when you want more context.",
+    "discoveryLabel": "Practice discovery",
+    "showingCount": "{{count}} challenges",
+    "completedByCount": "{{count}} solved",
+    "challengeCount_one": "{{count}} challenge",
+    "challengeCount_other": "{{count}} challenges",
+    "emptyEyebrow": "NO MATCHES",
+    "emptyTitle": "No challenges found",
+    "emptyDescription": "Try adjusting your search or filters to find a challenge to work on.",
+    "loading": "Loading challenges",
+    "errorEyebrow": "CATALOG UNAVAILABLE",
+    "errorTitle": "Practice is taking a moment",
+    "errorDescription": "We couldn't load the challenge library. Try again in a moment.",
+    "retry": "Try again"
+  },
   "tracks": {
     "all": {
-      "label": "All Challenges",
+      "label": "All",
       "description": "Overview of all available challenges"
     },
     "selectors": {
@@ -26,7 +45,7 @@
       "description": "Programming Fundamentals for Test Automation"
     },
     "core": {
-      "label": "Core",
+      "label": "Playwright Core",
       "description": "Navigation, Locators, Actions & Assertions"
     },
     "e2e": {
@@ -40,11 +59,20 @@
     "playwright": "Playwright"
   },
   "filters": {
+    "search": "Search practice challenges",
+    "track": "Practice tracks",
+    "difficulty": "Difficulty",
     "allDifficulties": "All Difficulties",
+    "tier": "Tier",
+    "view": "View mode",
+    "trackScrollHint": "Swipe horizontally to explore all tracks",
+    "allTiers": "All Tiers",
     "clear": "Clear",
     "hideCompleted": "Hide Completed",
     "showCompleted": "Show Completed",
-    "searchPlaceholder": "Search challenges..."
+    "searchPlaceholder": "Search practice challenges...",
+    "listView": "List view",
+    "gridView": "Grid view"
   },
   "difficulty": {
     "EASY": "Easy",
@@ -71,6 +99,17 @@
     "jsUndefined": "Your result is undefined. Make sure you assign a value to `result`.",
     "jsMismatch": "Your result doesn't match the expected output. Check your logic and try again.",
     "noAssertions": "No assertions were called. Write assertions like: await expect(locator).toHaveText('...');",
+    "grading": {
+      "missingEvidence": "The required calls were not executed in the test path: {{methods}}. Run them in the scenario itself; declarations or unused helpers don't count.",
+      "forbiddenMethods": "Remove these forbidden methods from the test: {{methods}}.",
+      "structuralLocator": "Use semantic locators such as getByRole or getByLabel instead of structural page.locator(...) calls.",
+      "forcedAction": "Remove the forced action. Let Playwright check actionability and call the action without a truthy force option.",
+      "directDomAccess": "Keep browser DOM access out of the test. Use Playwright locators and web-first assertions instead of document, window, globalThis, or evaluate.",
+      "swallowedError": "Don't swallow failures. Let the Playwright action or assertion fail the test instead of catching and ignoring it.",
+      "failedAssertion": "The {{matcher}} assertion failed and was suppressed. Fix the expected result and let the assertion fail the test when it is wrong.",
+      "failedAction": "The {{method}} Playwright action failed and was suppressed. Fix the locator or action and let the error fail the test.",
+      "sourceAnalysisUnavailable": "The test could not be checked safely. Run it again so its source policy can be analyzed."
+    },
     "selectorMismatch": "Selector does not match the target element",
     "executionError": "Execution Error",
     "alreadyCompleted": "You have already completed this challenge! Feel free to practice again.",
@@ -147,6 +186,7 @@
     "playwright-locators": "Locators",
     "playwright-assertions": "Assertions",
     "playwright-waits": "Wait Strategies",
+    "playwright-debugging": "Debugging & Reliability",
     "playwright-pom": "Page Object Model",
     "playwright-data-driven": "Data-Driven Testing",
     "playwright-infrastructure": "Test Infrastructure",
@@ -160,10 +200,35 @@
     "allTypes": "All Types",
     "comingSoon": "Coming Soon",
     "completed": "completed",
+    "completedState": "Completed",
+    "start": "Start",
+    "review": "Review",
     "rank": "Rank",
     "challenge": "Challenge",
     "stats": "Stats",
     "creatingNew": "Creating new challenges...",
     "craftingScenarios": "I'm crafting new scenarios based on real bugs I've found. Check back soon!"
+  },
+  "howPractice": {
+    "title": "How Practice works",
+    "description": "Practice is independent. Use Learn lessons when you want context, or jump directly into any topic.",
+    "steps": {
+      "choose": {
+        "title": "Choose",
+        "description": "Pick a challenge"
+      },
+      "solve": {
+        "title": "Solve",
+        "description": "Write and run your test code"
+      },
+      "run": {
+        "title": "Run",
+        "description": "Execute and verify"
+      },
+      "review": {
+        "title": "Review",
+        "description": "Check the result and improve"
+      }
+    }
   }
 }
