@@ -198,12 +198,12 @@
             "xpReward": 200,
             "order": 4100,
             "title": {
-                "en": "Capstone Checkpoint: Repair Checkout Recovery",
-                "id": "Capstone Checkpoint: Perbaiki Recovery Checkout"
+                "en": "Repair Checkout Recovery",
+                "id": "Perbaiki Recovery Checkout"
             },
             "description": {
                 "en": "Review an untrustworthy generated test and repair one checkout recovery scenario with business-relevant evidence.",
-                "id": "Review generated test yang nggak bisa dipercaya, lalu perbaiki satu checkout recovery scenario dengan business-relevant evidence."
+                "id": "Tinjau test hasil generate yang tidak dapat dipercaya, lalu perbaiki satu skenario pemulihan checkout dengan evidence yang relevan dengan kebutuhan bisnis."
             },
             "instructions": {
                 "en": "# Repair the Checkout Recovery Signal\n\nThe product rule is: quantity must be at least `1`, and after correcting an invalid quantity the customer can still place the order.\n\nThe starter was generated with structural selectors, a forced click, a fixed wait, a manual truthiness assertion, and swallowed failure. Replace it with one independent recovery test that:\n\n1. opens `/app/checkout.html`;\n2. enters quantity `0` and submits;\n3. proves the alert says exactly `Quantity must be at least 1`;\n4. corrects the quantity to `2` and submits again;\n5. proves the stale alert is hidden;\n6. proves the confirmation is visible and contains `2 items`;\n7. uses label/role locator contracts and web-first assertions; and\n8. contains no structural locator, `waitForTimeout`, forced action, `evaluate`/direct DOM manipulation, manual `textContent`/truthiness check, or swallowed error.\n\nThe Practice also checks that the two submits happen in order with input values `0` and `2`, and that the expected state appears after each submit.\n\nKeep this as one coherent recovery scenario. One focused test is enough; no abstraction is required. Variable names and organization are otherwise your choice. The behavior and evidence are the contract.",
