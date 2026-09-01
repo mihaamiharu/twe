@@ -164,14 +164,14 @@ Choose timeouts from durations seen in actual runs. If only one operation is slo
 
 ## When it fails
 
-| Observation                                     | Likely problem                                       | Check first                                               |
-| ----------------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------- |
-| Tests change real or unexpected data            | Target environment was not validated safely          | Base URL, project name, and environment variables         |
-| Local and CI runs execute different scenarios   | Discovery, grep, or project filters have drifted     | Final config and exact commands                           |
-| Suite runtime grows much faster than test count | Project dimensions formed a Cartesian product        | Project list and executions per scenario                  |
-| All failed tests take a long time               | Global timeout waits for states that never appear    | First failed test, assertion call log, and setup duration |
-| One project fails before test code starts       | Project-specific option or dependency setup is wrong | Project config, dependency result, actual input values    |
-| Credentials appear in artifacts                 | Secret entered visible UI or was logged              | Trace, screenshot, reporter output, test attachments      |
+| Observation                                     | Likely problem                                         | Check first                                               |
+| ----------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------- |
+| Tests change real or unexpected data            | Target environment was not validated safely            | Base URL, project name, and environment variables         |
+| Local and CI runs execute different scenarios   | Discovery, grep, or project filters have drifted       | Final config and exact commands                           |
+| Suite runtime grows much faster than test count | Project dimensions formed a Cartesian product          | Project list and executions per scenario                  |
+| All failed tests take a long time               | Test timeout is too large for states that never appear | First failed test, assertion call log, and setup duration |
+| One project fails before test code starts       | Project-specific option or dependency setup is wrong   | Project config, dependency result, actual input values    |
+| Credentials appear in artifacts                 | Secret entered visible UI or was logged                | Trace, screenshot, reporter output, test attachments      |
 
 Check the project and environment the runner actually used before editing the test. The same source code can run under a different base URL, storage state, locale, or device profile.
 
@@ -195,7 +195,7 @@ Ask AI to calculate the number of test executions and list its assumptions, not 
 
 ## Check your understanding
 
-A generated configuration defines three browsers, three devices, two locales, two roles, and staging plus production projects. It applies a 120-second global test timeout and falls back to the production URL when `BASE_URL` is absent. The team has 300 tests.
+A generated configuration defines three browsers, three devices, two locales, two roles, and staging plus production projects. It applies a 120-second test timeout and falls back to the production URL when `BASE_URL` is absent. The team has 300 tests.
 
 What risks and costs should you raise in review? How would you reduce this to a smaller and safer first configuration? For each change, decide whether it belongs in the test, a fixture, local configuration, or CI.
 
@@ -207,7 +207,7 @@ One reasonable review is:
 - Calculate the proposed 72 variants and 21,600 executions before retries.
 - Identify the primary supported browser and the small set of scenarios that need other browser, device, locale, or role coverage.
 - Keep production testing separate, require authorization, use read-only flows where appropriate, and define its own test-data and safety rules.
-- Return the global timeout to a duration supported by actual runs and investigate slow operations separately.
+- Return the test timeout to a duration supported by actual runs and investigate slow operations separately.
 - Give every retained project a report name that describes what ran and document why it is needed.
 - Verify that authentication state and secrets are securely supplied and never committed or attached.
 

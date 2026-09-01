@@ -164,14 +164,14 @@ Pilih timeout dari durasi yang benar-benar terlihat saat aplikasi berjalan. Kala
 
 ## Kalau gagal, mulai cek dari mana?
 
-| Yang terjadi                                            | Kemungkinan penyebab                                           | Cek dulu                                                    |
-| ------------------------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------------- |
-| Test mengubah data asli atau data yang nggak diharapkan | Target environment nggak divalidasi dengan aman                | `baseURL`, nama project, dan environment variable           |
-| Local dan CI menjalankan scenario berbeda               | Lokasi test, `grep`, atau project filter sudah berbeda         | Configuration akhir dan command yang benar-benar dijalankan |
-| Runtime naik jauh lebih cepat dari jumlah test          | Kombinasi project melipatgandakan setiap scenario              | Daftar project dan jumlah execution per scenario            |
-| Setiap test yang fail membutuhkan waktu lama            | Global timeout menunggu expected result yang nggak akan muncul | Test fail pertama, assertion call log, dan durasi setup     |
-| Satu project berhenti sebelum test code berjalan        | Setting khusus project atau dependency setup salah             | Project configuration, hasil dependency, dan input value    |
-| Credential muncul di artifact                           | Secret diketik di UI yang terlihat atau tercetak di log        | Trace, screenshot, reporter output, dan test attachment     |
+| Yang terjadi                                            | Kemungkinan penyebab                                                    | Cek dulu                                                    |
+| ------------------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Test mengubah data asli atau data yang nggak diharapkan | Target environment nggak divalidasi dengan aman                         | `baseURL`, nama project, dan environment variable           |
+| Local dan CI menjalankan scenario berbeda               | Lokasi test, `grep`, atau project filter sudah berbeda                  | Configuration akhir dan command yang benar-benar dijalankan |
+| Runtime naik jauh lebih cepat dari jumlah test          | Kombinasi project melipatgandakan setiap scenario                       | Daftar project dan jumlah execution per scenario            |
+| Setiap test yang fail membutuhkan waktu lama            | Test timeout terlalu besar untuk expected result yang nggak akan muncul | Test fail pertama, assertion call log, dan durasi setup     |
+| Satu project berhenti sebelum test code berjalan        | Setting khusus project atau dependency setup salah                      | Project configuration, hasil dependency, dan input value    |
+| Credential muncul di artifact                           | Secret diketik di UI yang terlihat atau tercetak di log                 | Trace, screenshot, reporter output, dan test attachment     |
 
 Cek project dan environment yang benar-benar digunakan oleh runner sebelum mengedit test. Source code yang sama bisa menjalankan kondisi berbeda ketika `baseURL`, storage state, locale, atau device profile berubah.
 
@@ -195,7 +195,7 @@ Minta AI menghitung jumlah test execution dan menyebutkan asumsi yang dipakai, b
 
 ## Coba cek pemahamanmu
 
-AI membuat configuration dengan tiga browser, tiga device, dua locale, dua role, serta project staging dan production. Semuanya memakai global test timeout 120 detik dan fallback ke production URL saat `BASE_URL` nggak ada. Team punya 300 test.
+AI membuat configuration dengan tiga browser, tiga device, dua locale, dua role, serta project staging dan production. Semuanya memakai test timeout 120 detik dan fallback ke production URL saat `BASE_URL` nggak ada. Team punya 300 test.
 
 Risiko dan biaya apa yang perlu kamu angkat saat review? Bagaimana kamu membuat configuration awal yang lebih kecil dan aman? Untuk setiap perubahan, tentukan apakah tempatnya ada di test, fixture, local configuration, atau CI.
 
@@ -207,7 +207,7 @@ Salah satu review yang masuk akal:
 - Hitung 72 variasi dan 21.600 test execution sebelum retry.
 - Tentukan browser utama, lalu pilih sedikit scenario yang memang perlu coverage browser, device, locale, atau role lain.
 - Pisahkan production testing, wajibkan authorization, gunakan flow read-only jika sesuai, lalu siapkan aturan test data dan keamanan sendiri.
-- Kembalikan global timeout ke durasi yang sesuai dengan hasil run, lalu cek operation lambat secara terpisah.
+- Kembalikan test timeout ke durasi yang sesuai dengan hasil run, lalu cek operation lambat secara terpisah.
 - Beri setiap project yang dipertahankan nama report dan alasan yang jelas.
 - Pastikan authentication state dan secret diberikan dengan aman, nggak masuk repository, dan nggak tersimpan sebagai attachment.
 
