@@ -1,19 +1,43 @@
 {
-    "title": "Changelog",
-    "subtitle": "Stay up to date with the latest features and improvements",
-    "types": {
-        "feature": "New Feature",
-        "improvement": "Improvement",
-        "fix": "Bug Fix",
-        "content": "New Content"
+  "title": "Changelog",
+  "subtitle": "Stay up to date with the latest features and improvements",
+  "types": {
+    "feature": "New Feature",
+    "improvement": "Improvement",
+    "fix": "Bug Fix",
+    "content": "New Content"
+  },
+  "entries": [
+    {
+      "date": "2026-09-01",
+      "type": "fix",
+      "title": "Release Readiness",
+      "description": "Hardened capstone and evidence-based grading, improved practice error recovery, added guarded curriculum migration tooling, and expanded cross-locale end-to-end coverage for a safer release."
     },
-    "entries": [
-        {
-            "date": "2026-02-25",
-            "version": "1.0.0",
-            "type": "feature",
-            "title": "Platform Launch",
-            "description": "Welcome to TestingWithEkki! We're excited to launch the platform with comprehensive Playwright tutorials, interactive coding challenges, and a global leaderboard. Start your journey to becoming a test automation expert today."
-        }
-    ]
+    {
+      "date": "2026-09-01",
+      "type": "content",
+      "title": "Web Automation Curriculum",
+      "description": "Refreshed the Web Automation curriculum across nine modules with clearer bilingual lessons, visual learning aids, runnable examples, and practice challenges aligned to each learning outcome."
+    },
+    {
+      "date": "2026-09-01",
+      "type": "improvement",
+      "title": "Learn and Practice",
+      "description": "Introduced unified Learn and Practice catalogs with guided module discovery, search and filters, progress tracking, completion rewards, preview mode, and a more focused in-browser practice workspace."
+    },
+    {
+      "date": "2026-08-31",
+      "type": "feature",
+      "title": "Rebrand v1",
+      "description": "Launched a refreshed TestingWithEkki experience with a new visual system, QA illustrations, improved homepage and public surfaces, a community-focused leaderboard, Labs, and updated account and profile flows."
+    },
+    {
+      "date": "2026-02-25",
+      "version": "1.0.0",
+      "type": "feature",
+      "title": "Platform Launch",
+      "description": "Welcome to TestingWithEkki! We're excited to launch the platform with comprehensive Playwright tutorials, interactive coding challenges, and a global leaderboard. Start your journey to becoming a test automation expert today."
+    }
+  ]
 }
