@@ -94,6 +94,7 @@ describe('PlaygroundHeader', () => {
         const runBtn = loaderIcon.closest('button');
 
         expect(runBtn).toHaveProperty('disabled', true);
+        expect(runBtn?.getAttribute('aria-busy')).toBe('true');
     });
 
     it('should show submit button when passed', () => {
