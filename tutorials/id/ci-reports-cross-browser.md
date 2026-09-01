@@ -88,7 +88,7 @@ Kalau team nggak pernah menguji deployment, hapus pilihan `BASE_URL` tersebut. K
 
 ### 2. Install runtime, dependency, dan browser dari awal
 
-Karena repository ini memakai Bun, berikut GitHub Actions job yang selaras dengan repository:
+Karena repository ini memakai Bun, teaching example berikut menggunakan command dan artifact path dari repository sambil menambahkan runtime pin yang eksplisit:
 
 ```yaml
 name: Checkout smoke
@@ -138,7 +138,7 @@ jobs:
           retention-days: 14
 ```
 
-Versi dan command di atas mengikuti Bun workflow repository ini. Di repository lain, ganti `1.3.4`, command untuk lockfile, browser yang diinstal, dan test command sesuai setup repository tersebut. Kalau versi runtime disimpan dalam file di repository, gunakan file itu sebagai sumber. Jangan memakai alias versi yang bisa berubah sewaktu-waktu.
+Command dan artifact path di atas mengikuti repository ini, sedangkan `1.3.4` adalah teaching pin yang eksplisit. Value tersebut bukan bukti bahwa workflow repository saat ini sudah memakai runtime pin. Repository yang dirawat sebaiknya mendeklarasikan Bun version melalui committed source seperti `packageManager`, `engines.bun`, atau version file, lalu membuat CI membaca source tersebut. Tanpa deklarasi itu, `setup-bun` bisa fallback ke `latest`, sehingga dua clean runner yang dimulai pada waktu berbeda bisa mendapat runtime berbeda. Di repository lain, ganti runtime version, command untuk lockfile, browser yang diinstal, dan test command dengan value yang memang dideklarasikan repository tersebut.
 
 Contoh minimal ini nggak memakai secret karena checkout smoke nggak membutuhkannya. Kalau authenticated test membutuhkan credential, berikan melalui protected environment yang memang diberi akses atau gunakan disposable test account. Pull request dari fork mungkin nggak menerima secret, dan code dari pull request nggak boleh mendapat production credential. Job ini hanya punya read-only access ke repository, durasinya dibatasi, dan artifact debugging tetap disimpan setelah test fail.
 
