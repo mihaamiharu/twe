@@ -125,7 +125,7 @@ function LearnPage() {
   const updateSearch = (updates: Partial<LearnSearch>) => {
     void navigate({
       to: '.',
-      search: { ...searchParams, ...updates },
+      search: (previous) => ({ ...previous, ...updates }),
       replace: true,
     });
   };
