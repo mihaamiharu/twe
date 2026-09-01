@@ -230,13 +230,13 @@ function LeaderboardPage() {
                           data-current-user={isCurrentUser ? 'true' : undefined}
                           style={getDelay(index)}
                           className={cn(
-                            'group flex items-center gap-3 px-4 py-4 transition-colors animate-in fade-in slide-in-from-bottom-1 fill-mode-backwards motion-reduce:animate-none motion-reduce:opacity-100 sm:gap-4 sm:px-5',
+                            'group grid grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 transition-colors animate-in fade-in slide-in-from-bottom-1 fill-mode-backwards motion-reduce:animate-none motion-reduce:opacity-100 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:gap-4 sm:px-5 md:grid-cols-[72px_minmax(0,1fr)_180px_120px]',
                             isCurrentUser
                               ? 'bg-[var(--orange-tint)]/55'
                               : 'bg-[var(--paper-surface)] hover:bg-[var(--warm-canvas)]/60',
                           )}
                         >
-                          <div className="flex w-8 flex-none items-center justify-center sm:w-12">
+                          <div className="flex items-center justify-center">
                             <span
                               className={cn(
                                 'font-mono text-sm font-medium',
@@ -249,22 +249,23 @@ function LeaderboardPage() {
                             </span>
                           </div>
 
-                          <div className="h-11 w-11 flex-none overflow-hidden rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] sm:h-12 sm:w-12">
-                            {user.image ? (
-                              <img
-                                src={user.image}
-                                alt={displayName}
-                                className="h-full w-full object-cover"
-                                loading="lazy"
-                              />
-                            ) : (
-                              <div className="flex h-full w-full items-center justify-center font-semibold text-[var(--brand-orange)]">
-                                {displayName.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </div>
+                          <div className="flex min-w-0 items-center gap-3 sm:gap-4">
+                            <div className="h-11 w-11 flex-none overflow-hidden rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] sm:h-12 sm:w-12">
+                              {user.image ? (
+                                <img
+                                  src={user.image}
+                                  alt={displayName}
+                                  className="h-full w-full object-cover"
+                                  loading="lazy"
+                                />
+                              ) : (
+                                <div className="flex h-full w-full items-center justify-center font-semibold text-[var(--brand-orange)]">
+                                  {displayName.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </div>
 
-                          <div className="min-w-0 flex-1">
+                            <div className="min-w-0 flex-1">
                             <div className="flex min-w-0 items-center gap-2">
                               <span className="truncate font-semibold">
                                 {displayName}
@@ -307,6 +308,7 @@ function LeaderboardPage() {
                                 ))}
                               </div>
                             )}
+                            </div>
                           </div>
 
                           <div className="hidden flex-none text-right md:block">
