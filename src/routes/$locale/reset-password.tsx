@@ -21,14 +21,22 @@ import {
 import { KeyRound, CheckCircle2, AlertCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
+import { z } from 'zod';
+
+const searchSchema = z.object({
+  token: z.string().optional(),
+  error: z.string().optional(),
+});
 
 export const Route = createFileRoute('/$locale/reset-password')({
+  validateSearch: searchSchema,
   component: ResetPasswordPage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Reset Password | TestingWithEkki',
-      description: 'Set a new password for your TestingWithEkki account.',
+      title: i18n.t('auth:seo.resetPassword.title', { lng: locale }),
+      description: i18n.t('auth:seo.resetPassword.description', { lng: locale }),
       path: '/reset-password',
       locale,
       noIndex: true,
@@ -38,6 +46,7 @@ export const Route = createFileRoute('/$locale/reset-password')({
 
 function ResetPasswordPage() {
   const { locale } = useParams({ from: '/$locale/reset-password' });
+  const { token, error: errorParam } = Route.useSearch();
   const { t } = useTranslation(['auth', 'common']);
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
@@ -45,11 +54,6 @@ function ResetPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
-
-  // Get token from URL query params
-  const searchParams = new URLSearchParams(window.location.search);
-  const token = searchParams.get('token');
-  const errorParam = searchParams.get('error');
 
   // Handle error from URL (e.g., INVALID_TOKEN)
   if (errorParam) {

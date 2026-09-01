@@ -1,4 +1,8 @@
 {
+  "seo": {
+    "title": "Profil | TestingWithEkki",
+    "description": "Kelola profil, progres, dan pencapaian TestingWithEkki kamu."
+  },
   "header": {
     "title": "Profil Kamu",
     "level": "Level {{level}}",

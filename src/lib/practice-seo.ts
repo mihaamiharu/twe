@@ -1,6 +1,12 @@
 import type { ChallengeCatalogDetail } from '@/lib/catalog.types';
 import i18n from '@/lib/i18n';
-import { BASE_URL, createSeoHead } from '@/lib/seo';
+import {
+  BASE_URL,
+  ORGANIZATION_ID,
+  PERSON_ID,
+  WEBSITE_ID,
+  createSeoHead,
+} from '@/lib/seo';
 
 type PracticeSeoChallenge = Pick<
   ChallengeCatalogDetail,
@@ -106,6 +112,7 @@ export function createPracticeDetailSeoHead({
       {
         '@context': 'https://schema.org',
         '@type': 'LearningResource',
+        '@id': `${url}#learningresource`,
         name: challenge.title,
         description: challenge.description,
         learningResourceType: typeLabel,
@@ -115,11 +122,9 @@ export function createPracticeDetailSeoHead({
         inLanguage: locale,
         url,
         image: ogImage,
-        author: {
-          '@type': 'Organization',
-          name: 'TestingWithEkki',
-          url: BASE_URL,
-        },
+        author: { '@id': PERSON_ID },
+        publisher: { '@id': ORGANIZATION_ID },
+        isPartOf: { '@id': WEBSITE_ID },
       },
     ],
   });

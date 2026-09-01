@@ -16,14 +16,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { submitContactMessage } from '@/server/contact.fn';
 import { createSeoHead } from '@/lib/seo';
 import { toast } from 'sonner';
+import i18n from '@/lib/i18n';
 
 export const Route = createFileRoute('/$locale/contact')({
   component: ContactPage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Contact | TestingWithEkki',
-      description: 'Contact Ekki about QA mentoring, partnerships, sponsorships, career opportunities, or questions about TestingWithEkki.',
+      title: i18n.t('contact:seo.title', { lng: locale }),
+      description: i18n.t('contact:seo.description', { lng: locale }),
       path: '/contact',
       locale,
     });

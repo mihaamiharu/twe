@@ -15,14 +15,15 @@ import {
 } from '@/components/ui/card';
 import { ArrowLeft, Mail, CheckCircle2 } from 'lucide-react';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
 
 export const Route = createFileRoute('/$locale/forgot-password')({
   component: ForgotPasswordPage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Forgot Password | TestingWithEkki',
-      description: 'Reset your TestingWithEkki password.',
+      title: i18n.t('auth:seo.forgotPassword.title', { lng: locale }),
+      description: i18n.t('auth:seo.forgotPassword.description', { lng: locale }),
       path: '/forgot-password',
       locale,
       noIndex: true,

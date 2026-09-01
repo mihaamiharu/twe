@@ -1,5 +1,11 @@
 import type { TutorialCatalogListItem } from './catalog.types';
-import { BASE_URL, createSeoHead } from './seo';
+import {
+  BASE_URL,
+  ORGANIZATION_ID,
+  PERSON_ID,
+  WEBSITE_ID,
+  createSeoHead,
+} from './seo';
 import i18n from './i18n';
 
 type LearnSeoLesson = Pick<
@@ -65,34 +71,25 @@ export function createLearnDetailSeoHead({ lesson, locale }: LearnSeoOptions) {
       {
         '@context': 'https://schema.org',
         '@type': 'Article',
+        '@id': `${url}#article`,
         headline: lesson.title,
         description: lesson.description,
         image: ogImage,
         articleSection: learnLabel,
-        keywords: lesson.tags.join(', '),
         inLanguage: locale,
         isAccessibleForFree: true,
-        author: {
-          '@type': 'Organization',
-          name: 'TestingWithEkki',
-          url: BASE_URL,
-        },
-        publisher: {
-          '@type': 'Organization',
-          name: 'TestingWithEkki',
-          logo: {
-            '@type': 'ImageObject',
-            url: `${BASE_URL}/logo-icon-512.png`,
-          },
-        },
+        author: { '@id': PERSON_ID },
+        publisher: { '@id': ORGANIZATION_ID },
+        isPartOf: { '@id': WEBSITE_ID },
         mainEntityOfPage: {
           '@type': 'WebPage',
-          '@id': url,
+          '@id': `${url}#webpage`,
         },
       },
       {
         '@context': 'https://schema.org',
         '@type': 'LearningResource',
+        '@id': `${url}#learningresource`,
         name: lesson.title,
         description: lesson.description,
         learningResourceType: 'Lesson',
@@ -103,11 +100,9 @@ export function createLearnDetailSeoHead({ lesson, locale }: LearnSeoOptions) {
         isAccessibleForFree: true,
         url,
         image: ogImage,
-        author: {
-          '@type': 'Organization',
-          name: 'TestingWithEkki',
-          url: BASE_URL,
-        },
+        author: { '@id': PERSON_ID },
+        publisher: { '@id': ORGANIZATION_ID },
+        isPartOf: { '@id': WEBSITE_ID },
       },
     ],
   });

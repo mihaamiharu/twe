@@ -1,5 +1,9 @@
 {
   "privacy": {
+    "seo": {
+      "title": "Kebijakan Privasi | TestingWithEkki",
+      "description": "Baca cara TestingWithEkki mengumpulkan, menggunakan, dan melindungi data pribadi."
+    },
     "title": "Kebijakan Privasi",
     "lastUpdated": "Terakhir diperbarui: Januari 2026",
     "intro": "TestingWithEkki (\"kami\") berkomitmen untuk melindungi data pribadi Anda sesuai dengan Undang-Undang Perlindungan Data Pribadi (UU PDP) dan peraturan yang berlaku di Indonesia. Kebijakan ini menjelaskan bagaimana kami mengumpulkan, menggunakan, memproses, dan melindungi informasi Anda.",
@@ -64,6 +68,10 @@
     }
   },
   "terms": {
+    "seo": {
+      "title": "Syarat dan Ketentuan | TestingWithEkki",
+      "description": "Baca ketentuan penggunaan platform pembelajaran test automation interaktif TestingWithEkki."
+    },
     "title": "Syarat dan Ketentuan",
     "lastUpdated": "Terakhir Diperbarui: Januari 2026",
     "intro": "Selamat datang di TestingWithEkki. Dengan mengakses atau menggunakan situs web kami, Anda setuju untuk terikat oleh Syarat dan Ketentuan ini.",

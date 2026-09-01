@@ -316,6 +316,15 @@ describe('Learn experience contracts', () => {
       'LearningResource',
     ]);
     expect(schemas[1]?.['headline']).toBe(english.title);
+    expect(schemas[1]?.['author']).toEqual({
+      '@id': 'https://testingwithekki.com/en/about#person',
+    });
+    expect(schemas[1]?.['publisher']).toEqual({
+      '@id': 'https://testingwithekki.com/#organization',
+    });
+    expect(schemas[2]?.['author']).toEqual({
+      '@id': 'https://testingwithekki.com/en/about#person',
+    });
     expect(schemas[2]?.['timeRequired']).toBe('PT18M');
   });
 

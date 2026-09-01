@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { z } from 'zod';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
 
 const searchSchema = z.object({
   token: z.string().optional(),
@@ -24,8 +25,8 @@ export const Route = createFileRoute('/$locale/confirm-subscription')({
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Confirm Subscription | TestingWithEkki',
-      description: 'Confirm your newsletter subscription for TestingWithEkki.',
+      title: i18n.t('auth:seo.confirmSubscription.title', { lng: locale }),
+      description: i18n.t('auth:seo.confirmSubscription.description', { lng: locale }),
       path: '/confirm-subscription',
       locale,
       noIndex: true,

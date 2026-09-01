@@ -80,6 +80,15 @@ describe('Practice detail SEO', () => {
     expect(jsonLd[1]?.['name']).toBe(challenge.title);
     expect(jsonLd[1]?.['description']).toBe(challenge.description);
     expect(jsonLd[1]?.['inLanguage']).toBe('id');
+    expect(jsonLd[1]?.['@id']).toBe(
+      'https://testingwithekki.com/id/practice/pw-locator-intro#learningresource',
+    );
+    expect(jsonLd[1]?.['author']).toEqual({
+      '@id': 'https://testingwithekki.com/en/about#person',
+    });
+    expect(jsonLd[1]?.['publisher']).toEqual({
+      '@id': 'https://testingwithekki.com/#organization',
+    });
   });
 
   test('marks missing detail content as noindex while retaining alternate links', () => {

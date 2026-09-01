@@ -11,7 +11,11 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { AboutHeroVisual } from '@/components/rebrand-visuals';
-import { createSeoHead } from '@/lib/seo';
+import {
+  createPersonSchema,
+  createProfilePageSchema,
+  createSeoHead,
+} from '@/lib/seo';
 import { LocaleRoutes, localeParams } from '@/lib/navigation';
 import i18n from '@/lib/i18n';
 
@@ -21,9 +25,19 @@ export const Route = createFileRoute('/$locale/about')({
     const locale = params.locale || 'en';
     return createSeoHead({
       title: i18n.t('about:seo.title', { lng: locale }),
-      description: 'Meet Ekki, the QA/SDET and creator behind TestingWithEkki.',
+      description: i18n.t('about:seo.description', { lng: locale }),
       path: '/about',
       locale,
+      jsonLd: [
+        createProfilePageSchema({
+          locale,
+          title: i18n.t('about:seo.title', { lng: locale }),
+          description: i18n.t('about:seo.description', { lng: locale }),
+        }),
+        createPersonSchema({
+          description: i18n.t('about:seo.description', { lng: locale }),
+        }),
+      ],
     });
   },
 });

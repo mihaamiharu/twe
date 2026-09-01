@@ -22,12 +22,9 @@ import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { CookieConsent } from '@/components/cookie-consent';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
-import i18n from '@/lib/i18n';
 import { organizationSchema } from '@/lib/seo';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
-
-const HOME_OG_IMAGE = 'https://testingwithekki.com/api/og?type=Home';
 
 function isLocaleProductPath(pathname: string) {
   return /^\/(en|id)(?:\/|$)/.test(pathname);
@@ -83,36 +80,8 @@ export const Route = createRootRouteWithContext<RootContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        name: 'keywords',
-        content: i18n.t('common:seo.keywords'),
-      },
-      {
-        property: 'og:title',
-        content: i18n.t('common:seo.ogTitle'),
-      },
-      {
-        property: 'og:description',
-        content: i18n.t('common:seo.ogDescription'),
-      },
-      {
-        property: 'og:type',
-        content: 'website',
-      },
-      {
         property: 'og:site_name',
         content: 'TestingWithEkki',
-      },
-      {
-        property: 'og:image',
-        content: HOME_OG_IMAGE,
-      },
-      {
-        property: 'og:image:width',
-        content: '1200',
-      },
-      {
-        property: 'og:image:height',
-        content: '630',
       },
       {
         name: 'twitter:card',
@@ -125,18 +94,6 @@ export const Route = createRootRouteWithContext<RootContext>()({
       {
         name: 'twitter:creator',
         content: '@ekkisyam2310',
-      },
-      {
-        name: 'twitter:title',
-        content: i18n.t('common:seo.ogTitle'),
-      },
-      {
-        name: 'twitter:description',
-        content: i18n.t('common:seo.ogDescription'),
-      },
-      {
-        name: 'twitter:image',
-        content: HOME_OG_IMAGE,
       },
       {
         name: 'theme-color',

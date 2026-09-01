@@ -5,6 +5,9 @@ import { useState } from 'react';
 
 export const Route = createFileRoute('/test-sentry')({
     component: TestSentryPage,
+    head: () => ({
+        meta: [{ name: 'robots', content: 'noindex, nofollow' }],
+    }),
 });
 
 function TestSentryPage() {

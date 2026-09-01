@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { leaderboardQueryOptions } from '@/lib/leaderboard.query';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
 
 interface LeaderboardEntry {
   id: string;
@@ -60,9 +61,8 @@ export const Route = createFileRoute('/$locale/leaderboard')({
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Leaderboard | TestingWithEkki',
-      description:
-        'See how the TestingWithEkki community is building stronger automation skills together.',
+      title: i18n.t('leaderboard:seo.title', { lng: locale }),
+      description: i18n.t('leaderboard:seo.description', { lng: locale }),
       path: '/leaderboard',
       locale,
     });

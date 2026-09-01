@@ -12,7 +12,7 @@ import { QaDoodle } from '@/components/qa-illustrations';
 import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
 import { authQueryOptions } from '@/lib/auth.query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
-import { BASE_URL, createSeoHead, websiteSchema } from '@/lib/seo';
+import { BASE_URL, createSeoHead, createWebsiteSchema } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { LocaleRoutes, localeParams } from '@/lib/navigation';
 
@@ -36,7 +36,12 @@ export const Route = createFileRoute('/$locale/')({
       path: '/',
       locale,
       ogImage: `${BASE_URL}/api/og?type=Home`,
-      jsonLd: [websiteSchema],
+      jsonLd: [
+        createWebsiteSchema({
+          locale,
+          description: i18n.t('common:seo.description', { lng: locale }),
+        }),
+      ],
     });
   },
 });

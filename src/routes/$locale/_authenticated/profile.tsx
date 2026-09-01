@@ -28,15 +28,15 @@ import { EmptyState } from '@/components/empty-state';
 import { getUserSettings } from '@/server/user.fn';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
 
 export const Route = createFileRoute('/$locale/_authenticated/profile')({
   component: ProfilePage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Profile | TestingWithEkki',
-      description:
-        'Manage your TestingWithEkki profile, progress, and achievements.',
+      title: i18n.t('profile:seo.title', { lng: locale }),
+      description: i18n.t('profile:seo.description', { lng: locale }),
       path: '/profile',
       locale,
       noIndex: true,

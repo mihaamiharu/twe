@@ -4,8 +4,7 @@
     "title": "TestingWithEkki — Practical Software Testing",
     "description": "Grow beyond test execution through Web Automation lessons and hands-on challenges in Practice.",
     "ogTitle": "Grow beyond test execution. | TestingWithEkki",
-    "ogDescription": "Build the foundations for Web Automation, learn Playwright, and practice your skills in the browser.",
-    "keywords": "playwright, automation testing, qa, software testing, learn qa automation, learn web automation, learn playwright, end-to-end testing, javascript testing"
+    "ogDescription": "Build the foundations for Web Automation, learn Playwright, and practice your skills in the browser."
   },
   "navigation": {
     "home": "Home",

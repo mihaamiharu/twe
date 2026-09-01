@@ -1,4 +1,8 @@
 {
+  "seo": {
+    "title": "Profile | TestingWithEkki",
+    "description": "Manage your TestingWithEkki profile, progress, and achievements."
+  },
   "header": {
     "title": "Your Profile",
     "level": "Level {{level}}",

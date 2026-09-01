@@ -2,14 +2,15 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useTranslation } from 'react-i18next';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
 import { createSeoHead } from '@/lib/seo';
+import i18n from '@/lib/i18n';
 
 export const Route = createFileRoute('/$locale/terms')({
   component: TermsPage,
   head: ({ params }) => {
     const locale = params.locale || 'en';
     return createSeoHead({
-      title: 'Terms of Service | TestingWithEkki',
-      description: 'Terms of Service for TestingWithEkki — the interactive test automation learning platform.',
+      title: i18n.t('legal:terms.seo.title', { lng: locale }),
+      description: i18n.t('legal:terms.seo.description', { lng: locale }),
       path: '/terms',
       locale,
     });
