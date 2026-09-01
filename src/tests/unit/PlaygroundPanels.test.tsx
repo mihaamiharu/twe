@@ -3,7 +3,6 @@ import { render, screen, cleanup } from '@testing-library/react';
 import { EditorPanel } from '@/components/challenges/playground/editor-panel';
 import { SelectorPanel } from '@/components/challenges/playground/selector-panel';
 import { ResultsPanel } from '@/components/challenges/playground/results-panel';
-import type { TestResult } from '@/components/challenges/test-results';
 import {
     createChallenge,
     createPlaygroundState,
@@ -53,17 +52,6 @@ void mock.module(
                 onChange={(event) => onChange(event.target.value, defaultType)}
             />
             <button data-testid="validate-btn" onClick={onValidate}>Validate</button>
-        </div>
-    ),
-}));
-
-void mock.module(
-'@/components/challenges/test-results', () => ({
-    TestResults: ({ results }: { results: TestResult[] }) => (
-        <div data-testid="test-results">
-            {results.map((r) => (
-                <div key={r.id} data-testid={`result-${r.id}`}>{r.name}: {r.passed ? 'PASS' : 'FAIL'}</div>
-            ))}
         </div>
     ),
 }));
@@ -230,8 +218,8 @@ describe('Playground Panels', () => {
                 />
             );
 
-            expect(screen.getByTestId('test-results')).toBeTruthy();
-            expect(screen.getByText('Test 1: PASS')).toBeTruthy();
+            expect(screen.getByText('Test 1')).toBeTruthy();
+            expect(screen.getByText('✓ PASSED')).toBeTruthy();
         });
 
         it('should show console output in console tab', () => {
