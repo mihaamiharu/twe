@@ -23,19 +23,9 @@ export class TutorialsPage extends BasePage {
     await this.page.waitForLoadState('domcontentloaded');
     await this.page.waitForLoadState('load');
     await expect(this.currentLessonsPreview).toBeVisible();
-    await this.page.waitForFunction(
-      () => {
-        const appWindow = window as Window & {
-          __TSS_START_OPTIONS__?: unknown;
-          $_TSR?: unknown;
-        };
-        return (
-          Boolean(appWindow.__TSS_START_OPTIONS__) &&
-          (appWindow.$_TSR?.initialized === true ||
-            appWindow.$_TSR === undefined)
-        );
-      },
-      undefined,
+    await expect(this.page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
       { timeout: 20_000 },
     );
   }

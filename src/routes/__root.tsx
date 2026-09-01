@@ -170,6 +170,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   const locale = params.locale || 'en';
   const pathname = context?.pathname || '';
   const forcedTheme = isLocaleProductPath(pathname) ? 'light' : undefined;
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -203,7 +208,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         />
         {/* JSON-LD Organization Schema now managed via head.scripts */}
       </head>
-      <body className="scrollbar-thin" suppressHydrationWarning>
+      <body
+        className="scrollbar-thin"
+        data-app-hydrated={isHydrated ? 'true' : 'false'}
+        suppressHydrationWarning
+      >
         <QueryClientProvider client={queryClient}>
           <ThemeProvider {...(forcedTheme ? { forcedTheme } : {})}>
             {children}
