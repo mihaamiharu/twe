@@ -18,7 +18,7 @@ export function HintDisplayPanel({
     const { t } = useTranslation(['challenges']);
 
     return (
-        <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in slide-in-from-bottom-4 motion-reduce:animate-none motion-reduce:opacity-100">
+        <div className="fixed bottom-4 right-4 z-50 max-w-sm animate-in fade-in-0 slide-in-from-bottom-4 duration-200 ease-(--ease-ui-out) motion-reduce:slide-in-from-bottom-0">
             <Card className="border-amber-500/30 bg-amber-50/95 dark:bg-amber-950/95 shadow-lg backdrop-blur-sm">
                 <CardContent className="p-4">
                     <div className="flex items-start gap-3">

@@ -64,6 +64,7 @@ export function ResultsPanel({
           size="sm"
           onClick={onRunCode}
           disabled={isRunning}
+          aria-busy={isRunning}
           className="h-8 rounded-md text-xs font-medium bg-brand-orange text-workspace-background hover:bg-brand-orange/90"
         >
           {isRunning ? (

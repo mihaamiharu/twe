@@ -205,7 +205,12 @@ export function PlaygroundHeader({
             variant="outline"
             onClick={onRunCode}
             disabled={isRunning}
-            aria-label={t('common:actions.runCode')}
+            aria-busy={isRunning}
+            aria-label={
+              isRunning
+                ? t('common:messages.loading')
+                : t('common:actions.runCode')
+            }
             className="font-bold border-brand-orange text-brand-orange hover:bg-brand-orange/10"
           >
             {isRunning ? (

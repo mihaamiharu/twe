@@ -130,7 +130,7 @@ export function ChallengePlayground(props: ChallengePlaygroundProps) {
       <div className="flex-1 overflow-hidden relative flex flex-col">
         <div
           className={cn(
-            'flex-1 flex flex-col min-h-0 transition-opacity duration-300',
+            'flex-1 flex flex-col min-h-0 transition-opacity duration-200 ease-(--ease-ui-out)',
             state.isLayoutReady ? 'opacity-100' : 'opacity-0 invisible',
           )}
         >

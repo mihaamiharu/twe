@@ -45,6 +45,7 @@ export function SelectorPanel({
                 size="sm"
                 onClick={onValidate}
                 disabled={isRunning || !selector}
+                aria-busy={isRunning}
                 className="font-bold border border-brand-orange bg-brand-orange hover:bg-brand-orange/90 text-workspace-background transition-colors duration-150"
               >
                 {isRunning ? (
