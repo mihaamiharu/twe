@@ -173,13 +173,11 @@ export interface LocatorFilterEvidenceDefinition {
   has?: LocatorLeafEvidenceDefinition;
 }
 
-export interface LocatorTargetEvidenceDefinition
-  extends LocatorLeafEvidenceDefinition {
+export interface LocatorTargetEvidenceDefinition extends LocatorLeafEvidenceDefinition {
   filters?: LocatorFilterEvidenceDefinition[];
 }
 
-export interface LocatorEvidenceDefinition
-  extends LocatorTargetEvidenceDefinition {
+export interface LocatorEvidenceDefinition extends LocatorTargetEvidenceDefinition {
   scope?: LocatorTargetEvidenceDefinition;
 }
 
@@ -248,6 +246,18 @@ export type TypeScriptEvidenceDefinition =
       operator: 'nullish-coalescing' | 'strict-undefined-check';
     };
 
+export interface AwaitedFunctionCallCountDefinition {
+  function: string;
+  minimum: number;
+}
+
+export interface FunctionMethodEvidenceDefinition {
+  function: string;
+  methods: string[];
+  /** When listed, these methods may only be called inside the named function. */
+  exclusiveMethods?: string[];
+}
+
 export interface ChallengeValidationDefinition {
   requiredAssertions?: string[];
   requiredMethods?: string[];
@@ -259,6 +269,10 @@ export interface ChallengeValidationDefinition {
   requiredAsyncFunctions?: string[];
   /** Require named free-function calls to be directly awaited. */
   requiredAwaitedFunctionCalls?: string[];
+  /** Require a named free function to be directly awaited a minimum number of times. */
+  requiredAwaitedFunctionCallCounts?: AwaitedFunctionCallCountDefinition[];
+  /** Require Playwright methods to be owned by a named helper function. */
+  requiredFunctionMethodEvidence?: FunctionMethodEvidenceDefinition[];
   /** Require named member calls such as Promise.all to be directly awaited. */
   requiredAwaitedMemberCalls?: string[];
   /** Require these free-function calls inside a directly awaited Promise.all. */

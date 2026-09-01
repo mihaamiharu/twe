@@ -123,11 +123,7 @@ const LocatorEvidenceSchema = LocatorTargetEvidenceSchema.extend({
   scope: LocatorTargetEvidenceSchema.optional(),
 }).strict();
 
-const EvidenceArgumentSchema = z.union([
-  z.string(),
-  z.number(),
-  z.boolean(),
-]);
+const EvidenceArgumentSchema = z.union([z.string(), z.number(), z.boolean()]);
 
 const RequiredEvidenceSequenceStepSchema = z.discriminatedUnion('type', [
   z
@@ -205,10 +201,47 @@ const ChallengeValidationSchema = z
     requiredMemberCalls: z.array(z.string().min(1)).optional(),
     requiredAsyncFunctions: z.array(z.string().min(1)).optional(),
     requiredAwaitedFunctionCalls: z.array(z.string().min(1)).optional(),
+    requiredAwaitedFunctionCallCounts: z
+      .array(
+        z
+          .object({
+            function: z.string().min(1),
+            minimum: z.number().int().positive(),
+          })
+          .strict(),
+      )
+      .min(1)
+      .optional(),
+    requiredFunctionMethodEvidence: z
+      .array(
+        z
+          .object({
+            function: z.string().min(1),
+            methods: z.array(z.string().min(1)).min(1),
+            exclusiveMethods: z.array(z.string().min(1)).min(1).optional(),
+          })
+          .strict()
+          .superRefine((evidence, context) => {
+            for (const method of evidence.exclusiveMethods ?? []) {
+              if (!evidence.methods.includes(method)) {
+                context.addIssue({
+                  code: 'custom',
+                  message: 'exclusiveMethods must also appear in methods',
+                  path: ['exclusiveMethods'],
+                });
+              }
+            }
+          }),
+      )
+      .min(1)
+      .optional(),
     requiredAwaitedMemberCalls: z.array(z.string().min(1)).optional(),
     requiredPromiseAllFunctionCalls: z.array(z.string().min(1)).optional(),
     requiredConstBindings: z.array(z.string().min(1)).optional(),
-    requiredTypeScriptEvidence: z.array(TypeScriptEvidenceSchema).min(1).optional(),
+    requiredTypeScriptEvidence: z
+      .array(TypeScriptEvidenceSchema)
+      .min(1)
+      .optional(),
     minimumConditionalBranches: z.number().int().positive().optional(),
     minimumTryCatchBlocks: z.number().int().positive().optional(),
     forbiddenMethods: z.array(z.string().min(1)).optional(),
@@ -375,9 +408,7 @@ function normalizeInteractionSequence(
 }
 
 function normalizeRequiredEvidenceSequence(
-  value: z.infer<
-    typeof ChallengeValidationSchema
-  >['requiredEvidenceSequence'],
+  value: z.infer<typeof ChallengeValidationSchema>['requiredEvidenceSequence'],
 ): RequiredEvidenceSequenceStep[] | undefined {
   if (value === undefined) return undefined;
 
@@ -521,27 +552,34 @@ function normalizeChallengeDefinition(
               ...omitUndefined({
                 requiredAssertions: value.validation.requiredAssertions,
                 requiredMethods: value.validation.requiredMethods,
-                requiredFunctionCalls:
-                  value.validation.requiredFunctionCalls,
+                requiredFunctionCalls: value.validation.requiredFunctionCalls,
                 requiredMemberCalls: value.validation.requiredMemberCalls,
-                requiredAsyncFunctions:
-                  value.validation.requiredAsyncFunctions,
+                requiredAsyncFunctions: value.validation.requiredAsyncFunctions,
                 requiredAwaitedFunctionCalls:
                   value.validation.requiredAwaitedFunctionCalls,
+                requiredAwaitedFunctionCallCounts:
+                  value.validation.requiredAwaitedFunctionCallCounts,
+                requiredFunctionMethodEvidence:
+                  value.validation.requiredFunctionMethodEvidence?.map(
+                    (evidence) => ({
+                      function: evidence.function,
+                      methods: evidence.methods,
+                      ...omitUndefined({
+                        exclusiveMethods: evidence.exclusiveMethods,
+                      }),
+                    }),
+                  ),
                 requiredAwaitedMemberCalls:
                   value.validation.requiredAwaitedMemberCalls,
                 requiredPromiseAllFunctionCalls:
                   value.validation.requiredPromiseAllFunctionCalls,
-                requiredConstBindings:
-                  value.validation.requiredConstBindings,
-                requiredTypeScriptEvidence:
-                  normalizeTypeScriptEvidence(
-                    value.validation.requiredTypeScriptEvidence,
-                  ),
+                requiredConstBindings: value.validation.requiredConstBindings,
+                requiredTypeScriptEvidence: normalizeTypeScriptEvidence(
+                  value.validation.requiredTypeScriptEvidence,
+                ),
                 minimumConditionalBranches:
                   value.validation.minimumConditionalBranches,
-                minimumTryCatchBlocks:
-                  value.validation.minimumTryCatchBlocks,
+                minimumTryCatchBlocks: value.validation.minimumTryCatchBlocks,
                 forbiddenMethods: value.validation.forbiddenMethods,
                 requiredEvidence: normalizeRequiredEvidenceSequence(
                   value.validation.requiredEvidence,

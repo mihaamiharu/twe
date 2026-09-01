@@ -72,7 +72,9 @@ describe('challenge execution validator', () => {
       },
     };
 
-    expect(validateChallengeExecution(passedExecution(base), validation).failure).toEqual({
+    expect(
+      validateChallengeExecution(passedExecution(base), validation).failure,
+    ).toEqual({
       kind: 'structural-locator',
     });
 
@@ -480,6 +482,73 @@ describe('challenge execution validator', () => {
           'prepareFixture() inside awaited Promise.all()',
           'loadAccount() inside awaited Promise.all()',
           'try/catch (1)',
+        ],
+      },
+    });
+  });
+
+  it('requires repeated awaited helper use and helper-owned methods', () => {
+    const validation = {
+      requiredAwaitedFunctionCallCounts: [
+        { function: 'submitLogin', minimum: 2 },
+      ],
+      requiredFunctionMethodEvidence: [
+        {
+          function: 'submitLogin',
+          methods: ['getByLabel', 'getByRole', 'fill', 'click'],
+          exclusiveMethods: ['getByLabel', 'fill', 'click'],
+        },
+      ],
+    };
+    const sourceAnalysis = {
+      calledMethods: ['getByLabel', 'getByRole', 'fill', 'click'],
+      awaitedFunctionCallCounts: { submitLogin: 2 },
+      scopedMethodCalls: [
+        { method: 'getByLabel', function: 'submitLogin' },
+        { method: 'getByRole', function: 'submitLogin' },
+        { method: 'fill', function: 'submitLogin' },
+        { method: 'click', function: 'submitLogin' },
+        { method: 'getByRole' },
+      ],
+      forbiddenMethods: [],
+      structuralLocatorCalls: 0,
+      forcedActions: [],
+      directDomAccesses: [],
+      swallowedErrorCount: 0,
+      strictViolations: [],
+    };
+
+    expect(
+      validateChallengeExecution(
+        passedExecution({ sourceAnalysis }),
+        validation,
+      ),
+    ).toEqual({ passed: true });
+
+    expect(
+      validateChallengeExecution(
+        passedExecution({
+          sourceAnalysis: {
+            ...sourceAnalysis,
+            awaitedFunctionCallCounts: { submitLogin: 1 },
+            scopedMethodCalls: [
+              { method: 'getByRole', function: 'submitLogin' },
+              { method: 'fill', function: 'submitLogin' },
+              { method: 'click', function: 'submitLogin' },
+              { method: 'getByLabel' },
+            ],
+          },
+        }),
+        validation,
+      ),
+    ).toEqual({
+      passed: false,
+      failure: {
+        kind: 'missing-required-evidence',
+        methods: [
+          'await submitLogin() (2 calls)',
+          'getByLabel() inside submitLogin()',
+          'getByLabel() only inside submitLogin()',
         ],
       },
     });

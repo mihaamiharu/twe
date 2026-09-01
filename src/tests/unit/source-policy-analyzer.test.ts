@@ -64,6 +64,22 @@ describe('source policy analyzer', () => {
     expect(analysis.directDomAccesses).toEqual([]);
   });
 
+  it('records forbidden generated method declarations even when unused', async () => {
+    const analysis = await analyzeSourcePolicy(
+      `
+        class UiActions {
+          async fillField() {}
+          async clickButton() {}
+        }
+      `,
+      {
+        validation: { forbiddenMethods: ['fillField', 'clickButton'] },
+      },
+    );
+
+    expect(analysis.forbiddenMethods).toEqual(['fillField', 'clickButton']);
+  });
+
   it('does not treat unrelated object methods as Playwright evidence', async () => {
     const analysis = await analyzeSourcePolicy(
       `
@@ -140,11 +156,7 @@ describe('source policy analyzer', () => {
 
     expect(analysis.calledFunctions).toContain('classifyRun');
     expect(analysis.memberCalls).toEqual(['map', 'join']);
-    expect(analysis.constBindings).toEqual([
-      'testRuns',
-      'statuses',
-      'result',
-    ]);
+    expect(analysis.constBindings).toEqual(['testRuns', 'statuses', 'result']);
     expect(analysis.conditionalBranchCount).toBe(3);
   });
 
@@ -173,16 +185,43 @@ describe('source policy analyzer', () => {
     `);
 
     expect(analysis.asyncFunctions).toEqual(['prepareFixture', 'runSetup']);
-    expect(analysis.awaitedFunctionCalls).toEqual([
-      'loadFixture',
-      'runSetup',
-    ]);
+    expect(analysis.awaitedFunctionCalls).toEqual(['loadFixture', 'runSetup']);
     expect(analysis.awaitedMemberCalls).toEqual(['Promise.all']);
     expect(analysis.awaitedPromiseAllFunctionCalls).toEqual([
       'prepareFixture',
       'loadAccount',
     ]);
     expect(analysis.tryCatchCount).toBe(1);
+  });
+
+  it('records awaited helper call counts and Playwright method ownership', async () => {
+    const analysis = await analyzeSourcePolicy(`
+      async function submitLogin(page, credentials) {
+        await page.getByLabel('Username').fill(credentials.username);
+        await page.getByLabel('Password').fill(credentials.password);
+        await page.getByRole('button', { name: 'Sign In' }).click();
+      }
+
+      test('login-recovery', async ({ page }) => {
+        await page.goto('/app/login.html');
+        await submitLogin(page, { username: 'wronguser', password: 'wrongpass' });
+        await expect(page.getByRole('alert')).toHaveText('Invalid username or password');
+        await submitLogin(page, { username: 'testuser', password: 'password123' });
+      });
+    `);
+
+    expect(analysis.awaitedFunctionCallCounts).toEqual({ submitLogin: 2 });
+    const expectedCalls = [
+      { method: 'getByLabel', function: 'submitLogin' },
+      { method: 'fill', function: 'submitLogin' },
+      { method: 'getByRole', function: 'submitLogin' },
+      { method: 'click', function: 'submitLogin' },
+      { method: 'goto' },
+      { method: 'toHaveText' },
+    ];
+    for (const call of expectedCalls) {
+      expect(analysis.scopedMethodCalls).toContainEqual(call);
+    }
   });
 
   it('records TypeScript structure without claiming semantic checking', async () => {
@@ -207,15 +246,15 @@ describe('source policy analyzer', () => {
     `);
 
     const expectedEvidence = [
-        'interface-property:AppConfig:apiUrl:string',
-        'interface-property:AppConfig:retryLimit?:number',
-        'inferred-variable:testId',
-        'variable-type:config:AppConfig',
-        'function-parameter:createUser:id:number',
-        'function-parameter:createUser:role?:"admin"|"guest"',
-        'function-return:createUser:string',
-        'operator:nullish-coalescing',
-        'operator:strict-undefined-check',
+      'interface-property:AppConfig:apiUrl:string',
+      'interface-property:AppConfig:retryLimit?:number',
+      'inferred-variable:testId',
+      'variable-type:config:AppConfig',
+      'function-parameter:createUser:id:number',
+      'function-parameter:createUser:role?:"admin"|"guest"',
+      'function-return:createUser:string',
+      'operator:nullish-coalescing',
+      'operator:strict-undefined-check',
     ];
     for (const evidence of expectedEvidence) {
       expect(analysis.typeScriptEvidence).toContain(evidence);

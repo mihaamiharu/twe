@@ -51,8 +51,10 @@ function locatorTargetEvidenceMatches(
 ): boolean {
   if (expected === undefined) return true;
   if (actual === undefined || actual.method !== expected.method) return false;
-  if (expected.value !== undefined && actual.value !== expected.value) return false;
-  if (expected.name !== undefined && actual.name !== expected.name) return false;
+  if (expected.value !== undefined && actual.value !== expected.value)
+    return false;
+  if (expected.name !== undefined && actual.name !== expected.name)
+    return false;
   if (expected.exact !== undefined && actual.exact !== expected.exact) {
     return false;
   }
@@ -85,8 +87,7 @@ function evidenceEventMatches(
       event.type === 'assertion' &&
       event.assertion.passed &&
       event.assertion.matcher === expected.matcher &&
-      (expected.soft === undefined ||
-        event.assertion.soft === expected.soft) &&
+      (expected.soft === undefined || event.assertion.soft === expected.soft) &&
       (expected.arguments === undefined ||
         JSON.stringify(event.assertion.arguments) ===
           JSON.stringify(expected.arguments)) &&
@@ -154,7 +155,11 @@ function findMissingEvidenceSteps(
     const step = expected[stepIndex];
     if (!step) return false;
 
-    for (let eventIndex = 0; eventIndex < availableEvents.length; eventIndex += 1) {
+    for (
+      let eventIndex = 0;
+      eventIndex < availableEvents.length;
+      eventIndex += 1
+    ) {
       const event = availableEvents[eventIndex];
       if (
         !event ||
@@ -192,9 +197,7 @@ function normalizeTypeAnnotation(annotation: string): string {
   return annotation.replace(/\s+/g, '').replaceAll("'", '"');
 }
 
-function typeScriptEvidenceKey(
-  evidence: TypeScriptEvidenceDefinition,
-): string {
+function typeScriptEvidenceKey(evidence: TypeScriptEvidenceDefinition): string {
   switch (evidence.type) {
     case 'inferred-variable':
       return `inferred-variable:${evidence.name}`;
@@ -253,8 +256,9 @@ export function validateChallengeExecution(
     : sourceMethods;
   const observedAssertions = new Set(
     validation.policy?.requireExecutedEvidence
-      ? trace?.assertions.map((assertion) => assertion.matcher) ?? []
-      : source?.calledMethods.filter((method) => method.startsWith('to')) ?? [],
+      ? (trace?.assertions.map((assertion) => assertion.matcher) ?? [])
+      : (source?.calledMethods.filter((method) => method.startsWith('to')) ??
+          []),
   );
 
   if (
@@ -309,7 +313,8 @@ export function validateChallengeExecution(
   }
 
   const forbiddenMethods = (validation.forbiddenMethods ?? []).filter(
-    (method) => source?.forbiddenMethods.includes(method) || runtimeMethods.has(method),
+    (method) =>
+      source?.forbiddenMethods.includes(method) || runtimeMethods.has(method),
   );
   if (forbiddenMethods.length > 0) {
     return {
@@ -332,7 +337,9 @@ export function validateChallengeExecution(
   if (
     policy?.forbidForcedActions &&
     (source?.forcedActions.some((action) => hasTruthyForce(action.value)) ||
-      trace?.methodCalls.some((call) => hasTruthyForce(call.actionOptions?.force)))
+      trace?.methodCalls.some((call) =>
+        hasTruthyForce(call.actionOptions?.force),
+      ))
   ) {
     return {
       passed: false,
@@ -340,14 +347,15 @@ export function validateChallengeExecution(
     };
   }
 
-  if (policy?.forbidDirectDomAccess && (source?.directDomAccesses.length ?? 0) > 0) {
+  if (
+    policy?.forbidDirectDomAccess &&
+    (source?.directDomAccesses.length ?? 0) > 0
+  ) {
     return {
       passed: false,
       failure: {
         kind: 'direct-dom-access',
-        ...(source === undefined
-          ? {}
-          : { methods: source.directDomAccesses }),
+        ...(source === undefined ? {} : { methods: source.directDomAccesses }),
       },
     };
   }
@@ -375,6 +383,8 @@ export function validateChallengeExecution(
   const memberCalls = new Set(source?.memberCalls ?? []);
   const asyncFunctions = new Set(source?.asyncFunctions ?? []);
   const awaitedFunctionCalls = new Set(source?.awaitedFunctionCalls ?? []);
+  const awaitedFunctionCallCounts = source?.awaitedFunctionCallCounts ?? {};
+  const scopedMethodCalls = source?.scopedMethodCalls ?? [];
   const awaitedMemberCalls = new Set(source?.awaitedMemberCalls ?? []);
   const awaitedPromiseAllFunctionCalls = new Set(
     source?.awaitedPromiseAllFunctionCalls ?? [],
@@ -395,6 +405,40 @@ export function validateChallengeExecution(
   )
     .filter((name) => !awaitedFunctionCalls.has(name))
     .map((name) => `await ${name}()`);
+  const missingAwaitedFunctionCallCounts = (
+    validation.requiredAwaitedFunctionCallCounts ?? []
+  )
+    .filter(
+      (requirement) =>
+        (awaitedFunctionCallCounts[requirement.function] ?? 0) <
+        requirement.minimum,
+    )
+    .map(
+      (requirement) =>
+        `await ${requirement.function}() (${requirement.minimum} calls)`,
+    );
+  const missingFunctionMethodEvidence = (
+    validation.requiredFunctionMethodEvidence ?? []
+  ).flatMap((requirement) => {
+    const missingInside = requirement.methods
+      .filter(
+        (method) =>
+          !scopedMethodCalls.some(
+            (call) =>
+              call.method === method && call.function === requirement.function,
+          ),
+      )
+      .map((method) => `${method}() inside ${requirement.function}()`);
+    const usedOutside = (requirement.exclusiveMethods ?? [])
+      .filter((method) =>
+        scopedMethodCalls.some(
+          (call) =>
+            call.method === method && call.function !== requirement.function,
+        ),
+      )
+      .map((method) => `${method}() only inside ${requirement.function}()`);
+    return [...missingInside, ...usedOutside];
+  });
   const missingAwaitedMemberCalls = (
     validation.requiredAwaitedMemberCalls ?? []
   )
@@ -411,10 +455,11 @@ export function validateChallengeExecution(
   const missingTypeScriptEvidence = (
     validation.requiredTypeScriptEvidence ?? []
   )
-    .filter((evidence) => !typeScriptEvidence.has(typeScriptEvidenceKey(evidence)))
+    .filter(
+      (evidence) => !typeScriptEvidence.has(typeScriptEvidenceKey(evidence)),
+    )
     .map(typeScriptEvidenceLabel);
-  const minimumConditionalBranches =
-    validation.minimumConditionalBranches ?? 0;
+  const minimumConditionalBranches = validation.minimumConditionalBranches ?? 0;
   const missingConditionalEvidence =
     (source?.conditionalBranchCount ?? 0) < minimumConditionalBranches
       ? [`if/else (${minimumConditionalBranches} branches)`]
@@ -439,6 +484,8 @@ export function validateChallengeExecution(
     missingMemberCalls.length > 0 ||
     missingAsyncFunctions.length > 0 ||
     missingAwaitedFunctionCalls.length > 0 ||
+    missingAwaitedFunctionCallCounts.length > 0 ||
+    missingFunctionMethodEvidence.length > 0 ||
     missingAwaitedMemberCalls.length > 0 ||
     missingPromiseAllFunctionCalls.length > 0 ||
     missingConstBindings.length > 0 ||
@@ -460,6 +507,8 @@ export function validateChallengeExecution(
             ...missingMemberCalls,
             ...missingAsyncFunctions,
             ...missingAwaitedFunctionCalls,
+            ...missingAwaitedFunctionCallCounts,
+            ...missingFunctionMethodEvidence,
             ...missingAwaitedMemberCalls,
             ...missingPromiseAllFunctionCalls,
             ...missingConstBindings,
