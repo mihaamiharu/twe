@@ -82,7 +82,7 @@ export function createLearnDetailSeoHead({ lesson, locale }: LearnSeoOptions) {
           name: 'TestingWithEkki',
           logo: {
             '@type': 'ImageObject',
-            url: `${BASE_URL}/logo-icon.png`,
+            url: `${BASE_URL}/logo-icon-512.png`,
           },
         },
         mainEntityOfPage: {

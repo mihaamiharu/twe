@@ -192,7 +192,7 @@ function HomePage() {
         <div className="grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14">
           <div className="relative mx-auto w-full max-w-[300px]">
             <div className="absolute inset-4 rounded-[42%] border border-[var(--brand-orange)]/35" />
-            <img src="/testing-workflow-illustration.png" alt="Illustration of a software testing workflow" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-center" width={1024} height={1024} loading="lazy" />
+            <img src="/testing-workflow-illustration.jpg" alt="Illustration of a software testing workflow" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-center" width={600} height={600} loading="lazy" />
             <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] shadow-sm">TEST FLOW / TWE</div>
           </div>
           <div>

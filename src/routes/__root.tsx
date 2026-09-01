@@ -163,12 +163,14 @@ export const Route = createRootRouteWithContext<RootContext>()({
         },
         {
           rel: 'icon',
-          href: '/logo-icon.png',
+          href: '/logo-icon-192.png',
           type: 'image/png',
+          sizes: '192x192',
         },
         {
           rel: 'apple-touch-icon',
-          href: '/logo-icon.png',
+          href: '/logo-icon-192.png',
+          sizes: '192x192',
         },
         {
           rel: 'manifest',

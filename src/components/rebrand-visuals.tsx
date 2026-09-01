@@ -255,11 +255,11 @@ function HomeInspectorCharacter({ className }: { className?: string }) {
       data-hero-character
     >
       <img
-        src="/illustrations/twe-inspector-male-hero.png"
+        src="/illustrations/twe-inspector-male-hero-768.png"
         alt="TWE Inspector pointing toward the highlighted Sign in button"
         className="absolute left-1/2 top-1/2 h-full w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
-        width={1145}
-        height={1374}
+        width={640}
+        height={768}
         loading="eager"
         fetchPriority="high"
         draggable={false}

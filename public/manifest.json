@@ -3,9 +3,14 @@
   "name": "TestingWithEkki — Practical Software Testing",
   "icons": [
     {
-      "src": "/logo-icon.png",
+      "src": "/logo-icon-192.png",
       "type": "image/png",
-      "sizes": "1254x1254"
+      "sizes": "192x192"
+    },
+    {
+      "src": "/logo-icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
     }
   ],
   "start_url": ".",

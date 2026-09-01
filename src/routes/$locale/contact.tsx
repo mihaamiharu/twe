@@ -100,7 +100,7 @@ function ContactPage() {
             number="01"
             icon={
               <img
-                src="/illustrations/twe-inspector-male-hero.png"
+                src="/illustrations/twe-inspector-male-hero-768.png"
                 alt=""
                 className="absolute left-1/2 top-0 h-[230%] w-auto max-w-none -translate-x-1/2 object-contain object-top"
               />
