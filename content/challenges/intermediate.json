@@ -2116,9 +2116,9 @@
         ]
       },
       "htmlContent": "<main>\n  <h1>Failed orders</h1>\n  <section aria-label=\"Orders to resubmit\">\n    <article role=\"article\" aria-labelledby=\"order-1007-heading\" data-order-id=\"ORD-1007\">\n      <h2 id=\"order-1007-heading\">Order ORD-1007</h2>\n      <button type=\"button\" onclick=\"const status=this.parentElement.querySelector('[role=status]');status.textContent='Submitting…';setTimeout(()=>status.textContent='Order submitted: ORD-1007',80)\">Submit order</button>\n      <p role=\"status\">Ready to submit</p>\n    </article>\n    <article role=\"article\" aria-labelledby=\"order-1042-heading\" data-order-id=\"ORD-1042\">\n      <h2 id=\"order-1042-heading\">Order ORD-1042</h2>\n      <button type=\"button\" onclick=\"const status=this.parentElement.querySelector('[role=status]');status.textContent='Submitting…';setTimeout(()=>status.textContent='Order submitted: ORD-1042',200)\">Submit order</button>\n      <p role=\"status\">Ready to submit</p>\n    </article>\n  </section>\n</main>",
-      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('resubmit Order ORD-1042', async ({ page }) => {\n  const order = page.getByRole('article').first();\n  await order.getByRole('button', { name: 'Submit order' }).click();\n  await page.waitForTimeout(1000);\n\n  const status = await page.getByRole('status').first().textContent();\n  expect(status).toBeTruthy();\n});",
+      "starterCode": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const order = page.getByRole('article').first();\n  await order.getByRole('button', { name: 'Submit order' }).click();\n  await page.waitForTimeout(1000);\n\n  const status = await page.getByRole('status').first().textContent();\n  expect(status).toBeTruthy();\n});",
       "testCases": [],
-      "solution": "const targetOrder = page.getByRole('article').filter({\n  has: page.getByRole('heading', {\n    name: 'Order ORD-1042',\n    exact: true,\n  }),\n});\n\nawait expect(targetOrder).toHaveCount(1);\nawait targetOrder.getByRole('button', { name: 'Submit order' }).click();\nawait expect(targetOrder.getByRole('status')).toHaveText(\n  'Order submitted: ORD-1042',\n);",
+      "solution": "import { test, expect } from '@playwright/test';\n\ntest('practice', async ({ page }) => {\n  const targetOrder = page.getByRole('article').filter({\n    has: page.getByRole('heading', {\n      name: 'Order ORD-1042',\n      exact: true,\n    }),\n  });\n\n  await expect(targetOrder).toHaveCount(1);\n  await targetOrder.getByRole('button', { name: 'Submit order' }).click();\n  await expect(targetOrder.getByRole('status')).toHaveText(\n    'Order submitted: ORD-1042',\n  );\n});",
       "expectedState": [
         {
           "selector": "[data-order-id=\"ORD-1042\"] [role=status]",
@@ -2129,7 +2129,82 @@
       "validation": {
         "requiredAssertions": ["toHaveCount", "toHaveText"],
         "requiredMethods": ["getByRole", "filter", "click"],
-        "forbiddenMethods": ["first", "nth", "waitForTimeout", "textContent", "isVisible", "toBeTruthy"]
+        "forbiddenMethods": ["first", "nth", "waitForTimeout", "textContent", "isVisible", "toBeTruthy"],
+        "policy": {
+          "requireExecutedEvidence": true,
+          "forbidStructuralLocators": true,
+          "forbidForcedActions": true,
+          "forbidDirectDomAccess": true,
+          "forbidSwallowedErrors": true
+        },
+        "requiredEvidenceSequence": [
+          {
+            "type": "assertion",
+            "matcher": "toHaveCount",
+            "arguments": [1],
+            "locator": {
+              "method": "getByRole",
+              "value": "article",
+              "filters": [
+                {
+                  "has": {
+                    "method": "getByRole",
+                    "value": "heading",
+                    "name": "Order ORD-1042",
+                    "exact": true
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "type": "method",
+            "method": "click",
+            "target": "locator",
+            "locator": {
+              "method": "getByRole",
+              "value": "button",
+              "name": "Submit order",
+              "scope": {
+                "method": "getByRole",
+                "value": "article",
+                "filters": [
+                  {
+                    "has": {
+                      "method": "getByRole",
+                      "value": "heading",
+                      "name": "Order ORD-1042",
+                      "exact": true
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "assertion",
+            "matcher": "toHaveText",
+            "arguments": ["Order submitted: ORD-1042"],
+            "locator": {
+              "method": "getByRole",
+              "value": "status",
+              "scope": {
+                "method": "getByRole",
+                "value": "article",
+                "filters": [
+                  {
+                    "has": {
+                      "method": "getByRole",
+                      "value": "heading",
+                      "name": "Order ORD-1042",
+                      "exact": true
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        ]
       },
       "tags": [
         "playwright",
