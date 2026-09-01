@@ -15,7 +15,7 @@ export class DashboardPage extends BasePage {
       .getByRole('link', { name: 'Start Web Automation', exact: true })
       .first();
     this.learningPathHeading = page.getByRole('heading', {
-      name: 'The Web Automation Learning Path',
+      name: 'Learn Web Automation step by step.',
       exact: true,
     });
   }
@@ -32,7 +32,7 @@ export class DashboardPage extends BasePage {
   async verifyLearningSurface() {
     await expect(this.learningPathHeading).toBeVisible();
     await expect(
-      this.page.getByRole('link', { name: 'Explore Practice', exact: true }).first(),
+      this.page.getByRole('link', { name: 'Browse Practice', exact: true }).first(),
     ).toBeVisible();
   }
 }

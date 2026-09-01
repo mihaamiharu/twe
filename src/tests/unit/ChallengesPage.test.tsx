@@ -1,4 +1,12 @@
-import { describe, it, expect, mock, beforeEach, afterEach } from 'bun:test';
+import {
+  describe,
+  it,
+  expect,
+  mock,
+  beforeAll,
+  beforeEach,
+  afterEach,
+} from 'bun:test';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 
 // Mutable mock state
@@ -8,7 +16,10 @@ globalThis.mockSearchParams = {
   view: 'grid',
   hideCompleted: false,
 };
-globalThis.mockNavigate = mock(() => Promise.resolve());
+globalThis.mockNavigate = mock((_options?: MockNavigateOptions) => {
+  void _options;
+  return Promise.resolve();
+});
 
 describe('ChallengesPage', () => {
   // Mock Data
@@ -57,6 +68,12 @@ describe('ChallengesPage', () => {
     },
   ];
 
+  beforeAll(async () => {
+    // Import once before beforeEach so the preload's query mock factory is
+    // initialized even when this file runs in isolation.
+    await import('@/routes/$locale/practice/index');
+  });
+
   beforeEach(() => {
     globalThis.mockSearchParams = {
       track: 'all',
@@ -73,6 +90,20 @@ describe('ChallengesPage', () => {
       }
       return { data: { success: true, data: mockChallenges } };
     });
+
+    globalThis.mockNavigate = mock((options?: MockNavigateOptions) => {
+      const search = options?.search;
+      const nextSearch =
+        typeof search === 'function'
+          ? (search as (
+              previous: typeof globalThis.mockSearchParams,
+            ) => typeof globalThis.mockSearchParams)(
+              globalThis.mockSearchParams,
+            )
+          : (search as typeof globalThis.mockSearchParams | undefined);
+      if (nextSearch) globalThis.mockSearchParams = nextSearch;
+      return Promise.resolve();
+    });
   });
 
   afterEach(() => {
@@ -82,7 +113,10 @@ describe('ChallengesPage', () => {
   const renderPage = async () => {
     // Dynamic import to ensure mocks apply
     const { ChallengesPage } = await import('@/routes/$locale/practice/index');
-    return render(<ChallengesPage />);
+    return {
+      ...render(<ChallengesPage />),
+      ChallengesPage,
+    };
   };
 
   it('should render all challenges by default', async () => {
@@ -193,22 +227,30 @@ describe('ChallengesPage', () => {
 
   it('should support roving keyboard focus and selection for track tabs', async () => {
     globalThis.mockNavigate.mockClear();
-    await renderPage();
+    const rendered = await renderPage();
 
     const tabs = screen.getAllByRole('tab');
     expect(tabs).toHaveLength(5);
     expect(tabs[0]?.getAttribute('tabindex')).toBe('0');
     expect(tabs[1]?.getAttribute('tabindex')).toBe('-1');
 
+    tabs[0]!.focus();
     fireEvent.keyDown(tabs[0]!, { key: 'ArrowRight' });
-    expect(document.activeElement).toBe(tabs[1]!);
     expect(globalThis.mockNavigate).toHaveBeenCalled();
+    rendered.rerender(<rendered.ChallengesPage />);
+    expect(document.activeElement).toBe(screen.getAllByRole('tab')[1]!);
 
-    fireEvent.keyDown(tabs[1]!, { key: 'End' });
-    expect(document.activeElement).toBe(tabs[4]!);
+    const updatedTabs = screen.getAllByRole('tab');
+    updatedTabs[1]!.focus();
+    fireEvent.keyDown(updatedTabs[1]!, { key: 'End' });
+    rendered.rerender(<rendered.ChallengesPage />);
+    expect(document.activeElement).toBe(screen.getAllByRole('tab')[4]!);
 
-    fireEvent.keyDown(tabs[4]!, { key: 'Home' });
-    expect(document.activeElement).toBe(tabs[0]!);
+    const finalTabs = screen.getAllByRole('tab');
+    finalTabs[4]!.focus();
+    fireEvent.keyDown(finalTabs[4]!, { key: 'Home' });
+    rendered.rerender(<rendered.ChallengesPage />);
+    expect(document.activeElement).toBe(screen.getAllByRole('tab')[0]!);
   });
   it('should show empty state when no matches found', async () => {
     globalThis.mockSearchParams = {

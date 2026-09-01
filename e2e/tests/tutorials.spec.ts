@@ -21,7 +21,7 @@ test.describe('Tutorials', () => {
       page.locator('[data-testid^="learning-path-step-"]'),
     ).toHaveCount(4);
     await expect(page.getByTestId('learning-path-step-01')).toContainText(
-      'Foundation 1: The Anatomy of an HTML Element',
+      'Automation Foundations & Judgment',
     );
   });
 
@@ -29,7 +29,7 @@ test.describe('Tutorials', () => {
     await tutorialsPage.currentLessonsPreview
       .getByTestId('learning-path-step-01')
       .click();
-    await expect(page).toHaveURL(/\/en\/learn\/html-element-anatomy$/);
+    await expect(page).toHaveURL(/\/en\/learn\/universal-mindset$/);
   });
 
   test('should keep the guided path usable on mobile', async ({ page }) => {
@@ -110,7 +110,7 @@ test.describe('Tutorials', () => {
   test('should preserve lesson search in URL state and filter the list', async ({
     page,
   }) => {
-    const search = page.getByRole('textbox');
+    const search = page.getByTestId('learn-search');
     await search.fill('DOM Tree');
 
     await expect
@@ -198,7 +198,7 @@ test.describe('Tutorials', () => {
   }) => {
     await page.goto('/id/learn/javascript-fundamentals-for-qa');
     await expect(page.locator('h1')).toContainText(
-      'Fundamental Modern JavaScript',
+      'JavaScript yang Perlu Kamu Tahu untuk QA Automation',
     );
     await expect(
       page.locator('meta[name="description"]').last(),

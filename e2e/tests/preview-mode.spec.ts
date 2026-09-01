@@ -86,6 +86,9 @@ test.describe('Preview mode regressions', () => {
     page,
   }) => {
     await page.goto('/en/practice/css-selector-101-id-class');
+    await expect(page.locator('.workspace-shell')).toBeVisible({
+      timeout: 20_000,
+    });
     await expect(
       page
         .getByRole('heading', { level: 1, name: 'Read an ID Selector' })

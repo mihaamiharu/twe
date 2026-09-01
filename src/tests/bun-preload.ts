@@ -74,7 +74,10 @@ globalThis.mockLoaderData = {
     success: false,
     error: 'No mock loader data configured',
 };
-globalThis.mockNavigate = mock(() => Promise.resolve());
+globalThis.mockNavigate = mock((_options?: MockNavigateOptions) => {
+    void _options;
+    return Promise.resolve();
+});
 
 void mock.module(
 '@tanstack/react-router', () => ({

@@ -62,7 +62,7 @@ describe('API request recovery practice grading', () => {
 
         await page.getByRole('button', { name: 'Load recommendations' }).click();
         await expect(page.getByRole('alert')).toHaveText(
-          'Recommendations are temporarily unavailable. Try again.',
+          'Unable to load recommendations. Please try again.',
         );
       });
     `);

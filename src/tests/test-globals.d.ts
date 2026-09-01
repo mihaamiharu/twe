@@ -7,6 +7,10 @@ interface QueryMockOptions {
 }
 
 declare global {
+  interface MockNavigateOptions {
+    search?: unknown;
+  }
+
   var mockSearchParams: {
     track?: TrackId;
     q?: string;
@@ -16,7 +20,7 @@ declare global {
   };
   var mockLoaderData: TutorialListResponse;
 
-  var mockNavigate: Mock<() => Promise<void>>;
+  var mockNavigate: Mock<(options?: MockNavigateOptions) => Promise<void>>;
   var mockUseQuery: Mock<(options: QueryMockOptions) => unknown>;
 }
 

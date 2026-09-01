@@ -32,7 +32,7 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
     await tutorialsPage.gotoList('id');
     await expect(tutorialsPage.tutorialCards.first()).toBeVisible();
     await expect(tutorialsPage.currentLessonsPreview).toContainText(
-      'Pondasi 1: Anatomi HTML Element',
+      'Fondasi Web Automation & QA Judgment',
     );
   });
 
