@@ -119,7 +119,7 @@ function ContactPage() {
             cta={t('partnerships.cta')}
             href="mailto:ekki@testingwithekki.com?subject=Partnership%20with%20TestingWithEkki"
             secondaryCta={t('partnerships.cvCta')}
-            secondaryHref="/cv.pdf"
+            secondaryHref="/Ekki_Syam_CV.pdf"
           />
         </div>
 
@@ -197,7 +197,7 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
         <ArrowRight className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
       </div>
 
-      <div className="grid gap-5 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:grid-cols-[96px_minmax(0,1fr)_1px_auto] sm:items-center sm:gap-6 sm:p-6">
+      <div className="grid gap-5 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:grid-cols-[96px_minmax(0,1fr)_1px_15rem] sm:items-center sm:gap-6 sm:p-6">
         <div className="flex items-center gap-3 sm:justify-center">
           <span className="font-mono text-xs text-[var(--brand-orange)] sm:hidden">{number}</span>
           <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange)]">{icon}</div>

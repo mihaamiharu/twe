@@ -21,7 +21,7 @@
   "background": {
     "eyebrow": "LATAR BELAKANG",
     "title": "Sedikit tentang latar belakang saya",
-    "paragraph1": "Saya memulai sebagai developer lalu mendalami pekerjaan QA engineering dan SDET. Pengalaman saya mencakup otomasi web dan API, sistem dengan banyak integrasi, microservices, event-driven testing, CI/CD, dan infrastruktur testing.",
+    "paragraph1": "Pengalaman saya mencakup otomasi web, mobile, dan API, sistem dengan banyak integrasi, webhook, microservices, event-driven testing, CI/CD, dan infrastruktur testing.",
     "paragraph2": "Seiring waktu, saya juga lebih banyak membangun framework, membantu tester lain melakukan otomasi, dan menjadi mentor bagi mereka yang ingin berkembang secara teknis."
   },
   "find": {
