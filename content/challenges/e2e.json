@@ -258,6 +258,76 @@
                     "forbidDirectDomAccess": true,
                     "forbidSwallowedErrors": true
                 },
+                "requiredEvidenceSequence": [
+                    {
+                        "type": "method",
+                        "method": "goto",
+                        "target": "page",
+                        "arguments": ["/app/checkout.html"]
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["0"],
+                        "locator": {
+                            "method": "getByLabel",
+                            "value": "Quantity"
+                        }
+                    },
+                    {
+                        "type": "method",
+                        "method": "click",
+                        "target": "locator",
+                        "locator": {
+                            "method": "getByRole",
+                            "value": "button",
+                            "name": "Place order"
+                        }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toHaveText",
+                        "arguments": ["Quantity must be at least 1"],
+                        "locator": { "method": "getByRole", "value": "alert" }
+                    },
+                    {
+                        "type": "method",
+                        "method": "fill",
+                        "target": "locator",
+                        "arguments": ["2"],
+                        "locator": {
+                            "method": "getByLabel",
+                            "value": "Quantity"
+                        }
+                    },
+                    {
+                        "type": "method",
+                        "method": "click",
+                        "target": "locator",
+                        "locator": {
+                            "method": "getByRole",
+                            "value": "button",
+                            "name": "Place order"
+                        }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toBeHidden",
+                        "locator": { "method": "getByRole", "value": "alert" }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toBeVisible",
+                        "locator": { "method": "getByRole", "value": "status" }
+                    },
+                    {
+                        "type": "assertion",
+                        "matcher": "toContainText",
+                        "arguments": ["2 items"],
+                        "locator": { "method": "getByRole", "value": "status" }
+                    }
+                ],
                 "interactionSequence": {
                     "event": "submit",
                     "selector": "#checkout-form",
