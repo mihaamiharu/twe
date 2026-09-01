@@ -23,7 +23,7 @@ test.describe('Indonesian (ID) Locale Scenarios', () => {
     await dashboardPage.goto('id');
     // The rebranded Indonesian homepage starts with the Phase 3 source-of-truth copy.
     await expect(dashboardPage.heroTitle).toContainText(
-      /Melampaui sekadar menjalankan test/i,
+      /Tingkatkan skill testing kamu/i,
     );
     await expect(page).toHaveURL(/\/id\/?$/);
   });

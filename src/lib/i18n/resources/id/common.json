@@ -1,10 +1,10 @@
 {
   "appName": "TestingWithEkki",
   "seo": {
-    "title": "TestingWithEkki — Pendidikan Software Testing Praktis",
-    "description": "Melampaui sekadar menjalankan test dengan pelajaran praktis dan tantangan hands-on untuk QA engineer.",
-    "ogTitle": "Melampaui sekadar menjalankan test. | TestingWithEkki",
-    "ogDescription": "Bangun kemampuan teknis testing melalui pelajaran Web Automation dan tantangan Practice.",
+    "title": "TestingWithEkki — Belajar Software Testing secara Praktis",
+    "description": "Tingkatkan skill testing kamu lewat materi Web Automation dan tantangan hands-on yang bisa dikerjakan langsung di browser.",
+    "ogTitle": "Tingkatkan skill testing kamu. | TestingWithEkki",
+    "ogDescription": "Bangun fondasi Web Automation, pelajari Playwright, dan langsung praktik di browser.",
     "keywords": "playwright, automation testing, qa, pengujian perangkat lunak, belajar qa automation, belajar web automation, belajar playwright, end-to-end testing, javascript testing"
   },
   "navigation": {
@@ -90,10 +90,10 @@
     "achievementUnlocked": "Berhasil dibuka: {{name}}"
   },
   "footer": {
-    "tagline": "Edukasi software testing praktis untuk QA engineer yang ingin berkembang secara teknis.",
+    "tagline": "Belajar software testing secara praktis untuk memperkuat skill teknis QA.",
     "explore": "Jelajahi",
-    "connect": "Terhubung",
-    "legal": "Legal",
+    "connect": "Kontak",
+    "legal": "Ketentuan",
     "copyright": "© TestingWithEkki {{year}}",
     "builtBy": "Dibuat oleh Ekki",
     "reportBug": "Laporkan Bug"

@@ -1,66 +1,66 @@
 {
   "hero": {
-    "eyebrow": "PENDIDIKAN SOFTWARE TESTING PRAKTIS",
-    "title": "Melampaui sekadar menjalankan test",
-    "description": "Bangun kemampuan teknis testing melalui pelajaran praktis dan tantangan hands-on. Mulai dari Web Automation, dari dasar web sampai Playwright.",
+    "eyebrow": "BELAJAR SOFTWARE TESTING SECARA PRAKTIS",
+    "title": "Tingkatkan skill testing kamu",
+    "description": "Pelajari cara kerja web, bangun fondasi pemrograman, lalu mulai praktik dengan Playwright.",
     "startWebAutomation": "Mulai Web Automation",
-    "explorePractice": "Jelajahi Practice",
-    "creatorNote": "Dibuat oleh Ekki · Belajar dengan ritmemu"
+    "explorePractice": "Lihat tantangan",
+    "creatorNote": "Dibuat oleh Ekki · Belajar sesuai waktumu"
   },
   "learningPath": {
-    "eyebrow": "OTOMASI WEB / PELAJARAN SAAT INI",
-    "title": "Mulai dari pelajaran yang sudah siap.",
-    "description": "Lihat pelajaran Web Automation saat ini, lalu gunakan Practice untuk menerapkan yang sudah kamu pelajari.",
+    "eyebrow": "WEB AUTOMATION / PELAJARAN TERSEDIA",
+    "title": "Pelajari Web Automation langkah demi langkah.",
+    "description": "Mulai dari dasar web, pelajari JavaScript dan TypeScript, lalu lanjut ke Playwright.",
     "cta": "Lihat semua pelajaran",
     "lessonNumber": "Pelajaran {{number}}",
-    "noLessons": "Katalog pelajaran saat ini tidak tersedia."
+    "noLessons": "Katalog pelajaran belum bisa ditampilkan."
   },
   "learnPractice": {
-    "eyebrow": "BELAJAR + PRACTICE",
+    "eyebrow": "BELAJAR + LATIHAN",
     "title": "Pelajari konsepnya. Praktikkan sendiri.",
-    "description": "Pelajaran menjelaskan idenya. Practice memberimu tempat untuk menggunakannya.",
-    "cta": "Jelajahi Practice",
+    "description": "Pahami konsepnya lewat materi di Belajar, lalu praktikkan lewat tantangan interaktif di Latihan.",
+    "cta": "Lihat tantangan",
     "steps": {
-      "learn": { "label": "BELAJAR", "title": "Pahami konsepnya", "description": "Mulai dari alasan di balik pekerjaan ini." },
-      "practice": { "label": "PRACTICE", "title": "Coba sendiri", "description": "Gunakan tantangan interaktif tanpa setup." },
-      "review": { "label": "REVIEW", "title": "Lihat apa dan mengapa berhasil", "description": "Jalankan test dan periksa hasilnya." }
+      "learn": { "label": "BELAJAR", "title": "Pahami konsepnya", "description": "Pahami cara kerja setiap teknik dan kapan perlu menggunakannya." },
+      "practice": { "label": "LATIHAN", "title": "Coba sendiri", "description": "Terapkan konsepnya langsung di browser tanpa perlu setup lokal." },
+      "review": { "label": "TINJAU", "title": "Tinjau hasilnya", "description": "Jalankan solusimu, lihat output, lalu coba lagi." }
     }
   },
   "philosophy": {
-    "title": "Pahami alasannya. Praktikkan caranya. Gunakan tool yang tepat.",
-    "description": "Testing bukan hanya tentang mengetahui tool yang digunakan. TWE berfokus pada pemahaman sistem yang diuji, menerapkan konsepnya sendiri, dan menggunakan tool saat benar-benar membantu.",
-    "why": "Pahami alasannya.",
-    "how": "Praktikkan caranya.",
-    "tools": "Gunakan tool yang tepat."
+    "title": "Pahami cara kerjanya. Praktikkan langsung. Pilih tool yang tepat.",
+    "description": "Di TWE, kamu mempelajari sistem yang kamu uji, mempraktikkan setiap konsep secara langsung, dan memilih tool sesuai kebutuhan.",
+    "why": "Pahami cara kerjanya.",
+    "how": "Praktikkan langsung.",
+    "tools": "Pilih tool yang tepat."
   },
   "creator": {
-    "eyebrow": "CREATOR",
+    "eyebrow": "DIBUAT OLEH EKKI",
     "title": "Belajar testing bersama Ekki.",
-    "description": "Saya adalah QA/SDET yang bekerja dengan otomasi, sistem yang banyak integrasi, dan infrastruktur testing. Saya membangun TWE untuk berbagi pembelajaran praktis dan mentorship yang membantu membentuk karier saya.",
+    "description": "Saya QA/SDET yang banyak bekerja dengan otomasi, sistem dengan banyak integrasi, dan infrastruktur testing. Saya membangun TWE untuk berbagi cara belajar praktis dan bimbingan yang dulu membantu saya berkembang dalam karier.",
     "cta": "Tentang Ekki"
   },
   "labs": {
     "eyebrow": "LABS · SEGERA HADIR",
-    "title": "Ruang baru untuk mengasah kemampuan testing.",
-    "description": "Labs sedang dibentuk sebagai ruang yang lebih tenang dan hands-on untuk mengeksplorasi software testing. Eksperimen pertamanya masih disiapkan, dan akan saya bagikan saat sudah siap.",
+    "title": "Berlatih di luar browser sandbox.",
+    "description": "Di Labs, kamu akan mengerjakan proyek QA dengan panduan dan menggunakan repository nyata, API, framework testing, serta pipeline CI. Labs masih dalam tahap pengembangan.",
     "cta": "Kunjungi Labs",
     "preview": {
       "label": "CATATAN LAB / 001",
-      "title": "Eksperimen interaksi",
+      "title": "Proyek QA dengan panduan",
       "status": "SEDANG DISIAPKAN",
       "steps": {
-        "observe": "Amati",
-        "try": "Coba",
-        "review": "Review"
+        "observe": "Setup",
+        "try": "Test",
+        "review": "Debug"
       },
-      "caption": "Eksperimen kecil. Feedback yang berguna."
+      "caption": "Berlatih dengan tool yang dipakai di dunia kerja."
     }
   },
   "cta": {
     "eyebrow": "MULAI DI SINI",
     "title": "Mulai dengan Web Automation.",
-    "description": "Bangun fondasinya, pelajari Playwright, dan praktikkan sambil berjalan.",
-    "primary": "Mulai Belajar",
-    "secondary": "Jelajahi Practice"
+    "description": "Bangun fondasi Web Automation, pelajari Playwright, dan terus berlatih.",
+    "primary": "Mulai Web Automation",
+    "secondary": "Lihat tantangan"
   }
 }
