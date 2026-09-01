@@ -23,6 +23,7 @@ test.describe('Practice list state', () => {
     }) => {
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`/${locale}/practice?view=grid`);
+      await page.waitForLoadState('networkidle');
 
       await expect(page.getByRole('tab')).toHaveCount(5);
       await expect(
