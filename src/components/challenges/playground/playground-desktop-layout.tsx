@@ -95,6 +95,7 @@ export function PlaygroundDesktopLayout({
           {hasHtml && (
             <TabsContent
               value="preview"
+              forceMount
               className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col"
             >
               <WebComponentPreview
