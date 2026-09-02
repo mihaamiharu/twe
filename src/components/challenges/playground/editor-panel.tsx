@@ -90,6 +90,7 @@ export function EditorPanel({
               />
             )}
             <MultiTabEditor
+              key={`${challenge.id}-${resetCount}`}
               files={fileContents}
               {...omitUndefined({
                 editableFiles: challenge.editableFiles,

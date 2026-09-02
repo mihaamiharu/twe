@@ -224,7 +224,12 @@ export async function executePlaywrightCode(
       } else {
         // Create isolated iframe (fallback behavior)
         iframe = document.createElement('iframe');
-        iframe.style.cssText = 'display: none;';
+        // Keep the document laid out so the Playwright shim can evaluate
+        // visibility using offsetParent/offset dimensions. `display: none`
+        // makes every element inside the iframe appear non-visible in real
+        // browsers, even when the element itself is visible.
+        iframe.style.cssText =
+          'position: fixed; width: 1px; height: 1px; left: -10000px; top: -10000px; border: 0; opacity: 0; pointer-events: none;';
         iframe.sandbox.add('allow-scripts', 'allow-same-origin', 'allow-forms');
         document.body.appendChild(iframe);
       }
@@ -663,8 +668,13 @@ export async function executePlaywrightCode(
           // Execute immediately for existing iframe
           void executeCode();
         } else {
-          // Wait for iframe to be ready
-          iframe.onload = executeCode;
+          // Wait for the initial iframe load only. VFS navigation rewrites the
+          // document and can fire load again; re-running here would race the
+          // active execution and clean up its iframe underneath it.
+          iframe.onload = () => {
+            iframe.onload = null;
+            void executeCode();
+          };
           // Trigger load event by setting src
           iframe.src = 'about:blank';
         }

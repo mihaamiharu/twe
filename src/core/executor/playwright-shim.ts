@@ -524,10 +524,10 @@ export class MockedPlaywrightPage {
       // Wrap content with necessary HTML structure including restored state
       const wrappedHtml = this._wrapVfsContent(content, preservedAppState);
 
-      // Update iframe content
-      this.targetDocument.open();
-      this.targetDocument.write(wrappedHtml);
-      this.targetDocument.close();
+      // Replace the document tree without calling document.open/write/close.
+      // Those APIs destroy the active script context, which can interrupt the
+      // learner's async test while a click-triggered VFS navigation is running.
+      this._replaceDocumentContents(wrappedHtml);
 
       // Restore window references BEFORE executing scripts so app scripts can access state
       if (this.targetDocument.defaultView) {
@@ -556,6 +556,30 @@ export class MockedPlaywrightPage {
     // Legacy mode (no VFS) - just update URL tracking
     this.currentUrl = url;
     await this.delay(50);
+  }
+
+  private _replaceDocumentContents(html: string): void {
+    const parsedDocument = new DOMParser().parseFromString(html, 'text/html');
+    const nextDocumentElement = parsedDocument.documentElement;
+    if (!nextDocumentElement) {
+      throw new Error('Could not create VFS document');
+    }
+
+    const currentDocumentElement = this.targetDocument.documentElement;
+
+    if (currentDocumentElement) {
+      for (const attribute of Array.from(currentDocumentElement.attributes)) {
+        currentDocumentElement.removeAttribute(attribute.name);
+      }
+      for (const attribute of Array.from(nextDocumentElement.attributes)) {
+        currentDocumentElement.setAttribute(attribute.name, attribute.value);
+      }
+      currentDocumentElement.innerHTML = nextDocumentElement.innerHTML;
+    } else {
+      this.targetDocument.appendChild(
+        this.targetDocument.importNode(nextDocumentElement, true),
+      );
+    }
   }
 
   /**
