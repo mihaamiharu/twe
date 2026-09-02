@@ -118,7 +118,7 @@ function ContactPage() {
             description={t('partnerships.description')}
             note={t('partnerships.opportunityNote')}
             cta={t('partnerships.cta')}
-            href="mailto:ekki@testingwithekki.com?subject=Partnership%20with%20TestingWithEkki"
+            href="mailto:admin@testingwithekki.com?subject=Partnership%20with%20TestingWithEkki"
             secondaryCta={t('partnerships.cvCta')}
             secondaryHref="/Ekki_Syam_CV.pdf"
           />
