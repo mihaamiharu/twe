@@ -554,6 +554,53 @@ describe('useChallengeExecution', () => {
         expect(mockState.setIsResetConfirmOpen).toHaveBeenCalledWith(false);
     });
 
+    it('should reset multi-file editor contents and per-file storage', async () => {
+        const setFileContents = mock();
+        const setSelectedFile = mock();
+        const setOpenFiles = mock();
+        const files = {
+            '/app/products.html': '<h1>Products</h1>',
+            '/tests/cart.spec.ts': 'starter test',
+        };
+        const fileState = createPlaygroundState({
+            ...mockState,
+            fileContents: {
+                ...files,
+                '/tests/cart.spec.ts': 'changed test',
+            },
+            setFileContents,
+            setSelectedFile,
+            setOpenFiles,
+        });
+        const fileProps = createPlaygroundProps({
+            ...mockProps,
+            challenge: createChallenge({
+                id: 'multi-file',
+                type: 'PLAYWRIGHT',
+                starterCode: 'starter test',
+                files,
+                editableFiles: ['/tests/cart.spec.ts'],
+            }),
+        });
+
+        const { result } = renderHook(() =>
+            useChallengeExecution(fileState, fileProps, mockIframe),
+        );
+
+        await act(async () => {
+            await result.current.confirmReset();
+        });
+
+        expect(setFileContents).toHaveBeenCalledWith(files);
+        expect(setSelectedFile).toHaveBeenCalledWith('/tests/cart.spec.ts');
+        expect(setOpenFiles).toHaveBeenCalledWith(['/tests/cart.spec.ts']);
+        // Check the mocked storage method directly to verify per-file cleanup.
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        expect(storage.storage.removeItem).toHaveBeenCalledWith(
+            'challenge-multi-file-user1-/tests/cart.spec.ts',
+        );
+    });
+
     it('should update file content on file change', () => {
         const fileState = createPlaygroundState({
             ...mockState,

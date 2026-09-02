@@ -92,6 +92,9 @@ export function useChallengeExecution(
         previewValidation,
         setPreviewValidation,
         setCode,
+        setFileContents,
+        setSelectedFile,
+        setOpenFiles,
         setSelector,
         setSelectorType,
         setResetCount,
@@ -427,9 +430,28 @@ export function useChallengeExecution(
             ? `challenge-${challenge.id}-${userId}`
             : `challenge-${challenge.id}`;
 
-        await storage.removeItem(storageKey);
+        const storageKeys = challenge.files
+            ? [
+                  storageKey,
+                  ...Object.keys(challenge.files).map(
+                      (path) => `${storageKey}-${path}`,
+                  ),
+              ]
+            : [storageKey];
+
+        await Promise.all(
+            [...new Set(storageKeys)].map((key) => storage.removeItem(key)),
+        );
 
         setCode(challenge.starterCode);
+        if (challenge.files) {
+            setFileContents({ ...challenge.files });
+            const firstFile = Object.keys(challenge.files)[0];
+            const editableFiles =
+                challenge.editableFiles ?? (firstFile ? [firstFile] : []);
+            setOpenFiles([...editableFiles]);
+            setSelectedFile(editableFiles[0] ?? '');
+        }
         setSelector('');
         setTestResults([]);
         setHasPassed(false);
@@ -445,6 +467,9 @@ export function useChallengeExecution(
         setHasPassed,
         setPreviewValidation,
         setResetCount,
+        setFileContents,
+        setSelectedFile,
+        setOpenFiles,
         setIsResetConfirmOpen,
     ]);
 
