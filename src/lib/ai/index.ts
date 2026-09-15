@@ -27,7 +27,7 @@ export interface HintResponse {
 }
 
 /**
- * Generate an AI hint for a challenge using DeepSeek Chat (V3).
+ * Generate an AI hint for a challenge using DeepSeek V4.1 Flash.
  * The hint guides the user without revealing the exact solution.
  */
 export async function generateHint(request: HintRequest): Promise<HintResponse> {
@@ -51,7 +51,7 @@ export async function generateHint(request: HintRequest): Promise<HintResponse> 
 
     try {
         const completion = await client.chat.completions.create({
-            model: 'deepseek-chat',
+            model: 'deepseek-flash',
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: userPrompt },
