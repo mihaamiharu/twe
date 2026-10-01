@@ -16,8 +16,39 @@ async function run(
   return process.exited;
 }
 
+type ContainerRuntime = 'docker' | 'podman';
+
+const configuredRuntime = process.env.E2E_CONTAINER_RUNTIME;
+const runtimeIsSupported =
+  configuredRuntime === undefined ||
+  configuredRuntime === '' ||
+  configuredRuntime === 'docker' ||
+  configuredRuntime === 'podman';
+if (!runtimeIsSupported) {
+  throw new Error(
+    `E2E_CONTAINER_RUNTIME must be "podman" or "docker". Received: ${configuredRuntime}`,
+  );
+}
+
+const explicitRuntime =
+  configuredRuntime === 'docker' || configuredRuntime === 'podman'
+    ? configuredRuntime
+    : undefined;
+const detectedRuntime: ContainerRuntime | undefined = Bun.which('docker')
+  ? 'docker'
+  : Bun.which('podman')
+    ? 'podman'
+    : undefined;
+const containerRuntime = explicitRuntime ?? detectedRuntime;
+
+if (containerRuntime === undefined) {
+  throw new Error(
+    'Neither Docker nor Podman was found on PATH. Install Docker Desktop (or Podman), start it, and retry.',
+  );
+}
+
 let exitCode = await run([
-  'podman',
+  containerRuntime,
   'compose',
   'up',
   '-d',
@@ -41,7 +72,7 @@ if (exitCode === 0) {
     }
   } finally {
     const cleanupExitCode = await run([
-      'podman',
+      containerRuntime,
       'compose',
       'stop',
       'postgres_test',

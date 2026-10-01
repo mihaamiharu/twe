@@ -40,6 +40,9 @@ Challenges and tutorials are authored in JSON/Markdown (`content/challenges/`, `
 ## 🛠️ Development Workflow
 
 ### Key Commands
+- `bun run setup`: Initialize local environment, PostgreSQL, migrations, and content.
+- `bun run dev:local`: Start local database and development server (macOS/Windows).
+- `bun run db:up` / `bun run db:stop`: Start/stop local PostgreSQL, preserving data.
 - `bun run dev`: Start development server (Port 3000).
 - `bun run db:migrate`: Apply database migrations.
 - `bun run db:generate`: Generate migrations from schema changes.
@@ -49,8 +52,9 @@ Challenges and tutorials are authored in JSON/Markdown (`content/challenges/`, `
 - `bun run test:e2e`: Run Playwright tests for the platform itself.
 
 ### Environment Setup
-- Copy `.env.example` to `.env`.
-- Use `podman compose up -d` (or Docker) for local PostgreSQL.
+- Install Bun, Git, and Docker Desktop on macOS or Windows; start Docker Desktop.
+- Run `bun install`, `bun run setup`, then `bun run dev:local`.
+- See [Local development](docs/LOCAL_DEVELOPMENT.md) for Podman and manual/custom DB workflows.
 
 ## 💅 Coding Standards
 
