@@ -7,6 +7,8 @@ This file contains guidelines for agentic coding assistants working in this repo
 ### Build & Dev
 
 * `bun run dev` - Start development server (Nitro + Vite)
+* `bun run setup` - Initialize local env, PostgreSQL, migrations, and content (macOS/Windows)
+* `bun run dev:local` - Start local PostgreSQL and the development server
 * `bun run build` - Build for production
 * `bun run preview` - Preview production build
 
@@ -17,10 +19,16 @@ This file contains guidelines for agentic coding assistants working in this repo
 
 ### Database (Drizzle ORM v1.0+)
 
-We use `podman` by default for local environment infrastructure.
+We use `docker compose` (Docker Desktop) for local environment infrastructure. Podman works as an alternative.
+
+Use `bun run setup` once, then `bun run dev:local` daily on macOS and Windows.
+See [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md). The local helpers preserve
+existing `.env` files and require the example local DB URL with no `DIRECT_URL`.
+
+* `bun run db:up` / `bun run db:stop` - Start/stop local PostgreSQL without deleting data
 
 * `bun run db:push` - Sync schema to DB (Development)
-* `bun run db:migrate` - Execute production migrations
+* `bun run db:migrate` - Apply checked-in migrations to the configured database
 * `bun run db:studio` - Open Drizzle Studio
 
 ---
@@ -134,7 +142,7 @@ const { data } = useQuery({
 2. **Prefer Server Functions**: Only use `api/` routes for external webhooks or non-React consumers.
 3. **Optimistic Updates**: Always implement optimistic UI logic in TanStack Query mutations for a "zero-latency" feel.
 4. **Isomorphic Logic**: Keep logic inside `loader` or `Server Functions`. Avoid `useEffect` for data fetching.
-5. **Environment Run**: We default to `podman local` rather than traditional `docker` when standing up services.
+5. **Environment Run**: We use `docker compose` for standing up local services (Podman also works).
 
 ---
 

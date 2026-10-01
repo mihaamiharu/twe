@@ -4,45 +4,13 @@ services:
     container_name: twe-postgres
     restart: unless-stopped
     ports:
-      - '5432:5432'
+      - '127.0.0.1:5432:5432'
     environment:
       POSTGRES_USER: twe_user
       POSTGRES_PASSWORD: twe_password
       POSTGRES_DB: twe_db
-      # PostgreSQL optimizations for 4GB RAM server
-      # Using 1GB shared_buffers (25% of RAM) and 3GB effective cache (75% of RAM)
-      POSTGRES_SHARED_BUFFERS: 1GB
-      POSTGRES_EFFECTIVE_CACHE_SIZE: 3GB
-      POSTGRES_MAINTENANCE_WORK_MEM: 256MB
-      POSTGRES_WORK_MEM: 16MB
-      POSTGRES_WAL_BUFFERS: 8MB
-      POSTGRES_MAX_CONNECTIONS: 100
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    command:
-      - postgres
-      - -c
-      - shared_buffers=1GB
-      - -c
-      - effective_cache_size=3GB
-      - -c
-      - maintenance_work_mem=256MB
-      - -c
-      - work_mem=16MB
-      - -c
-      - wal_buffers=8MB
-      - -c
-      - max_connections=100
-      - -c
-      - max_wal_size=1GB
-      - -c
-      - min_wal_size=80MB
-      - -c
-      - checkpoint_completion_target=0.9
-      - -c
-      - random_page_cost=1.1
-      - -c
-      - effective_io_concurrency=200
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U twe_user -d twe_db']
       interval: 10s
@@ -54,7 +22,7 @@ services:
     container_name: twe-postgres-test
     restart: unless-stopped
     ports:
-      - '5433:5432'
+      - '127.0.0.1:5433:5432'
     environment:
       POSTGRES_USER: twe_test
       POSTGRES_PASSWORD: twe_password

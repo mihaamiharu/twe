@@ -8,53 +8,31 @@ TestingWithEkki is a platform built for QA engineers to learn modern testing ski
 
 You will need the following tools installed:
 
-- **[Bun](https://bun.sh/)** (v1.0+): Our package manager and runtime.
-- **[Podman](https://podman.io/docs/installation)** with WSL 2 and Docker Compose: Required for the local PostgreSQL database. Podman Desktop is optional.
+- **[Bun](https://bun.sh/)** (v1.0+): Our package manager and runtime. Scripts such as `bun run dev` and `bun test` do not run on Node.js alone.
+- **[Docker Desktop](https://www.docker.com/products/docker-desktop/)**: Runs PostgreSQL on macOS and Windows (WSL 2 backend on Windows). Podman is an alternative.
 - **Git**: Version control.
 
 ## 🚀 Local Development Setup
 
-1. **Clone the repository**
+The same commands work on macOS Terminal and Windows PowerShell. Install Bun,
+Git, and Docker Desktop; start Docker Desktop before running setup.
 
-   ```bash
-   git clone https://github.com/mihaamiharu/twe.git
-   cd twe
-   ```
+```sh
+git clone https://github.com/mihaamiharu/twe.git
+cd twe
+bun install
+bun run setup
+bun run dev:local
+```
 
-2. **Install dependencies**
+The app runs at [http://localhost:3000](http://localhost:3000). `setup` creates a
+missing `.env` with a generated auth secret, starts PostgreSQL, runs migrations,
+and syncs content. Existing environment files are preserved. Run setup again after
+pulling database migrations or content changes. Daily startup uses `dev:local`.
 
-   ```bash
-   bun install
-   ```
-
-3. **Set up environment variables**
-
-   ```powershell
-   Copy-Item .env.example .env
-   ```
-
-   > **Note**: You may need to adjust `DATABASE_URL` in `.env` if your local Docker setup differs.
-
-4. **Start the database**
-
-   ```powershell
-   podman compose up -d --wait postgres
-   ```
-
-5. **Run database migrations**
-
-   ```bash
-   bun run db:migrate
-   bun run db:sync
-   ```
-
-6. **Start the development server**
-
-   ```bash
-   bun run dev
-   ```
-
-   The app will be available at [http://localhost:3000](http://localhost:3000).
+Use `bun run db:stop` to stop PostgreSQL without deleting your data. See
+[Local development](./docs/LOCAL_DEVELOPMENT.md) for both platforms, Podman,
+manual/custom databases, optional services, and troubleshooting.
 
 ## 💻 Development Workflow
 
@@ -113,11 +91,11 @@ bun test
 ### End-to-End (E2E) Tests
 
 We use Playwright for E2E testing. The command below creates an isolated,
-disposable PostgreSQL 15 container with Podman, applies the schema and content,
-starts the app in test mode, provisions test users, and cleans up its resources
-when the run finishes. Ensure your intended Podman machine or service is running
-before starting the suite. Podman is the local default; use
-`E2E_CONTAINER_RUNTIME=docker` to run the same orchestration with Docker.
+disposable PostgreSQL 15 container with Docker (or Podman), applies the schema
+and content, starts the app in test mode, provisions test users, and cleans up
+its resources when the run finishes. Ensure your container runtime is running
+before starting the suite. Docker is used when it is on `PATH`, otherwise
+Podman; force one with `E2E_CONTAINER_RUNTIME`.
 
 ```bash
 bun run test:e2e

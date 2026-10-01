@@ -32,6 +32,11 @@ This document serves as the **source of truth** for development patterns, archit
 
 ### Database & ORM
 
+For local development on macOS and Windows, install Bun and start Docker Desktop,
+then run `bun install`, `bun run setup`, and `bun run dev:local`. Use `bun run db:stop`
+to stop PostgreSQL while preserving data. See [Local development](docs/LOCAL_DEVELOPMENT.md)
+for environment settings, Podman, and the manual workflow.
+
 - **PostgreSQL** + **Drizzle ORM**.
 - **Schema**: Defined in `src/db/schema.ts`.
 - **Migrations**: `drizzle/migrations`.

@@ -188,7 +188,10 @@ async function resolvePort(
 function resolveContainerRuntime(): ContainerRuntime {
   const configuredRuntime = process.env.E2E_CONTAINER_RUNTIME;
   if (configuredRuntime === undefined || configuredRuntime === '') {
-    return 'podman';
+    if (Bun.which('docker')) return 'docker';
+    if (Bun.which('podman')) return 'podman';
+
+    return 'docker';
   }
   if (configuredRuntime === 'docker' || configuredRuntime === 'podman') {
     return configuredRuntime;
@@ -208,7 +211,7 @@ async function ensureContainerRuntime(
     version = await captureCommand(runtime, ['--version']);
   } catch {
     throw new Error(
-      `${displayName} is required for E2E tests but was not found on PATH. Install ${displayName} and retry.`,
+      `${displayName} is required for E2E tests but was not found on PATH. Install Docker Desktop or Podman, start it, and retry.`,
     );
   }
   if (version.exitCode !== 0) {

@@ -14,6 +14,7 @@ import { logger } from '@/lib/logger';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { authMiddleware } from './auth.mw';
 import { getCachedTierTotals } from './content.server';
+import { getUserXPProgress } from './user-xp-progress';
 
 export type UserData = {
   id: string;
@@ -126,18 +127,7 @@ export const getUserSettings = createServerFn({ method: 'GET' })
         // Heatmap logic removed
 
         // Calculate XP progress to next level
-        const currentLevel = user.level || 1;
-        const currentXP = user.xp || 0;
-        const xpForCurrentLevel = 100 * Math.pow(currentLevel - 1, 2);
-        const xpForNextLevel = 100 * Math.pow(currentLevel, 2);
-
-        const xpProgress = Math.max(0, currentXP - xpForCurrentLevel);
-        const xpNeeded = Math.max(100, xpForNextLevel - xpForCurrentLevel); // Ensure never 0
-
-        const xpProgressPercentage = Math.min(
-          100,
-          Math.max(0, Math.round((xpProgress / xpNeeded) * 100)),
-        );
+        const xpProgress = getUserXPProgress(user.xp);
 
         // Construct recent activity
         const activityItems: {
@@ -199,10 +189,7 @@ export const getUserSettings = createServerFn({ method: 'GET' })
 
             // Gamification
             xp: user.xp,
-            level: user.level,
-            xpProgress,
-            xpNeeded,
-            xpProgressPercentage,
+            ...xpProgress,
 
             // Privacy
             profileVisibility: user.profileVisibility,

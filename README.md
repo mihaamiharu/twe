@@ -17,78 +17,32 @@ A gamified platform for learning QA testing skills through interactive tutorials
 
 ## 🚀 Quick Start
 
-### Prerequisites
+Use the same workflow on **macOS and Windows**: Bun runs the app, and Docker
+Desktop runs PostgreSQL 15. Install Bun, Git, and Docker Desktop, then start
+Docker Desktop and wait until `docker info` succeeds.
 
-- [Bun](https://bun.sh/) (v1.0+) or Node.js (v22+)
-- [Podman](https://podman.io/docs/installation) with WSL 2 and Docker Compose (for PostgreSQL; Podman Desktop is optional)
-- [Git](https://git-scm.com/)
-
-On Windows, install the command-line tools and create the Podman machine:
-
-```powershell
-winget install RedHat.Podman
-winget install Docker.DockerCompose
-podman machine init --cpus 4 --memory 4096 --disk-size 40
-podman machine start
-```
-
-If a Podman machine already exists, only run `podman machine start`.
-
-### 1. Clone & Install
-
-```bash
+```sh
 git clone https://github.com/mihaamiharu/twe.git
 cd twe
 bun install
+bun run setup
+bun run dev:local
 ```
 
-### 2. Environment Setup
+Open [http://localhost:3000](http://localhost:3000).
 
-```powershell
-Copy-Item .env.example .env
+`setup` creates a missing `.env` with a generated auth secret, starts the database,
+applies migrations, and syncs content. It preserves existing `.env` files.
+`dev:local` starts the database and app without rerunning initialization.
+
+```sh
+bun run db:up      # Start only the local dev database
+bun run db:stop    # Stop it while preserving data
 ```
 
-Edit `.env` with your values:
-
-```env
-# Database
-DATABASE_URL=postgresql://postgres:password@localhost:5432/twe
-
-# BetterAuth
-BETTER_AUTH_SECRET=your-secret-key-here
-BETTER_AUTH_URL=http://localhost:3000
-
-# Google OAuth (optional)
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-
-# Email (for verification emails)
-SMTP_HOST=smtp.example.com
-SMTP_PORT=587
-SMTP_USER=your-email@example.com
-SMTP_PASS=your-email-password
-```
-
-### 3. Start Database
-
-```powershell
-podman compose up -d --wait postgres
-```
-
-### 4. Run Migrations
-
-```bash
-bun run db:migrate
-bun run db:sync
-```
-
-### 5. Start Development Server
-
-```bash
-bun run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+The helpers use `postgresql://twe_user:twe_password@localhost:5432/twe_db` and
+reject custom database URLs or `DIRECT_URL`. For manual setup, Podman, optional
+integrations, and troubleshooting, see [Local development](./docs/LOCAL_DEVELOPMENT.md).
 
 ### Run the end-to-end suite
 
@@ -102,12 +56,13 @@ regular and admin accounts, runs the full Playwright suite, and removes its
 container and app process even when a test fails. It selects verified free
 local ports automatically. Set `E2E_DB_PORT` or `E2E_APP_PORT` to a specific
 free port when needed, or set either to `0` to request automatic selection.
-Podman is the default local container runtime. Set
-`E2E_CONTAINER_RUNTIME=docker` to run the same orchestration with Docker, as
-GitHub Actions does.
+The runner uses Docker when it is on `PATH`, otherwise Podman. Set
+`E2E_CONTAINER_RUNTIME=docker` or `E2E_CONTAINER_RUNTIME=podman` to force a
+specific runtime, as GitHub Actions does with `docker`.
 
 The command only removes the uniquely named container it created; it does not
-stop or remove the development databases from `podman compose`.
+stop or remove the development databases from `docker compose`. Install the
+browser once with `bunx playwright install chromium` before the first run.
 
 ## 📦 Tech Stack
 
@@ -150,7 +105,9 @@ src/
 ## 🔧 Available Scripts
 
 ```bash
-bun run dev        # Start development server
+bun run setup      # Initialize local env, database, and content
+bun run dev:local  # Start local database and development server
+bun run dev        # Start app only (manual/custom DB workflow)
 bun run build      # Build for production
 bun run start      # Start production server
 bun run test       # Run tests (Bun Test)
@@ -173,7 +130,9 @@ Local integration tests run against a dedicated PostgreSQL container.
 
 ```bash
 bun run test:unit         # Only unit tests
-bun run test:integration  # Only integration tests (requires docker)
+# Integration tests use the test database on port 5433, not the dev database:
+docker compose up -d --wait postgres_test
+bun run test:integration  # Only integration tests
 ```
 
 ### Local CI/CD (One-Command)
@@ -191,9 +150,9 @@ _Starts `postgres_test`, runs all tests, and stops the container cleanup regardl
 If you want to keep the test database running:
 
 ```bash
-podman compose up -d --wait postgres_test
+docker compose up -d --wait postgres_test
 bun test
-# podman compose stop postgres_test
+# docker compose stop postgres_test
 ```
 
 ## 🎮 Challenge Types

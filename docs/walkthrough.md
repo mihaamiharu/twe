@@ -210,16 +210,13 @@ PORT=3000
 
 **First Commands:**
 
+For the current repository, use the shared macOS/Windows workflow described in
+[Local development](LOCAL_DEVELOPMENT.md):
+
 ```bash
-# Initialize TanStack Start project
-npm create @tanstack/start@latest
-
-# Set up PostgreSQL with Docker
-podman compose up -d
-
-# Initialize Drizzle
-npx drizzle-kit generate
-npx drizzle-kit migrate
+bun install
+bun run setup
+bun run dev:local
 ```
 
 ---

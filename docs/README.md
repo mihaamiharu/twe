@@ -5,6 +5,7 @@ Welcome to the **TestingWithEkki** project documentation.
 ## Project Basics
 
 - [**README.md**](../README.md): Quick start guide and project overview.
+- [**LOCAL_DEVELOPMENT.md**](./LOCAL_DEVELOPMENT.md): Shared Bun + Docker workflow for macOS and Windows.
 - [**GLOSSARY.md**](./GLOSSARY.md): Definitions of terms used in the project.
 - [**CHANGELOG.md**](./CHANGELOG.md): History of changes and versions.
 
