@@ -34,11 +34,14 @@ export function createLocalEnv(template: string) {
 }
 
 export function ensureLocalEnv(envPath: string, templatePath: string) {
+  // Callers supply repository paths or isolated test fixtures, never user input.
+  /* eslint-disable security/detect-non-literal-fs-filename */
   if (existsSync(envPath)) return false;
   // Exclusive creation preserves configuration even in concurrent runs.
   writeFileSync(envPath, createLocalEnv(readFileSync(templatePath, 'utf8')), {
     flag: 'wx',
   });
+  /* eslint-enable security/detect-non-literal-fs-filename */
   return true;
 }
 
@@ -74,6 +77,8 @@ async function main() {
   }
 
   const envPath = resolve(projectRoot, '.env');
+  // envPath is the fixed .env file beneath this script's repository root.
+  // eslint-disable-next-line security/detect-non-literal-fs-filename
   if (!existsSync(envPath)) {
     if (action !== 'setup')
       throw new Error('Run bun run setup first to create .env.');
@@ -82,6 +87,7 @@ async function main() {
   }
   const env = localEnvironment({
     ...process.env,
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Fixed repository .env path.
     ...parse(readFileSync(envPath)),
   });
   for (const command of commands) {
