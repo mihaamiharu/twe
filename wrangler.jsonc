@@ -6,8 +6,14 @@
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": false,
   "preview_urls": false,
-  "assets": { "binding": "ASSETS", "directory": "dist/client" },
-  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "dist/client",
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 0.1,
+  },
   "vars": {
     "APP_ENV": "local",
     "BETTER_AUTH_URL": "http://localhost:3000",
@@ -46,10 +52,20 @@
           "migrations_dir": "drizzle/d1",
         },
       ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "APP_RUNTIME",
+            "class_name": "AppRuntime",
+          },
+        ],
+      },
     },
     "production": {
       "name": "twe-production",
-      "triggers": { "crons": ["0 19 * * *"] },
+      "triggers": {
+        "crons": ["0 19 * * *"],
+      },
       "workers_dev": false,
       "preview_urls": false,
       "vars": {
@@ -66,6 +82,28 @@
           "migrations_dir": "drizzle/d1",
         },
       ],
+      "durable_objects": {
+        "bindings": [
+          {
+            "name": "APP_RUNTIME",
+            "class_name": "AppRuntime",
+          },
+        ],
+      },
     },
   },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "APP_RUNTIME",
+        "class_name": "AppRuntime",
+      },
+    ],
+  },
+  "migrations": [
+    {
+      "tag": "app-runtime-v1",
+      "new_sqlite_classes": ["AppRuntime"],
+    },
+  ],
 }

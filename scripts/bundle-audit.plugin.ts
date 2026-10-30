@@ -14,6 +14,14 @@ export function bundleAuditPlugin(): Plugin {
         const chunks = Object.values(bundle).filter(
           (output) => output.type === 'chunk',
         );
+        if (
+          !chunks.some(
+            (chunk) => chunk.isEntry && chunk.exports.includes('AppRuntime'),
+          )
+        )
+          this.error(
+            'The Worker entry must export the SQLite AppRuntime class.',
+          );
         for (const [fileName, output] of Object.entries(bundle)) {
           // Vite may emit browser Worker assets while scanning modules that
           // ClientOnly later removes. Keep those scripts in client Static Assets.

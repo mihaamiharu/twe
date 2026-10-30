@@ -3,6 +3,14 @@ import type { D1Database } from '@cloudflare/workers-types';
 export interface RuntimeEnv {
   DB: D1Database;
   ASSETS?: { fetch(request: Request): Promise<Response> };
+  APP_RUNTIME?: {
+    getByName(
+      name: string,
+      options: { locationHint: 'apac' },
+    ): {
+      fetch(request: Request): Promise<Response>;
+    };
+  };
   APP_ENV: 'local' | 'preview' | 'production' | 'test';
   BETTER_AUTH_URL: string;
   BETTER_AUTH_SECRET: string;

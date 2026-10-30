@@ -17,6 +17,10 @@ export async function createTestSandbox(baseUrl: string) {
     compatibility_flags: ['nodejs_compat'],
     workers_dev: false,
     preview_urls: false,
+    durable_objects: {
+      bindings: [{ name: 'APP_RUNTIME', class_name: 'AppRuntime' }],
+    },
+    migrations: [{ tag: 'app-runtime-v1', new_sqlite_classes: ['AppRuntime'] }],
     assets: { binding: 'ASSETS', directory: join(root, 'public') },
     vars: {
       APP_ENV: 'test',

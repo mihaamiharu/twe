@@ -1,11 +1,37 @@
 import { timingSafeEqual } from 'node:crypto';
+import { DurableObject } from 'cloudflare:workers';
 import {
   createStartHandler,
   defaultStreamHandler,
 } from '@tanstack/react-start/server';
 import { getRuntimeEnv } from '#platform';
+import type { RuntimeEnv } from './runtime/env';
 
 const handleStart = createStartHandler(defaultStreamHandler);
+
+// D1 remains the database. The SQLite-backed class supplies a Free-compatible
+// compute boundary for SSR, existing password hashes and arbitrary OG images.
+// Never create an object per user/request: one stable instance bounds duration.
+export class AppRuntime extends DurableObject<RuntimeEnv> {
+  override async fetch(request: Request): Promise<Response> {
+    try {
+      return await handleStart(request);
+    } catch {
+      // Catch before the object boundary: a rejected fetch can otherwise put a
+      // raw database/auth exception into platform logs before the gateway sees it.
+      console.error(
+        JSON.stringify({
+          event: 'application_request_failed',
+          requestId: crypto.randomUUID(),
+        }),
+      );
+      return new Response('Internal server error', {
+        status: 500,
+        headers: { 'Cache-Control': 'private, no-store' },
+      });
+    }
+  }
+}
 
 function protect(response: Response, preview: boolean): Response {
   const headers = new Headers(response.headers);
@@ -87,7 +113,12 @@ export default {
         preview,
       );
     try {
-      return protect(await handleStart(request), preview);
+      if (!env.APP_RUNTIME)
+        throw new Error('Application runtime is unavailable.');
+      const response = await env.APP_RUNTIME.getByName('application', {
+        locationHint: 'apac',
+      }).fetch(request);
+      return protect(response, preview);
     } catch {
       // No exception payload, query, headers, user data or credentials in logs.
       console.error(

@@ -22,6 +22,12 @@ const config = z
       EMAIL_HTTP_URL: z.string().url().optional(),
     }),
     d1_databases: z.array(bindingSchema),
+    durable_objects: z.object({
+      bindings: z.array(z.object({ name: z.string(), class_name: z.string() })),
+    }),
+    migrations: z.array(
+      z.object({ new_sqlite_classes: z.array(z.string()).optional() }),
+    ),
   })
   .parse(built);
 const source = z
@@ -39,6 +45,13 @@ const expectedId = source.env[target]?.d1_databases.find(
 if (
   config.name !== `twe-${target}` ||
   config.vars.APP_ENV !== target ||
+  !config.durable_objects.bindings.some(
+    (binding) =>
+      binding.name === 'APP_RUNTIME' && binding.class_name === 'AppRuntime',
+  ) ||
+  !config.migrations.some((migration) =>
+    migration.new_sqlite_classes?.includes('AppRuntime'),
+  ) ||
   !config.d1_databases.some(
     (binding) =>
       binding.binding === 'DB' &&
