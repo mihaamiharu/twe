@@ -8,6 +8,7 @@ Initial inventory October 30, 2026; implementation evidence updated October 31. 
 
 - Work through the linked implementation issues in dependency order.
 - Keep the VPS serving production until the migration is ready for cutover.
+- The owner now requires strict $0 and has deferred cutover for the [Free compute redesign](CLOUDFLARE_FREE_ARCHITECTURE.md); Paid is not an approved fallback.
 - Consolidate test execution into [#256](https://github.com/mihaamiharu/twe/issues/256), before release. Do not repeatedly run unit, integration, E2E, lint, typecheck, or build checks during each inventory or implementation step.
 - Record unverified behavior honestly. Implementation progress does not establish release readiness.
 - Preserve the April 2027 cutover target and require explicit sign-off before VPS retirement.

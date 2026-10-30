@@ -17,7 +17,7 @@ This file contains guidelines for agentic coding assistants working in this repo
 
 ### Database (Drizzle ORM v1.0+)
 
-The Cloudflare migration branch uses local workerd and D1 through Wrangler. No local PostgreSQL container is required. PostgreSQL history and recovery tools remain under `src/db/legacy/` until post-cutover retirement.
+The Cloudflare migration branch uses local workerd and D1 through Wrangler. Under the strict-$0 architecture, the gateway forwards dynamic Start requests to the SQLite-backed AppRuntime Durable Object; D1 remains the business database. Preserve that compute boundary and verify gateway/object quotas separately. No local PostgreSQL container is required. PostgreSQL history and recovery tools remain under `src/db/legacy/` until post-cutover retirement.
 
 - `bun run setup` - Create local secrets if absent, apply D1 migrations and sync editorial data
 - `bun run dev:local` - Start Vite with local workerd/D1
