@@ -1,1 +1,7 @@
+* text=auto
+
+# Keep executable and container files usable inside Linux environments.
+*.sh text eol=lf
+Dockerfile* text eol=lf
+
 src/server/generated/content-manifest.json linguist-generated=true
