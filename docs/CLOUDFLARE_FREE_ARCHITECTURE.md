@@ -21,3 +21,13 @@ The `spikes/free-runtime` probe is synthetic only. It has no database, product r
 ## Initial isolated result
 
 The protected probe deployed as version `357c4e3b-a0ea-4a8d-a08b-8d2d3523ebd5`. All nine authorized requests passed and unauthorized access returned 401. Captured gateway CPU was 0–1 ms; object native scrypt was 76–81 ms and existing Better Auth scrypt 142–148 ms. Both matched the same synthetic stored-hash vector. Native hashing alone does not meet the ordinary Worker CPU budget. The compute boundary is promising; full-app context/transport, resource budgets and actual Free-account deployment remain unproven. See [sanitized samples](reports/cloudflare-free-probe-20261031.json).
+
+## Full application candidate
+
+Runtime source `fb48add` is deployed only to twe-preview as version `40ff8186-03e1-456e-bab9-2b956aaa8ca0`. The Worker now forwards dynamic requests to AppRuntime; D1, all auth algorithms/data and public HTML/OG behavior are retained. Local/test configs use the same boundary. Builds fail if AppRuntime is not exported, and deployment preflight requires its binding plus the SQLite class migration.
+
+Local HTTP and hosted preview smoke passed, as did all 30 D1 integration tests, targeted auth checks, lint/typecheck and the Worker build. Eight concurrent learner/admin server-session requests retained their identities. Three hosted submissions added one completion and 10 XP, and an injected later failure left the resulting state unchanged. No Playwright, actual email/Google/AI/GitHub delivery or production cutover ran.
+
+Captured gateway CPU was 0–1 ms across SSR/auth/OG/server functions. Object CPU samples included Home 21–34 ms, Learn 30–43 ms, Practice 48–58 ms, login 183–187 ms and a custom OG render 37 ms. See [separate execution-model samples](reports/cloudflare-durable-preview-20261031.json). All captured outcomes were ok. These observations support the compute boundary; they do not prove p99, controlled cold starts, memory, billed duration or account-wide Free quota/billing acceptance. Production remains deferred.
+
+CLI data tooling now creates a short-lived data-only proxy config without compute declarations; this avoids misleading class-export warnings while preserving the app's real local workerd boundary. D1 access, private `.dev.vars` resolution, auth and temporary-file cleanup were verified. AppRuntime uses no business/object storage. A future storage/timer/sharding change needs an explicit quota/recovery review.

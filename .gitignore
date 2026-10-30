@@ -48,3 +48,5 @@ vps_access_guide.md
 conductor/
 
 src/worker-bindings.generated.d.ts
+# Private, short-lived data-only Wrangler configs; removed after proxy startup.
+.*.data-proxy-*.json

@@ -4,7 +4,7 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { randomBytes } from 'node:crypto';
 import { hashPassword } from 'better-auth/crypto';
-import { getPlatformProxy } from 'wrangler';
+import { getDataPlatformProxy } from './data-platform-proxy';
 import { z } from 'zod';
 import { createTestSandbox } from './test-sandbox';
 import { readJsonConfig } from './json-config';
@@ -94,12 +94,12 @@ if (
 
 const sandbox = await createTestSandbox('http://localhost:3000');
 let platform:
-  | Awaited<ReturnType<typeof getPlatformProxy<RuntimeEnv>>>
+  | Awaited<ReturnType<typeof getDataPlatformProxy<RuntimeEnv>>>
   | undefined;
 try {
   await sandbox.migrate();
   await sandbox.run(['run', 'db:sync']);
-  platform = await getPlatformProxy<RuntimeEnv>({
+  platform = await getDataPlatformProxy<RuntimeEnv>({
     configPath: sandbox.configPath,
     remoteBindings: false,
     envFiles: [],

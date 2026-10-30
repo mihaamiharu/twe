@@ -13,7 +13,7 @@ on:
         required: true
         type: string
       approve_production:
-        description: Confirm production readiness and release approval
+        description: Confirm Free-plan account/quotas, local E2E and production release approval
         type: boolean
         default: false
 

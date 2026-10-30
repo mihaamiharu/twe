@@ -1,6 +1,6 @@
 # Local development on Workers and D1
 
-The migration branch uses Bun, Vite, local workerd and a persisted local D1 database. It does not require a PostgreSQL container. The former VPS/PostgreSQL workflow is retained in [the recovery reference](LOCAL_DEVELOPMENT_POSTGRESQL.md); its old package commands are historical.
+The migration branch uses Bun, Vite, local workerd, a SQLite-backed AppRuntime Durable Object and a persisted local D1 database. The object supplies compute; application data remains in D1. It does not require a PostgreSQL container. The former VPS/PostgreSQL workflow is retained in [the recovery reference](LOCAL_DEVELOPMENT_POSTGRESQL.md); its old package commands are historical.
 
 ## Setup
 
@@ -52,3 +52,7 @@ Integration and E2E runners each create a disposable D1 config/state under `.wra
 - Email is unavailable: choose/configure an HTTP transport for preview/production. Disabled email is allowed only locally/in tests.
 - Wrong deploy environment: rebuild with cf:build:preview or cf:build:production; the deploy wrapper rejects mismatched artifacts.
 - Preserve `.env`, PostgreSQL volumes and recovery files while migrating; do not remove the old infrastructure until post-cutover sign-off.
+
+## Compute and CLI data bindings
+
+Vite and the disposable HTTP/E2E app use the same AppRuntime forwarding boundary as preview. The Worker handles security/maintenance/assets; dynamic Start requests run in the object. Local-only data scripts use a D1/vars proxy without object declarations, because Wrangler’s platform proxy does not execute the application class. Its exclusive mode-0600 temporary config stays beside the original to preserve relative paths and `.dev.vars`, then is removed after startup. The original config and secrets are never rewritten. The ignored filename pattern covers interrupted cleanup.

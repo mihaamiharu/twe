@@ -1,0 +1,209 @@
+{
+  "runtimeCommit": "fb48add",
+  "workerVersion": "40ff8186-03e1-456e-bab9-2b956aaa8ca0",
+  "data": "synthetic only",
+  "measuredAt": "2026-10-31 Asia/Jakarta",
+  "outcomes": {
+    "stateless ok": 38,
+    "durableObject ok": 23
+  },
+  "cpuByExecutionModel": {
+    "durableObject /_serverFn": {
+      "samples": 8,
+      "minCpuMs": 1,
+      "medianCpuMs": 2.5,
+      "maxCpuMs": 13,
+      "minWallMs": 256,
+      "maxWallMs": 385
+    },
+    "durableObject /api/auth/get-session": {
+      "samples": 2,
+      "minCpuMs": 2,
+      "medianCpuMs": 2.0,
+      "maxCpuMs": 2,
+      "minWallMs": 99,
+      "maxWallMs": 105
+    },
+    "durableObject /api/auth/sign-in/email": {
+      "samples": 2,
+      "minCpuMs": 183,
+      "medianCpuMs": 185.0,
+      "maxCpuMs": 187,
+      "minWallMs": 547,
+      "maxWallMs": 609
+    },
+    "durableObject /api/auth/sign-out": {
+      "samples": 2,
+      "minCpuMs": 4,
+      "medianCpuMs": 4.5,
+      "maxCpuMs": 5,
+      "minWallMs": 275,
+      "maxWallMs": 277
+    },
+    "durableObject /api/og (custom)": {
+      "samples": 1,
+      "minCpuMs": 37,
+      "medianCpuMs": 37,
+      "maxCpuMs": 37,
+      "minWallMs": 38,
+      "maxWallMs": 38
+    },
+    "durableObject /api/og (known redirect)": {
+      "samples": 2,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.0,
+      "maxCpuMs": 0,
+      "minWallMs": 0,
+      "maxWallMs": 1
+    },
+    "durableObject /en": {
+      "samples": 2,
+      "minCpuMs": 21,
+      "medianCpuMs": 27.5,
+      "maxCpuMs": 34,
+      "minWallMs": 193,
+      "maxWallMs": 255
+    },
+    "durableObject /en/learn": {
+      "samples": 2,
+      "minCpuMs": 30,
+      "medianCpuMs": 36.5,
+      "maxCpuMs": 43,
+      "minWallMs": 212,
+      "maxWallMs": 216
+    },
+    "durableObject /en/practice": {
+      "samples": 2,
+      "minCpuMs": 48,
+      "medianCpuMs": 53.0,
+      "maxCpuMs": 58,
+      "minWallMs": 142,
+      "maxWallMs": 160
+    },
+    "stateless /_serverFn": {
+      "samples": 12,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.0,
+      "maxCpuMs": 1,
+      "minWallMs": 268,
+      "maxWallMs": 829
+    },
+    "stateless /admin": {
+      "samples": 1,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 284,
+      "maxWallMs": 284
+    },
+    "stateless /api/auth/get-session": {
+      "samples": 3,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 107,
+      "maxWallMs": 284
+    },
+    "stateless /api/auth/sign-in/email": {
+      "samples": 3,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 1,
+      "minWallMs": 555,
+      "maxWallMs": 1034
+    },
+    "stateless /api/auth/sign-out": {
+      "samples": 3,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 1,
+      "minWallMs": 283,
+      "maxWallMs": 293
+    },
+    "stateless /api/og (custom)": {
+      "samples": 2,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.0,
+      "maxCpuMs": 0,
+      "minWallMs": 46,
+      "maxWallMs": 201
+    },
+    "stateless /api/og (known redirect)": {
+      "samples": 3,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 8,
+      "maxWallMs": 12
+    },
+    "stateless /api/test/seed-user": {
+      "samples": 1,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 9,
+      "maxWallMs": 9
+    },
+    "stateless /en": {
+      "samples": 2,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.5,
+      "maxCpuMs": 1,
+      "minWallMs": 204,
+      "maxWallMs": 268
+    },
+    "stateless /en/learn": {
+      "samples": 2,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.5,
+      "maxCpuMs": 1,
+      "minWallMs": 220,
+      "maxWallMs": 222
+    },
+    "stateless /en/practice": {
+      "samples": 2,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.5,
+      "maxCpuMs": 1,
+      "minWallMs": 148,
+      "maxWallMs": 169
+    },
+    "stateless /esbuild.wasm": {
+      "samples": 1,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 116,
+      "maxWallMs": 116
+    },
+    "stateless /og/static PNG": {
+      "samples": 1,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 8,
+      "maxWallMs": 8
+    },
+    "stateless /robots.txt": {
+      "samples": 1,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 10,
+      "maxWallMs": 10
+    },
+    "stateless /sitemap.xml": {
+      "samples": 1,
+      "minCpuMs": 0,
+      "medianCpuMs": 0,
+      "maxCpuMs": 0,
+      "minWallMs": 104,
+      "maxWallMs": 104
+    }
+  },
+  "limitations": [
+    "Small observational sample; no p99 or controlled cold-start claim",
+    "Wall time in tail is not billed object-active duration",
+    "Account Free billing, memory and account-wide quota headroom remain release gates"
+  ]
+}

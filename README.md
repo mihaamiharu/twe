@@ -17,7 +17,7 @@ A gamified platform for learning QA testing skills through interactive tutorials
 
 ## 🚀 Quick Start
 
-The migration branch runs TanStack Start on Cloudflare Workers with D1 and Static Assets. Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git, then:
+The migration branch runs TanStack Start through a thin Cloudflare Worker and a SQLite-backed Durable Object for dynamic compute, with D1 and Static Assets. The owner requires strict $0 and has deferred cutover pending Free-plan validation. Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git, then:
 
 ```sh
 git clone https://github.com/mihaamiharu/twe.git

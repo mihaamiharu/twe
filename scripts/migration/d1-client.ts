@@ -1,6 +1,6 @@
 import { readJsonConfig } from '../json-config';
 import { join } from 'node:path';
-import { getPlatformProxy } from 'wrangler';
+import { getDataPlatformProxy } from '../data-platform-proxy';
 import { z } from 'zod';
 import type { RuntimeEnv } from '../../src/runtime/env';
 import { cellSchema } from './model';
@@ -24,7 +24,7 @@ export async function createD1Client(
   target: 'local' | 'preview' | 'production',
 ) {
   if (target === 'local') {
-    const platform = await getPlatformProxy<RuntimeEnv>({
+    const platform = await getDataPlatformProxy<RuntimeEnv>({
       configPath: process.env['TWE_WRANGLER_CONFIG'] || 'wrangler.jsonc',
       remoteBindings: false,
       envFiles: [],
