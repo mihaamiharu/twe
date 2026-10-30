@@ -5,10 +5,15 @@ Welcome to the **TestingWithEkki** project documentation.
 ## Project Basics
 
 - [**README.md**](../README.md): Quick start guide and project overview.
-- [**LOCAL_DEVELOPMENT.md**](./LOCAL_DEVELOPMENT.md): Shared Bun + Docker workflow for macOS and Windows.
+- [**LOCAL_DEVELOPMENT.md**](./LOCAL_DEVELOPMENT.md): Bun + local Workers/D1 workflow for macOS and Windows.
 - [**CLOUDFLARE_MIGRATION.md**](./CLOUDFLARE_MIGRATION.md): Migration order, existing infrastructure inventory, and remaining production recovery work.
 - [**CLOUDFLARE_CONTENT.md**](./CLOUDFLARE_CONTENT.md): Bundled content, route/cache policy, and remaining asset/OG work.
 - [**CLOUDFLARE_OG.md**](./CLOUDFLARE_OG.md): Static share-card preparation, legacy query handling, and Workers rendering strategy.
+- [**CLOUDFLARE_D1.md**](./CLOUDFLARE_D1.md): Type mappings, authentication persistence and atomic reward batches.
+- [**CLOUDFLARE_DATA.md**](./CLOUDFLARE_DATA.md): Restricted PostgreSQL export, D1 import and complete reconciliation.
+- [**CLOUDFLARE_OPERATIONS.md**](./CLOUDFLARE_OPERATIONS.md): Bindings, HTTP email, rate limits, CI/deploy and backups.
+- [**CLOUDFLARE_READINESS.md**](./CLOUDFLARE_READINESS.md): Recorded validation evidence and outstanding release gates.
+- [**CLOUDFLARE_CUTOVER.md**](./CLOUDFLARE_CUTOVER.md): Local/preview readiness, approved cutover, rollback and retirement.
 - [**GLOSSARY.md**](./GLOSSARY.md): Definitions of terms used in the project.
 - [**CHANGELOG.md**](./CHANGELOG.md): History of changes and versions.
 

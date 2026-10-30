@@ -4,7 +4,7 @@
  */
 
 import { db } from './index';
-import { challenges } from './schema';
+import { challenges } from './postgres-schema';
 import { inArray } from 'drizzle-orm';
 import { getLocalizedString } from '@/lib/localized';
 

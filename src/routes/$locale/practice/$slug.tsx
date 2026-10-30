@@ -6,7 +6,9 @@ import {
   Link,
   notFound,
   rootRouteId,
+  ClientOnly,
 } from '@tanstack/react-router';
+import { createClientOnlyFn } from '@tanstack/react-start';
 import { useTranslation } from 'react-i18next';
 import { lazy, Suspense, useCallback, useMemo } from 'react';
 import {
@@ -42,10 +44,11 @@ import {
 import { omitUndefined } from '@/lib/omit-undefined';
 import { createPracticeDetailSeoHead } from '@/lib/practice-seo';
 
-const ChallengePlayground = lazy(async () => {
+const loadChallengePlayground = createClientOnlyFn(async () => {
   const module = await import('@/components/challenges/challenge-playground');
   return { default: module.ChallengePlayground };
 });
+const ChallengePlayground = lazy(loadChallengePlayground);
 
 export const Route = createFileRoute('/$locale/practice/$slug')({
   loader: async ({ context, params }) => {
@@ -285,18 +288,20 @@ function ChallengeDetailPage() {
   return (
     <div className="h-[calc(100dvh-4.5625rem)] min-w-0 overflow-hidden flex flex-col">
       <div className="flex-1 min-h-0 min-w-0 overflow-hidden">
-        <Suspense fallback={<ChallengeSkeleton />}>
-          <ChallengePlayground
-            key={challenge.id}
-            challenge={challenge}
-            onSubmit={handleSubmit}
-            {...omitUndefined({ userId })}
-            hintUsed={challengeData?.userProgress?.usedHint || false}
-            initialHintContent={
-              challengeData?.userProgress?.hintContent || null
-            }
-          />
-        </Suspense>
+        <ClientOnly fallback={<ChallengeSkeleton />}>
+          <Suspense fallback={<ChallengeSkeleton />}>
+            <ChallengePlayground
+              key={challenge.id}
+              challenge={challenge}
+              onSubmit={handleSubmit}
+              {...omitUndefined({ userId })}
+              hintUsed={challengeData?.userProgress?.usedHint || false}
+              initialHintContent={
+                challengeData?.userProgress?.hintContent || null
+              }
+            />
+          </Suspense>
+        </ClientOnly>
       </div>
 
       {lastSubmissionResult && (

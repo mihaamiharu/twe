@@ -3,7 +3,7 @@ import { createAuthClient } from 'better-auth/react';
 // Create the auth client for React
 export const authClient = createAuthClient({
   // baseURL should be relative on the client to avoid localhost issues in production
-  baseURL: typeof window !== 'undefined' ? window.location.origin : process.env.BETTER_AUTH_URL,
+  baseURL: typeof window !== 'undefined' ? window.location.origin : undefined,
 });
 
 // Export commonly used hooks for convenience
@@ -31,7 +31,6 @@ export const forgetPassword = async ({
       await response.text(),
     );
   }
-
 
   const body: unknown = JSON.parse(await response.text());
   return body;

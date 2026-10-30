@@ -15,9 +15,8 @@ export const getAdminSubscribers = createServerFn({ method: 'GET' })
         .orderBy(desc(newsletterSubscribers.createdAt));
 
       return { success: true, data: list };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch subscribers:', error);
+    } catch {
+      console.error('Failed to fetch subscribers:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -37,15 +36,13 @@ export const updateSubscriberStatus = createServerFn({ method: 'POST' })
         .set({
           status: input.status,
           updatedAt: new Date(),
-          confirmedAt:
-            input.status === 'CONFIRMED' ? new Date() : undefined,
+          confirmedAt: input.status === 'CONFIRMED' ? new Date() : undefined,
         })
         .where(eq(newsletterSubscribers.id, input.id));
 
       return { success: true, message: 'Subscriber updated' };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to update subscriber:', error);
+    } catch {
+      console.error('Failed to update subscriber:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

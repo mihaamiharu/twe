@@ -69,32 +69,6 @@ jobs:
     name: Integration
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://twe_test:twe_password@localhost:5433/twe_test
-      TEST_DATABASE_URL: postgresql://twe_test:twe_password@localhost:5433/twe_test
-      DIRECT_URL: postgresql://twe_test:twe_password@localhost:5433/twe_test
-      BETTER_AUTH_SECRET: dummy_secret_for_ci_tests_1234567890
-      BETTER_AUTH_URL: http://localhost:3000
-      REQUIRE_EMAIL_VERIFICATION: 'false'
-      GOOGLE_CLIENT_ID: dummy_google_client_id
-      GOOGLE_CLIENT_SECRET: dummy_google_client_secret
-
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: twe_test
-          POSTGRES_PASSWORD: twe_password
-          POSTGRES_DB: twe_test
-        ports:
-          - 5433:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -105,9 +79,6 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Apply database migrations
-        run: bun run db:migrate
-
       - name: Run integration tests
         run: bun run test:integration
 
@@ -117,7 +88,6 @@ jobs:
     timeout-minutes: 20
     env:
       CI: 'true'
-      E2E_CONTAINER_RUNTIME: docker
 
     steps:
       - name: Checkout code
@@ -168,13 +138,3 @@ jobs:
             echo "One or more required CI jobs did not pass."
             exit 1
           fi
-
-  deploy-production:
-    name: Deploy production
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: required
-    permissions:
-      contents: read
-      packages: write
-    uses: ./.github/workflows/deploy-prod.yml
-    secrets: inherit

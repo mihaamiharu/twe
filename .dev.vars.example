@@ -1,0 +1,14 @@
+# Copy to .dev.vars for local Worker development. Never commit real values.
+BETTER_AUTH_SECRET="replace-with-at-least-32-random-characters"
+# EMAIL_PROVIDER=disabled is allowed only for local/test use. Mail is not logged.
+# EMAIL_API_KEY=""
+# EMAIL_PROVIDER="http"
+# EMAIL_HTTP_URL="https://your-selected-provider.example/send"
+# EMAIL_FROM="TestingWithEkki <verified-sender@example.com>"
+# GOOGLE_CLIENT_ID=""
+# GOOGLE_CLIENT_SECRET=""
+# DEEPSEEK_API_KEY=""
+# GH_API_TOKEN=""
+# GH_OWNER="mihaamiharu"
+# GH_REPO="twe"
+# ADMIN_EMAIL=""

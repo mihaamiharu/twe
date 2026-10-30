@@ -1,5 +1,5 @@
 /**
- * Email Service - Gmail SMTP with Nodemailer
+ * Email service — awaited HTTP delivery
  *
  * Features:
  * - Email verification for new registrations
@@ -7,24 +7,67 @@
  * - Password reset emails (future)
  */
 
-import nodemailer from 'nodemailer';
 import { logger } from '@/lib/logger';
+import { getRuntimeEnv } from '#platform';
 
-// Create reusable transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: Number(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASSWORD,
-  },
-});
+interface Mail {
+  from: string;
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+  replyTo?: string;
+}
 
-// Get sender address
-const getFromAddress = () => {
-  return process.env.SMTP_FROM || `TestingWithEkki <${process.env.SMTP_USER}>`;
-};
+async function sendMail(mail: Mail): Promise<void> {
+  const env = getRuntimeEnv();
+  if (
+    env.EMAIL_PROVIDER === 'disabled' &&
+    (env.APP_ENV === 'local' || env.APP_ENV === 'test')
+  )
+    return;
+  if (
+    !['resend', 'http'].includes(env.EMAIL_PROVIDER ?? '') ||
+    !env.EMAIL_API_KEY ||
+    !env.EMAIL_FROM
+  )
+    throw new Error('Outbound email is not configured.');
+  const endpoint =
+    env.EMAIL_PROVIDER === 'resend'
+      ? 'https://api.resend.com/emails'
+      : env.EMAIL_HTTP_URL;
+  if (!endpoint || new URL(endpoint).protocol !== 'https:')
+    throw new Error('Email HTTP transport requires an HTTPS endpoint.');
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.EMAIL_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(
+      env.EMAIL_PROVIDER === 'http'
+        ? { ...mail, from: env.EMAIL_FROM }
+        : {
+            from: env.EMAIL_FROM,
+            to: [mail.to],
+            subject: mail.subject,
+            html: mail.html,
+            ...(mail.text ? { text: mail.text } : {}),
+            ...(mail.replyTo ? { reply_to: mail.replyTo } : {}),
+          },
+    ),
+    redirect: 'error',
+    signal: AbortSignal.timeout(20_000),
+  });
+  if (!response.ok) {
+    await response.body?.cancel();
+    throw new Error(`Email provider rejected delivery (${response.status}).`);
+  }
+  await response.body?.cancel();
+}
+
+const getFromAddress = () =>
+  getRuntimeEnv().EMAIL_FROM || 'TestingWithEkki <noreply@example.invalid>';
 
 /**
  * Send verification email to new user
@@ -99,14 +142,14 @@ ${appName}
     `;
 
   try {
-    await transporter.sendMail({
+    await sendMail({
       from: getFromAddress(),
       to,
       subject,
       text,
       html,
     });
-    logger.info(`[Email] Verification email sent to ${to}`);
+    logger.info('[Email] Verification email accepted');
   } catch (error) {
     logger.error('[Email] Failed to send verification email:', error);
     throw new Error('Failed to send verification email');
@@ -189,14 +232,14 @@ ${appName}
     `;
 
   try {
-    await transporter.sendMail({
+    await sendMail({
       from: getFromAddress(),
       to,
       subject,
       text,
       html,
     });
-    logger.info(`[Email] Password reset email sent to ${to}`);
+    logger.info('[Email] Password reset email accepted');
   } catch (error) {
     logger.error('[Email] Failed to send password reset email:', error);
     throw new Error('Failed to send password reset email');
@@ -217,7 +260,7 @@ export async function sendBugReportNotification(report: {
   browserInfo?: string | null;
   reporterEmail?: string | null;
 }): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminEmail = getRuntimeEnv().ADMIN_EMAIL;
 
   if (!adminEmail) {
     logger.info(
@@ -296,7 +339,7 @@ export async function sendBugReportNotification(report: {
     `;
 
   try {
-    await transporter.sendMail({
+    await sendMail({
       from: getFromAddress(),
       to: adminEmail,
       subject,
@@ -320,7 +363,8 @@ export async function sendNewsletterConfirmationEmail(
   const subject = `Confirm your ${appName} subscription`;
 
   // Use environment variable for base URL if available, otherwise default to production
-  const baseUrl = process.env.BETTER_AUTH_URL || 'https://testingwithekki.com';
+  const baseUrl =
+    getRuntimeEnv().BETTER_AUTH_URL || 'https://testingwithekki.com';
   // Check if we need to insert the locale - for now default to 'en' or handle in frontend
   // Ideally, we'd pass locale to this function, but let's stick to 'en' as base for now
   // and maybe redirect based on browser later, or the user can change it.
@@ -385,14 +429,14 @@ ${appName}
     `;
 
   try {
-    await transporter.sendMail({
+    await sendMail({
       from: getFromAddress(),
       to,
       subject,
       text,
       html,
     });
-    logger.info(`[Email] Newsletter confirmation sent to ${to}`);
+    logger.info('[Email] Newsletter confirmation accepted');
   } catch (error) {
     logger.error('[Email] Failed to send newsletter confirmation:', error);
     throw new Error('Failed to send newsletter confirmation');
@@ -410,7 +454,7 @@ export async function sendContactNotificationEmail(message: {
   message: string;
   createdAt: Date;
 }): Promise<void> {
-  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminEmail = getRuntimeEnv().ADMIN_EMAIL;
 
   if (!adminEmail) {
     logger.info(
@@ -422,7 +466,8 @@ export async function sendContactNotificationEmail(message: {
   const subject = `📩 [Contact] ${message.topic || 'general'} message from ${message.name}`;
 
   // Use environment variable for base URL if available
-  const baseUrl = process.env.BETTER_AUTH_URL || 'https://testingwithekki.com';
+  const baseUrl =
+    getRuntimeEnv().BETTER_AUTH_URL || 'https://testingwithekki.com';
 
   const html = `
 <!DOCTYPE html>
@@ -468,14 +513,16 @@ export async function sendContactNotificationEmail(message: {
   `;
 
   try {
-    await transporter.sendMail({
+    await sendMail({
       from: getFromAddress(),
       to: adminEmail,
       replyTo: message.email,
       subject,
       html,
     });
-    logger.info(`[Email] Contact notification sent to admin for message: ${message.id}`);
+    logger.info(
+      `[Email] Contact notification sent to admin for message: ${message.id}`,
+    );
   } catch (error) {
     logger.error('[Email] Failed to send contact notification:', error);
     // Don't throw - notification failing shouldn't break the user flow if possible

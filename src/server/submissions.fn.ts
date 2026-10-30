@@ -2,14 +2,8 @@ import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { authMiddleware } from './auth.mw';
 import { db } from '@/db';
-import {
-  submissions,
-  challenges,
-  progress,
-  testCases,
-  achievements,
-} from '@/db/schema';
-import { eq, and, sql, inArray, desc } from 'drizzle-orm';
+import { submissions, challenges, testCases } from '@/db/schema';
+import { eq, and, sql, desc } from 'drizzle-orm';
 import { logger } from '@/lib/logger';
 import { getRawChallengeContent } from './content.server';
 import type { JsonValue, TestCaseDefinition } from '@/lib/content.types';
@@ -221,80 +215,14 @@ export const challengeSubmissionHandler = async ({
         xpReward: challenge.xpReward,
       },
       shouldComplete: isPassed,
-      onPersist: async (transaction, reward) => {
-        if (reward.isFirstCompletion) {
-          await transaction
-            .update(challenges)
-            .set({
-              completionCount: sql`${challenges.completionCount} + 1`,
-            })
-            .where(eq(challenges.id, challenge.id));
-
-          logger.info(
-            `[Submission] First completion for user ${userId}. Awarding ${reward.xpAwarded} XP${reward.usedHint ? ' (50% penalty for hint usage)' : ''}.`,
-          );
-        } else if (isPassed) {
-          logger.info(
-            `[Submission] Challenge ${challenge.id} passed but not first completion. No XP awarded.`,
-          );
-        }
-
-        const [submission] = await transaction
-          .insert(submissions)
-          .values({
-            userId,
-            challengeId: challenge.id,
-            code,
-            isPassed,
-            xpEarned: reward.xpAwarded,
-            executionTime,
-            testsPassed,
-            testsTotal,
-            errorMessage: testResults.find((r) => r.error)?.error,
-          })
-          .returning();
-        if (!submission) throw new Error('Failed to create submission');
-
-        if (isPassed) {
-          await transaction
-            .update(progress)
-            .set({ bestSubmissionId: submission.id })
-            .where(eq(progress.id, reward.progressId));
-        }
-
-        let newAchievements: { id: string; name: string; icon: string }[] = [];
-        if (reward.awardedAchievementSlugs.length > 0) {
-          const dbAwarded = await transaction
-            .select({
-              id: achievements.id,
-              name: sql<string>`COALESCE(${achievements.name}->>${locale}, ${achievements.name}->>'en', '')`,
-              icon: achievements.icon,
-            })
-            .from(achievements)
-            .where(inArray(achievements.slug, reward.awardedAchievementSlugs));
-
-          newAchievements = dbAwarded.map((achievement) => ({
-            id: achievement.id,
-            name: achievement.name,
-            icon: achievement.icon,
-          }));
-
-          logger.info(
-            `[Achievements] User ${userId} earned: ${newAchievements.map((achievement) => achievement.name).join(', ')}`,
-          );
-        }
-
-        return {
-          submission: {
-            id: submission.id,
-            isPassed,
-            testsPassed,
-            testsTotal,
-            xpEarned: reward.xpAwarded,
-            executionTime,
-          },
-          newAchievements,
-        };
+      locale,
+      submission: {
+        code,
+        isPassed,
+        executionTime,
+        testsPassed,
+        testsTotal,
+        errorMessage: testResults.find((result) => result.error)?.error,
       },
     });
 
@@ -309,7 +237,7 @@ export const challengeSubmissionHandler = async ({
       },
     };
   } catch (error) {
-    console.error('Error submitting solution:', error);
+    console.error('Error submitting solution:');
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -350,7 +278,7 @@ export const getSubmissions = createServerFn({ method: 'GET' })
 
       // Get total count
       const [countResult] = await db
-        .select({ count: sql<number>`count(*)::int` })
+        .select({ count: sql<number>`count(*)` })
         .from(submissions)
         .where(and(...conditions));
 
@@ -390,7 +318,7 @@ export const getSubmissions = createServerFn({ method: 'GET' })
         },
       };
     } catch (error) {
-      console.error('Error fetching submissions:', error);
+      console.error('Error fetching submissions:');
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown error',

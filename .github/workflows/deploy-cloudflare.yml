@@ -1,0 +1,81 @@
+name: Deploy Cloudflare candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Target environment
+        type: choice
+        options: [preview, production]
+        default: preview
+      approved_sha:
+        description: Full commit SHA approved for this candidate
+        required: true
+        type: string
+      approve_production:
+        description: Confirm production readiness and release approval
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-${{ inputs.target }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Pin the reviewed candidate
+        env:
+          APPROVED_SHA: ${{ inputs.approved_sha }}
+          TARGET: ${{ inputs.target }}
+          APPROVE_PRODUCTION: ${{ inputs.approve_production }}
+        run: |
+          test "$APPROVED_SHA" = "$(git rev-parse HEAD)"
+          if [ "$TARGET" = production ]; then
+            test "$APPROVE_PRODUCTION" = true
+            test "${{ github.ref }}" = refs/heads/release/cloudflare-migration
+          fi
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run lint -- --max-warnings 0
+      - run: bun run typecheck
+      - run: bun run test:unit
+      - run: bun run test:integration
+      - run: bunx playwright install --with-deps chromium
+      - run: bun run test:e2e
+      - run: bun run build
+
+  deploy:
+    needs: validate
+    environment: cloudflare-${{ inputs.target }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ENV: ${{ inputs.target }}
+      TWE_RELEASE_APPROVED_SHA: ${{ inputs.approved_sha }}
+      TWE_ALLOW_PRODUCTION_DEPLOY: ${{ inputs.approve_production && 'yes' || 'no' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      - name: Apply additive migrations before the matching app
+        env:
+          TARGET: ${{ inputs.target }}
+        run: bunx wrangler d1 migrations apply DB --remote --env "$TARGET" --config wrangler.jsonc
+      - name: Deploy the checked environment artifact
+        env:
+          TARGET: ${{ inputs.target }}
+        run: bun scripts/deploy-cloudflare.ts "$TARGET"

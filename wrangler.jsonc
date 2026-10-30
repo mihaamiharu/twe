@@ -1,0 +1,71 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "twe-local",
+  "main": "src/server.ts",
+  "compatibility_date": "2026-10-29",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "assets": { "binding": "ASSETS", "directory": "dist/client" },
+  "observability": { "enabled": true, "head_sampling_rate": 0.1 },
+  "vars": {
+    "APP_ENV": "local",
+    "BETTER_AUTH_URL": "http://localhost:3000",
+    "REQUIRE_EMAIL_VERIFICATION": "false",
+    "EMAIL_PROVIDER": "disabled",
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "twe-local",
+      "database_id": "local-only",
+      "migrations_dir": "drizzle/d1",
+    },
+  ],
+  "env": {
+    "preview": {
+      "name": "twe-preview",
+      "workers_dev": true,
+      "preview_urls": false,
+      "assets": {
+        "binding": "ASSETS",
+        "directory": "dist/client",
+        "run_worker_first": true,
+      },
+      "vars": {
+        "APP_ENV": "preview",
+        "EMAIL_PROVIDER": "unconfigured",
+        "BETTER_AUTH_URL": "https://twe-preview.ekkisyam2310.workers.dev",
+        "REQUIRE_EMAIL_VERIFICATION": "true",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "twe-preview",
+          "database_id": "a57397b4-3f7f-432e-a161-04330b3a5b4b",
+          "migrations_dir": "drizzle/d1",
+        },
+      ],
+    },
+    "production": {
+      "name": "twe-production",
+      "triggers": { "crons": ["0 19 * * *"] },
+      "workers_dev": false,
+      "preview_urls": false,
+      "vars": {
+        "APP_ENV": "production",
+        "EMAIL_PROVIDER": "unconfigured",
+        "BETTER_AUTH_URL": "https://testingwithekki.com",
+        "REQUIRE_EMAIL_VERIFICATION": "true",
+      },
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "twe-production",
+          "database_id": "6f6630be-ed32-4d07-ba24-24d45bb160c9",
+          "migrations_dir": "drizzle/d1",
+        },
+      ],
+    },
+  },
+}

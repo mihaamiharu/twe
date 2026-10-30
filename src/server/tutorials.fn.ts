@@ -241,8 +241,8 @@ export const getTutorials = createServerFn({ method: 'GET' })
           totalPages: 1,
         },
       };
-    } catch (error) {
-      console.error('Error fetching tutorials:', error);
+    } catch {
+      console.error('Error fetching tutorials:');
       return {
         success: false,
         error: 'An error occurred while processing your request.',
@@ -360,7 +360,7 @@ export const getTutorial = createServerFn({ method: 'GET' })
       if (error instanceof Error && error.message === 'Tutorial not found') {
         return { success: false, error: 'Tutorial not found' };
       }
-      console.error('Error fetching tutorial detail:', error);
+      console.error('Error fetching tutorial detail:');
       return {
         success: false,
         error: 'An error occurred while processing your request.',
@@ -443,31 +443,6 @@ export const completeTutorialHandler = async ({
         xpReward: TUTORIAL_COMPLETION_XP,
       },
       shouldComplete: true,
-      onPersist: async (transaction, reward) => {
-        if (reward.isFirstCompletion) {
-          await transaction
-            .update(tutorials)
-            .set({ viewCount: sql`${tutorials.viewCount} + 1` })
-            .where(eq(tutorials.id, tutorial.id));
-        }
-
-        const awardedAchievements = new Set(reward.awardedAchievementSlugs);
-        const newAchievements = reward.earnedAchievements
-          .filter((achievement) => awardedAchievements.has(achievement.id))
-          .map((achievement) => ({
-            id: achievement.id,
-            name: achievement.name,
-            icon: achievement.icon,
-          }));
-
-        if (newAchievements.length > 0) {
-          logger.info(
-            `[Achievements] Tutorial completion triggered: ${newAchievements.map((achievement) => achievement.name).join(', ')}`,
-          );
-        }
-
-        return { newAchievements };
-      },
     });
 
     return {
@@ -478,8 +453,8 @@ export const completeTutorialHandler = async ({
         newAchievements: completion.persisted.newAchievements,
       },
     };
-  } catch (error) {
-    console.error('Error marking tutorial complete:', error);
+  } catch {
+    console.error('Error marking tutorial complete:');
     return {
       success: false,
       error: 'An error occurred while processing your request.',
@@ -509,8 +484,8 @@ export const incrementTutorialViewCount = createServerFn({ method: 'POST' })
         .set({ viewCount: sql`${tutorials.viewCount} + 1` })
         .where(eq(tutorials.slug, slug));
       return { success: true };
-    } catch (error) {
-      console.error('Error incrementing view count:', error);
+    } catch {
+      console.error('Error incrementing view count:');
       return { success: false, error: 'Failed to increment view count' };
     }
   });

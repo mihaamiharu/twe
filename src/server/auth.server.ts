@@ -3,120 +3,136 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { tanstackStartCookies } from 'better-auth/tanstack-start';
 import { db } from '@/db';
 import * as schema from '@/db/schema';
-import * as dotenv from 'dotenv';
+import { getRuntimeEnv } from '#platform';
 import {
   sendVerificationEmail,
   sendPasswordResetEmail,
 } from '@/server/email.server';
 
-dotenv.config();
+function createAuth() {
+  const env = getRuntimeEnv();
+  if (!env.BETTER_AUTH_SECRET || env.BETTER_AUTH_SECRET.length < 32)
+    throw new Error('BETTER_AUTH_SECRET must contain at least 32 characters.');
+  if (!env.BETTER_AUTH_URL) throw new Error('BETTER_AUTH_URL is missing.');
+  const verificationRequired =
+    env.APP_ENV === 'production' || env.REQUIRE_EMAIL_VERIFICATION === 'true';
+  return betterAuth({
+    rateLimit: { enabled: false }, // handleAuthRequest applies atomic D1 limits.
+    logger: { disabled: true },
+    // Database configuration with Drizzle adapter
+    database: drizzleAdapter(db, {
+      provider: 'sqlite',
+      transaction: false, // D1 does not support interactive transaction callbacks.
+      schema: {
+        user: schema.users,
+        session: schema.sessions,
+        account: schema.accounts,
+        verification: schema.verification,
+      },
+    }),
 
-// Validate required environment variables
-if (!process.env.BETTER_AUTH_SECRET) {
-  throw new Error(
-    'BETTER_AUTH_SECRET is not set. Please add it to your .env file.',
-  );
-}
-
-if (!process.env.BETTER_AUTH_URL) {
-  throw new Error(
-    'BETTER_AUTH_URL is not set. Please add it to your .env file.',
-  );
-}
-
-export const auth = betterAuth({
-  // Database configuration with Drizzle adapter
-  database: drizzleAdapter(db, {
-    provider: 'pg', // PostgreSQL
-    schema: {
-      user: schema.users,
-      session: schema.sessions,
-      account: schema.accounts,
-      verification: schema.verification,
-    },
-  }),
-
-  user: {
-    additionalFields: {
-      role: {
-        type: 'string',
+    user: {
+      additionalFields: {
+        role: {
+          type: 'string',
+          defaultValue: 'USER',
+          input: false,
+        },
       },
     },
-  },
 
-  // Email/Password authentication with email verification
-  // Disable email verification in development/staging for easier testing
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: process.env.REQUIRE_EMAIL_VERIFICATION === 'true' || process.env.NODE_ENV === 'production',
-    sendResetPassword: ({ user, url }) => {
-      // Fire and forget email sending to avoid blocking the user flow
-      return sendPasswordResetEmail(user.email, url, user.name || undefined).catch(
-        (error) => {
-          console.error(
-            '[Auth] Background password reset email failed:',
-            error,
-          );
-        },
-      );
-    },
-  },
-
-  // Email verification configuration
-  emailVerification: {
-    sendOnSignUp: process.env.REQUIRE_EMAIL_VERIFICATION === 'true' || process.env.NODE_ENV === 'production',
-    autoSignInAfterVerification: true,
-    sendVerificationEmail: ({ user, url }) => {
-      // Fire and forget email sending to avoid blocking the user flow
-      return sendVerificationEmail(user.email, url, user.name || undefined).catch(
-        (error) => {
-          console.error('[Auth] Background verification email failed:', error);
-        },
-      );
-    },
-  },
-
-  // Google OAuth
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID || '',
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
-      enabled: !!(
-        process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET
-      ),
-      mapProfileToUser: (profile) => {
-        return {
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-          emailVerified: profile.email_verified,
-        };
+    // Email/Password authentication with email verification
+    // Disable email verification in development/staging for easier testing
+    emailAndPassword: {
+      enabled: true,
+      requireEmailVerification: verificationRequired,
+      sendResetPassword: async ({ user, url }) => {
+        await sendPasswordResetEmail(user.email, url, user.name || undefined);
       },
     },
-  },
 
-  // Session configuration
-  session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
-    updateAge: 60 * 60 * 24, // Update session every 24 hours
-  },
-
-  // Base URL
-  baseURL: process.env.BETTER_AUTH_URL,
-  secret: process.env.BETTER_AUTH_SECRET,
-  trustedOrigins: [process.env.BETTER_AUTH_URL],
-
-  // Advanced options
-  advanced: {
-    database: {
-      // Generate UUIDs for IDs (our schema uses uuid type)
-      generateId: () => crypto.randomUUID(),
+    // Email verification configuration
+    emailVerification: {
+      sendOnSignUp: verificationRequired,
+      autoSignInAfterVerification: true,
+      sendVerificationEmail: async ({ user, url }) => {
+        await sendVerificationEmail(user.email, url, user.name || undefined);
+      },
     },
-  },
 
-  // TanStack Start plugin for proper cookie handling (must be last)
-  plugins: [tanstackStartCookies()],
+    // Google OAuth
+    socialProviders: {
+      google: {
+        clientId: env.GOOGLE_CLIENT_ID || '',
+        clientSecret: env.GOOGLE_CLIENT_SECRET || '',
+        enabled: !!(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+        mapProfileToUser: (profile) => {
+          return {
+            name: profile.name,
+            email: profile.email,
+            image: profile.picture,
+            emailVerified: profile.email_verified,
+          };
+        },
+      },
+    },
+
+    // Session configuration
+    session: {
+      expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
+      updateAge: 60 * 60 * 24, // Update session every 24 hours
+    },
+
+    // Base URL
+    baseURL: env.BETTER_AUTH_URL,
+    secret: env.BETTER_AUTH_SECRET,
+    trustedOrigins: [env.BETTER_AUTH_URL],
+
+    // Advanced options
+    advanced: {
+      ipAddress: { ipAddressHeaders: ['cf-connecting-ip'] },
+      database: {
+        // Preserve the existing UUID identity format.
+        generateId: () => crypto.randomUUID(),
+      },
+    },
+
+    // TanStack Start plugin for proper cookie handling (must be last)
+    plugins: [tanstackStartCookies()],
+  });
+}
+
+export type Auth = ReturnType<typeof createAuth>;
+let current:
+  | { secret: string; url: string; database: object; auth: Auth }
+  | undefined;
+function getAuth(): Auth {
+  const env = getRuntimeEnv();
+  if (
+    !current ||
+    current.secret !== env.BETTER_AUTH_SECRET ||
+    current.url !== env.BETTER_AUTH_URL ||
+    current.database !== env.DB
+  ) {
+    current = {
+      secret: env.BETTER_AUTH_SECRET,
+      url: env.BETTER_AUTH_URL,
+      database: env.DB,
+      auth: createAuth(),
+    };
+  }
+  return current.auth;
+}
+
+export const auth = new Proxy({} as Auth, {
+  get(_target, property) {
+    const instance = getAuth();
+    const value: unknown = Reflect.get(instance, property);
+    if (typeof value === 'function')
+      return (...args: unknown[]): unknown => {
+        const result: unknown = Reflect.apply(value, instance, args);
+        return result;
+      };
+    return value;
+  },
 });
-
-// Export types for client
-export type Auth = typeof auth;

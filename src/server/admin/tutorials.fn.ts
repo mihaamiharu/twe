@@ -15,9 +15,8 @@ export const getAdminTutorials = createServerFn({ method: 'GET' })
         .orderBy(tutorials.createdAt);
 
       return { success: true, data: list };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch tutorials:', error);
+    } catch {
+      console.error('Failed to fetch tutorials:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -41,9 +40,8 @@ export const updateTutorialStatus = createServerFn({ method: 'POST' })
         .where(eq(tutorials.id, input.id));
 
       return { success: true, message: 'Tutorial updated' };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to update tutorial:', error);
+    } catch {
+      console.error('Failed to update tutorial:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

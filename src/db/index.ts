@@ -1,41 +1,43 @@
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from 'drizzle-orm/d1';
+import { closeRuntime, getRuntimeEnv } from '#platform';
 import * as schema from './schema';
-import * as dotenv from 'dotenv';
+import type { RuntimeEnv } from '@/runtime/env';
 
-dotenv.config();
+const databases = new WeakMap<
+  RuntimeEnv['DB'],
+  ReturnType<typeof createDatabase>
+>();
 
-// Check if DATABASE_URL or TEST_DATABASE_URL is set
-if (!process.env.DATABASE_URL && !process.env.TEST_DATABASE_URL) {
-  throw new Error(
-    'Neither DATABASE_URL nor TEST_DATABASE_URL environment variable is set. Please check your environment configuration.',
-  );
+function createDatabase(binding: RuntimeEnv['DB']) {
+  return drizzle(binding, { schema });
 }
 
-// Create PostgreSQL connection
-const connectionString = (process.env.NODE_ENV === 'test' && process.env.TEST_DATABASE_URL) 
-  ? process.env.TEST_DATABASE_URL 
-  : process.env.DATABASE_URL!;
+export function getDatabase() {
+  const binding = getRuntimeEnv().DB;
+  if (!binding) throw new Error('D1 DB binding is missing.');
+  let database = databases.get(binding);
+  if (!database) {
+    database = createDatabase(binding);
+    databases.set(binding, database);
+  }
+  return database;
+}
 
-// Detect if using Supabase (requires prepare: false for PgBouncer)
-const isSupabase = connectionString.includes('supabase.com');
+export type Database = ReturnType<typeof createDatabase>;
 
-// For query purposes
-// Supabase uses PgBouncer in transaction mode which doesn't support prepared statements
-const queryClient = postgres(connectionString, {
-  prepare: !isSupabase,
+// Binding lookup stays lazy while shared helpers retain a typed import.
+export const db = new Proxy({} as Database, {
+  get(_target, property) {
+    const database = getDatabase();
+    const value: unknown = Reflect.get(database, property);
+    if (typeof value === 'function')
+      return (...args: unknown[]): unknown => {
+        const result: unknown = Reflect.apply(value, database, args);
+        return result;
+      };
+    return value;
+  },
 });
 
-// Create Drizzle database instance with schema
-export const db = drizzle(queryClient, { schema });
-
-// Export schema for use in other files
 export * from './schema';
-
-// Helper function to close database connection (useful for scripts and testing)
-export async function closeDatabase() {
-  await queryClient.end();
-}
-
-// Type definitions for better TypeScript support
-export type Database = typeof db;
+export const closeDatabase = closeRuntime;

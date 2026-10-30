@@ -7,3 +7,5 @@ Dockerfile* text eol=lf
 src/server/generated/content-manifest.json linguist-generated=true
 src/server/generated/og-resources.json linguist-generated=true
 src/lib/generated/og-catalog.json linguist-generated=true
+
+drizzle/d1/meta/*.json linguist-generated=true

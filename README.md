@@ -17,52 +17,28 @@ A gamified platform for learning QA testing skills through interactive tutorials
 
 ## 🚀 Quick Start
 
-Use the same workflow on **macOS and Windows**: Bun runs the app, and Docker
-Desktop runs PostgreSQL 15. Install Bun, Git, and Docker Desktop, then start
-Docker Desktop and wait until `docker info` succeeds.
+The migration branch runs TanStack Start on Cloudflare Workers with D1 and Static Assets. Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git, then:
 
 ```sh
 git clone https://github.com/mihaamiharu/twe.git
 cd twe
-bun install
+bun install --frozen-lockfile
 bun run setup
 bun run dev:local
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open [http://localhost:3000](http://localhost:3000). Setup preserves `.env`/`.dev.vars`, creates local D1 state and syncs editorial content. Docker/Podman and PostgreSQL are not required for this branch. Production remains on the VPS until the migration's readiness/cutover gates are approved.
 
-`setup` creates a missing `.env` with a generated auth secret, starts the database,
-applies migrations, and syncs content. It preserves existing `.env` files.
-`dev:local` starts the database and app without rerunning initialization.
-
-```sh
-bun run db:up      # Start only the local dev database
-bun run db:stop    # Stop it while preserving data
-```
-
-The helpers use `postgresql://twe_user:twe_password@localhost:5432/twe_db` and
-reject custom database URLs or `DIRECT_URL`. For manual setup, Podman, optional
-integrations, and troubleshooting, see [Local development](./docs/LOCAL_DEVELOPMENT.md).
+See [Local development](./docs/LOCAL_DEVELOPMENT.md) and [Cloudflare operations](./docs/CLOUDFLARE_OPERATIONS.md).
 
 ### Run the end-to-end suite
 
-```bash
+```sh
+bunx playwright install chromium
 bun run test:e2e
 ```
 
-This command creates a disposable PostgreSQL 15 container, applies migrations
-and synced content, starts the app in `NODE_ENV=test`, provisions isolated
-regular and admin accounts, runs the full Playwright suite, and removes its
-container and app process even when a test fails. It selects verified free
-local ports automatically. Set `E2E_DB_PORT` or `E2E_APP_PORT` to a specific
-free port when needed, or set either to `0` to request automatic selection.
-The runner uses Docker when it is on `PATH`, otherwise Podman. Set
-`E2E_CONTAINER_RUNTIME=docker` or `E2E_CONTAINER_RUNTIME=podman` to force a
-specific runtime, as GitHub Actions does with `docker`.
-
-The command only removes the uniquely named container it created; it does not
-stop or remove the development databases from `docker compose`. Install the
-browser once with `bunx playwright install chromium` before the first run.
+The runner creates its own disposable local D1 state, applies migrations, starts a test-mode Worker, provisions synthetic users and removes its own app/state afterward. It selects a free application port; E2E_APP_PORT can override it. The normal local database and remote resources are excluded. The migration owner will run this locally before release.
 
 ## 📦 Tech Stack
 
@@ -70,7 +46,7 @@ browser once with `bunx playwright install chromium` before the first run.
 | --------------- | ----------------------------------------------------------- |
 | **Framework**   | [TanStack Start](https://tanstack.com/start)                |
 | **Language**    | TypeScript 5.0                                              |
-| **Database**    | PostgreSQL 15 + [Drizzle ORM](https://orm.drizzle.team)     |
+| **Database**    | Cloudflare D1 + [Drizzle ORM](https://orm.drizzle.team)     |
 | **Auth**        | [BetterAuth](https://better-auth.com)                       |
 | **UI**          | [shadcn/ui](https://ui.shadcn.com) + Tailwind CSS           |
 | **Code Editor** | [Monaco Editor](https://microsoft.github.io/monaco-editor/) |
@@ -106,54 +82,28 @@ src/
 
 ```bash
 bun run setup      # Initialize local env, database, and content
-bun run dev:local  # Start local database and development server
-bun run dev        # Start app only (manual/custom DB workflow)
+bun run dev:local  # Start local workerd/D1 development server
+bun run dev        # Start Vite with local workerd/D1
 bun run build      # Build for production
-bun run start      # Start production server
+bun run start      # Preview the built Worker locally
 bun run test       # Run tests (Bun Test)
 bun run db:migrate # Run database migrations
 bun run db:sync    # Sync tutorials, challenges, and achievements
-bun run db:studio  # Open Drizzle Studio
+bun run db:studio  # List local D1 tables
 ```
 
 ## 🧪 Testing & CI/CD
 
-Pull requests to `main` run quality/build, unit, integration, and E2E jobs in
-parallel. Integration and E2E each own an isolated PostgreSQL database; the E2E
-runner also starts the app and provisions its test users. An aggregate
-`Required CI` job fails unless every job succeeds. Production deployment runs
-only after the same gate passes on `main`.
+Pull requests to `main` run quality/build, unit, disposable D1 integration and E2E jobs. An aggregate Required CI gate requires all jobs. Cloudflare deployment is a manual candidate workflow with a pinned SHA, environment isolation and explicit production approval; merging no longer deploys a VPS container.
 
-Local integration tests run against a dedicated PostgreSQL container.
-
-### Running Subsets
-
-```bash
-bun run test:unit         # Only unit tests
-# Integration tests use the test database on port 5433, not the dev database:
-docker compose up -d --wait postgres_test
-bun run test:integration  # Only integration tests
+```sh
+bun run test:unit
+bun run test:integration
+bun run test:ci    # lint/typecheck/unit/D1 integration/build
+bun run test:e2e   # separate local browser run before release
 ```
 
-### Local CI/CD (One-Command)
-
-To run everything (Infrastructure + Tests) in one go:
-
-```bash
-bun run test:ci
-```
-
-_Starts `postgres_test`, runs all tests, and stops the container cleanup regardless of result._
-
-### Manual Database Control
-
-If you want to keep the test database running:
-
-```bash
-docker compose up -d --wait postgres_test
-bun test
-# docker compose stop postgres_test
-```
+See [data transfer](./docs/CLOUDFLARE_DATA.md), [schema/rewards](./docs/CLOUDFLARE_D1.md), and [cutover/rollback](./docs/CLOUDFLARE_CUTOVER.md). Existing PostgreSQL migrations and tools remain available for recovery until retirement.
 
 ## 🎮 Challenge Types
 

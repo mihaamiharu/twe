@@ -1,3 +1,4 @@
+import { getRuntimeEnv } from '#platform';
 import { createFileRoute } from '@tanstack/react-router';
 import { db } from '@/db';
 import { users } from '@/db/schema';
@@ -42,7 +43,7 @@ export const Route = createFileRoute('/api/test/seed-user')({
 
           // 2. We use Better Auth's sign-up internally to correctly hash and salt the password
           // without needing to import their internal crypto utilities.
-          const baseUrl = process.env.VITE_APP_URL || 'http://localhost:3000';
+          const baseUrl = getRuntimeEnv().BETTER_AUTH_URL;
           const signupRes = await fetch(`${baseUrl}/api/auth/sign-up/email`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

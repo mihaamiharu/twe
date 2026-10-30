@@ -1,4 +1,5 @@
-import { test, expect, describe, beforeAll, afterAll, beforeEach } from 'bun:test';
+import { getRuntimeEnv } from '#platform';
+import { test, expect, describe, beforeAll, beforeEach } from 'bun:test';
 import { db } from '../../db';
 import { users, challenges, tutorials } from '../../db/schema';
 import { truncateTables } from './setup';
@@ -8,40 +9,25 @@ import { handleTeardownUserRequest } from '../../routes/api/test/teardown-user';
 import { handleResetProgressRequest } from '../../routes/api/test/reset-progress';
 import { handleSetProgressRequest } from '../../routes/api/test/set-progress';
 
-const TEST_SECRET = 'test-secret-123';
+const TEST_SECRET = getRuntimeEnv().E2E_SECRET ?? 'missing-test-secret';
 const TEST_EMAIL = 'e2e-tester@example.com';
 
 describe('E2E Test Support APIs', () => {
-  let originalEnv: string;
-  let originalSecret: string | undefined;
-
   beforeAll(async () => {
-    originalEnv = process.env.NODE_ENV || 'development';
-    originalSecret = process.env.E2E_SECRET;
-
-    process.env.NODE_ENV = 'test';
-    process.env.E2E_SECRET = TEST_SECRET;
-
     await truncateTables();
-  });
-
-  afterAll(() => {
-    process.env.NODE_ENV = originalEnv;
-    if (originalSecret !== undefined) {
-      process.env.E2E_SECRET = originalSecret;
-    } else {
-      delete process.env.E2E_SECRET;
-    }
   });
 
   beforeEach(async () => {
     await truncateTables();
-    
+
     // Seed some static data for tests
-    await db.insert(users).values({
-      email: TEST_EMAIL,
-      name: 'Test Tester',
-    }).returning();
+    await db
+      .insert(users)
+      .values({
+        email: TEST_EMAIL,
+        name: 'Test Tester',
+      })
+      .returning();
 
     await db.insert(challenges).values({
       slug: 'e2e-test-challenge',
@@ -76,48 +62,56 @@ describe('E2E Test Support APIs', () => {
   describe('Security Gates', () => {
     test('rejects request without correct secret header', async () => {
       const req = buildRequest({ email: TEST_EMAIL }, 'wrong-secret');
-      
+
       const res = await handleTeardownUserRequest(req);
       expect(res.status).toBe(403);
     });
 
-    test('rejects request if NODE_ENV is not test', async () => {
-      const req = buildRequest({ email: TEST_EMAIL });
-      
-      const origEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = 'development';
-      const res = await handleTeardownUserRequest(req);
-      if (origEnv === undefined) {
-        delete process.env.NODE_ENV;
-      } else {
-        process.env.NODE_ENV = origEnv;
+    test('rejects request if APP_ENV is not test', async () => {
+      const env = getRuntimeEnv();
+      const original = env.APP_ENV;
+      try {
+        env.APP_ENV = 'production';
+        const response = await handleTeardownUserRequest(
+          buildRequest({ email: TEST_EMAIL }),
+        );
+        expect(response.status).toBe(403);
+      } finally {
+        env.APP_ENV = original;
       }
-      
-      expect(res.status).toBe(403);
     });
   });
 
   describe('Teardown User API', () => {
     test('successfully deletes an existing user', async () => {
       const req = buildRequest({ email: TEST_EMAIL });
-      
+
       const res = await handleTeardownUserRequest(req);
       expect(res.status).toBe(200);
 
-      const user = await db.query.users.findFirst({ where: eq(users.email, TEST_EMAIL) });
+      const user = await db.query.users.findFirst({
+        where: eq(users.email, TEST_EMAIL),
+      });
       expect(user).toBeUndefined();
     });
   });
 
   describe('Set & Reset Progress APIs', () => {
     test('sets challenge progress correctly and grants XP', async () => {
-      const req = buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 });
-      
+      const req = buildRequest({
+        email: TEST_EMAIL,
+        type: 'challenge',
+        slug: 'e2e-test-challenge',
+        xp: 50,
+      });
+
       const res = await handleSetProgressRequest(req);
       expect(res.status).toBe(200);
 
       // Verify db
-      const user = await db.query.users.findFirst({ where: eq(users.email, TEST_EMAIL) });
+      const user = await db.query.users.findFirst({
+        where: eq(users.email, TEST_EMAIL),
+      });
       expect(user?.xp).toBe(50); // was 0
 
       const prog = await db.query.progress.findMany();
@@ -125,7 +119,7 @@ describe('E2E Test Support APIs', () => {
       const firstProgress = prog[0];
       if (!firstProgress) throw new Error('Expected seeded progress');
       expect(firstProgress.isCompleted).toBe(true);
-      
+
       const subs = await db.query.submissions.findMany();
       expect(subs.length).toBe(1);
       const firstSubmission = subs[0];
@@ -136,15 +130,24 @@ describe('E2E Test Support APIs', () => {
 
     test('resets all challenge progress and resets user XP', async () => {
       // Setup: set progress first
-      await handleSetProgressRequest(buildRequest({ email: TEST_EMAIL, type: 'challenge', slug: 'e2e-test-challenge', xp: 50 }));
-      
+      await handleSetProgressRequest(
+        buildRequest({
+          email: TEST_EMAIL,
+          type: 'challenge',
+          slug: 'e2e-test-challenge',
+          xp: 50,
+        }),
+      );
+
       // Reset
-      const req = buildRequest({ email: TEST_EMAIL, type: 'challenge' }); // null slug means all 
+      const req = buildRequest({ email: TEST_EMAIL, type: 'challenge' }); // null slug means all
       const res = await handleResetProgressRequest(req);
       expect(res.status).toBe(200);
 
       // Verify wiped
-      const user = await db.query.users.findFirst({ where: eq(users.email, TEST_EMAIL) });
+      const user = await db.query.users.findFirst({
+        where: eq(users.email, TEST_EMAIL),
+      });
       expect(user?.xp).toBe(0);
 
       const prog = await db.query.progress.findMany();

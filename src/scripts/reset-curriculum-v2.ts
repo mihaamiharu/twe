@@ -1,11 +1,7 @@
+import { getRuntimeEnv } from '#platform';
 import { sql } from 'drizzle-orm';
 import { db, closeDatabase } from '../db';
-import {
-  challenges,
-  progress,
-  userAchievements,
-  users,
-} from '../db/schema';
+import { challenges, progress, userAchievements, users } from '../db/schema';
 
 const CONFIRMATION_TOKEN = 'RESET_CURRICULUM_V2';
 
@@ -23,27 +19,17 @@ function assertExplicitConfirmation() {
 async function resetCurriculumV2() {
   assertExplicitConfirmation();
 
-  const databaseUrl = process.env.DATABASE_URL;
-  if (!databaseUrl) {
-    throw new Error('DATABASE_URL is required.');
-  }
-
-  const database = new URL(databaseUrl);
+  if (getRuntimeEnv().APP_ENV !== 'local' && getRuntimeEnv().APP_ENV !== 'test')
+    throw new Error('Learner resets are restricted to local/test D1.');
   console.log(
-    `Resetting Curriculum v2 learner state in ${database.hostname}${database.pathname}...`,
+    'Resetting local D1 learner state; historical submissions are preserved.',
   );
-  console.log('Historical submissions will be preserved.');
-
-  await db.transaction(async (transaction) => {
-    await transaction.delete(userAchievements);
-    await transaction.delete(progress);
-    await transaction
-      .update(users)
-      .set({ xp: 0, level: 1, updatedAt: new Date() });
-    await transaction
-      .update(challenges)
-      .set({ completionCount: 0, updatedAt: new Date() });
-  });
+  await db.batch([
+    db.delete(userAchievements),
+    db.delete(progress),
+    db.update(users).set({ xp: 0, level: 1, updatedAt: new Date() }),
+    db.update(challenges).set({ completionCount: 0, updatedAt: new Date() }),
+  ]);
 
   const [progressResult] = await db
     .select({ count: sql<number>`count(*)` })

@@ -1,12 +1,7 @@
 import { createServerFn } from '@tanstack/react-start';
 import { adminMiddleware } from '../auth.mw';
 import { db } from '@/db';
-import {
-  users,
-  submissions,
-  challenges,
-  bugReports,
-} from '@/db/schema';
+import { users, submissions, challenges, bugReports } from '@/db/schema';
 import { count, desc, sql, gte, lt, and } from 'drizzle-orm';
 
 export const getAdminStats = createServerFn({ method: 'GET' })
@@ -69,13 +64,13 @@ export const getAdminStats = createServerFn({ method: 'GET' })
           .where(gte(submissions.createdAt, sevenDaysAgo)),
         db
           .select({
-            date: sql<string>`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`,
+            date: sql<string>`date(${submissions.createdAt} / 1000, 'unixepoch')`,
             count: count(),
           })
           .from(submissions)
           .where(gte(submissions.createdAt, thirtyDaysAgo))
-          .groupBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`)
-          .orderBy(sql`to_char(${submissions.createdAt}, 'YYYY-MM-DD')`),
+          .groupBy(sql`date(${submissions.createdAt} / 1000, 'unixepoch')`)
+          .orderBy(sql`date(${submissions.createdAt} / 1000, 'unixepoch')`),
         db
           .select({
             id: challenges.id,
@@ -108,13 +103,13 @@ export const getAdminStats = createServerFn({ method: 'GET' })
         }),
         db
           .select({
-            date: sql<string>`to_char(${users.createdAt}, 'YYYY-MM-DD')`,
+            date: sql<string>`date(${users.createdAt} / 1000, 'unixepoch')`,
             count: count(),
           })
           .from(users)
           .where(gte(users.createdAt, thirtyDaysAgo))
-          .groupBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`)
-          .orderBy(sql`to_char(${users.createdAt}, 'YYYY-MM-DD')`),
+          .groupBy(sql`date(${users.createdAt} / 1000, 'unixepoch')`)
+          .orderBy(sql`date(${users.createdAt} / 1000, 'unixepoch')`),
         db
           .select({
             isPassed: submissions.isPassed,
@@ -136,9 +131,10 @@ export const getAdminStats = createServerFn({ method: 'GET' })
 
       const userGrowthPercent =
         (previousMonthUsers[0]?.value ?? 0) > 0
-          ? (((currentMonthUsers[0]?.value ?? 0) - (previousMonthUsers[0]?.value ?? 0)) /
-            (previousMonthUsers[0]?.value ?? 0)) *
-          100
+          ? (((currentMonthUsers[0]?.value ?? 0) -
+              (previousMonthUsers[0]?.value ?? 0)) /
+              (previousMonthUsers[0]?.value ?? 0)) *
+            100
           : (currentMonthUsers[0]?.value ?? 0) > 0
             ? 100
             : 0;
@@ -146,9 +142,9 @@ export const getAdminStats = createServerFn({ method: 'GET' })
       const submissionGrowthPercent =
         (previousMonthSubmissions[0]?.value ?? 0) > 0
           ? (((currentMonthSubmissions[0]?.value ?? 0) -
-            (previousMonthSubmissions[0]?.value ?? 0)) /
-            (previousMonthSubmissions[0]?.value ?? 0)) *
-          100
+              (previousMonthSubmissions[0]?.value ?? 0)) /
+              (previousMonthSubmissions[0]?.value ?? 0)) *
+            100
           : (currentMonthSubmissions[0]?.value ?? 0) > 0
             ? 100
             : 0;
@@ -191,7 +187,7 @@ export const getAdminStats = createServerFn({ method: 'GET' })
       };
     } catch (ignored) {
       const error = ignored as Error;
-      console.error('Failed to fetch admin stats:', error);
+      console.error('Failed to fetch admin stats:');
       return {
         success: false,
         error: error.message,

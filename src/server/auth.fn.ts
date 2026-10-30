@@ -9,8 +9,8 @@ import { auth } from './auth.server';
 import { db } from '@/db';
 import { users, accounts } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
-import { sendVerificationEmail } from '@/server/email.server';
-import { logger } from '@/lib/logger';
+import { getRuntimeEnv } from '#platform';
+import { consumeRateLimit, hashIdentifier } from './rate-limit';
 import { buildAuthSession, type AuthSession } from './auth-session';
 
 export type { AuthSession, SessionUser } from './auth-session';
@@ -20,7 +20,10 @@ async function ensureUserImage(userId: string): Promise<string | null> {
   try {
     // Check for Google account
     const account = await db.query.accounts.findFirst({
-      where: and(eq(accounts.userId, userId), eq(accounts.providerId, 'google')),
+      where: and(
+        eq(accounts.userId, userId),
+        eq(accounts.providerId, 'google'),
+      ),
     });
 
     if (account?.idToken) {
@@ -29,7 +32,12 @@ async function ensureUserImage(userId: string): Promise<string | null> {
         const encodedPayload = account.idToken.split('.')[1];
         if (!encodedPayload) return null;
         const payload: unknown = JSON.parse(
-          Buffer.from(encodedPayload, 'base64').toString(),
+          new TextDecoder().decode(
+            Uint8Array.from(
+              atob(encodedPayload.replaceAll('-', '+').replaceAll('_', '/')),
+              (character) => character.charCodeAt(0),
+            ),
+          ),
         );
         if (
           typeof payload === 'object' &&
@@ -47,8 +55,8 @@ async function ensureUserImage(userId: string): Promise<string | null> {
         // Ignore decoding errors
       }
     }
-  } catch (error) {
-    console.error('[Auth] Failed to lazy update user image:', error);
+  } catch {
+    console.error('[Auth] Failed to lazy update user image:');
   }
   return null;
 }
@@ -75,21 +83,16 @@ export const getServerSession = createServerFn({ method: 'GET' }).handler(
             emailVerified: session.user.emailVerified || false,
             role: session.user.role || 'USER',
           },
-          process.env.VITE_GA_MEASUREMENT_ID,
+          getRuntimeEnv().VITE_GA_MEASUREMENT_ID,
         );
       }
-    } catch (error) {
-      console.error('[Auth] Failed to get session:', error);
+    } catch {
+      console.error('[Auth] Failed to get session:');
     }
 
-    return buildAuthSession(null, process.env.VITE_GA_MEASUREMENT_ID);
+    return buildAuthSession(null, getRuntimeEnv().VITE_GA_MEASUREMENT_ID);
   },
 );
-
-// Simple in-memory rate limiting (per email, 60 second cooldown)
-// Note: This resets on server restart/redeploy
-const rateLimitMap = new Map<string, number>();
-const COOLDOWN_MS = 60 * 1000;
 
 // Zod schema for email validation
 const ResendVerificationSchema = z.object({
@@ -104,13 +107,15 @@ export const resendVerification = createServerFn({ method: 'POST' })
 
       const normalizedEmail = email.toLowerCase().trim();
 
-      // Rate limiting check
-      const lastSent = rateLimitMap.get(normalizedEmail);
-      const now = Date.now();
-
-      if (lastSent && now - lastSent < COOLDOWN_MS) {
-        const remainingSeconds = Math.ceil(
-          (COOLDOWN_MS - (now - lastSent)) / 1000,
+      const rate = await consumeRateLimit(
+        `verification-email:${await hashIdentifier(normalizedEmail)}`,
+        1,
+        60_000,
+      );
+      if (!rate.allowed) {
+        const remainingSeconds = Math.max(
+          1,
+          Math.ceil((rate.resetAt - Date.now()) / 1000),
         );
         return {
           success: false,
@@ -142,34 +147,18 @@ export const resendVerification = createServerFn({ method: 'POST' })
         };
       }
 
-      // Generate verification URL
-      const baseUrl = process.env.BETTER_AUTH_URL || 'http://localhost:3000';
-      const token = crypto.randomUUID();
-      const verificationUrl = `${baseUrl}/api/auth/verify-email?token=${token}&callbackURL=/login`;
-
-      // Send the verification email
-      // Fire and forget email sending
-      sendVerificationEmail(
-        user.email,
-        verificationUrl,
-        user.name || undefined,
-      ).catch((error) => {
-        console.error(
-          '[Auth] Background resend verification email failed:',
-          error,
-        );
+      // Better Auth signs the token; arbitrary UUIDs are not verification tokens.
+      await auth.api.sendVerificationEmail({
+        body: { email: normalizedEmail, callbackURL: '/en/login' },
+        headers: getRequest().headers,
       });
-
-      // Update rate limit
-      rateLimitMap.set(normalizedEmail, now);
-      logger.info(`[Auth] Resent verification email to ${normalizedEmail}`);
 
       return {
         success: true,
         message: 'Verification email sent! Please check your inbox.',
       };
-    } catch (error) {
-      console.error('Error resending verification email:', error);
+    } catch {
+      console.error('Error resending verification email:');
       return { success: false, error: 'Failed to resend verification email' };
     }
   });

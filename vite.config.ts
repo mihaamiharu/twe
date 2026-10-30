@@ -1,48 +1,36 @@
 import { defineConfig } from 'vite';
-import { devtools } from '@tanstack/devtools-vite';
+import { cloudflare } from '@cloudflare/vite-plugin';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
 import { contentManifestPlugin } from './scripts/content-manifest.plugin';
 import { ogAssetsPlugin } from './scripts/og-assets.plugin';
+import { bundleAuditPlugin } from './scripts/bundle-audit.plugin';
 
 const config = defineConfig({
   plugins: [
     contentManifestPlugin(),
     ogAssetsPlugin(),
-    devtools(),
+    cloudflare({
+      configPath: process.env['TWE_WRANGLER_CONFIG'] || 'wrangler.jsonc',
+      persistState: {
+        path: process.env['TWE_D1_PERSIST'] || '.wrangler/state',
+      },
+      viteEnvironment: { name: 'ssr' },
+      remoteBindings: false,
+    }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({ server: { entry: './server.ts' } }),
     viteReact(),
+    bundleAuditPlugin(),
   ],
   optimizeDeps: {
     exclude: ['@resvg/resvg-js'],
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // React core
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'react-vendor';
-          }
-          // TanStack libraries
-          if (id.includes('node_modules/@tanstack/')) {
-            return 'tanstack-vendor';
-          }
-          // UI libraries (Radix, Lucide)
-          if (id.includes('node_modules/@radix-ui/') || id.includes('node_modules/lucide-react/')) {
-            return 'ui-vendor';
-          }
-          return undefined;
-        },
-      },
-    },
   },
 });
 

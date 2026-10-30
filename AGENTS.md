@@ -6,30 +6,29 @@ This file contains guidelines for agentic coding assistants working in this repo
 
 ### Build & Dev
 
-* `bun run dev` - Start development server (Nitro + Vite)
-* `bun run setup` - Initialize local env, PostgreSQL, migrations, and content (macOS/Windows)
-* `bun run dev:local` - Start local PostgreSQL and the development server
-* `bun run build` - Build for production
-* `bun run preview` - Preview production build
+- `bun run dev` - Start development server (Nitro + Vite)
+- `bun run setup` - Initialize local env, PostgreSQL, migrations, and content (macOS/Windows)
+- `bun run dev:local` - Start local PostgreSQL and the development server
+- `bun run build` - Build for production
+- `bun run preview` - Preview production build
 
 ### Testing
 
-* `bun test` - Run unit/logic tests
-* `bun run test:e2e` - Run the isolated, disposable Playwright E2E suite
+- `bun test` - Run unit/logic tests
+- `bun run test:e2e` - Run the isolated, disposable Playwright E2E suite
 
 ### Database (Drizzle ORM v1.0+)
 
-We use `docker compose` (Docker Desktop) for local environment infrastructure. Podman works as an alternative.
+The Cloudflare migration branch uses local workerd and D1 through Wrangler. No local PostgreSQL container is required. PostgreSQL history and recovery tools remain under `src/db/legacy/` until post-cutover retirement.
 
-Use `bun run setup` once, then `bun run dev:local` daily on macOS and Windows.
-See [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md). The local helpers preserve
-existing `.env` files and require the example local DB URL with no `DIRECT_URL`.
+- `bun run setup` - Create local secrets if absent, apply D1 migrations and sync editorial data
+- `bun run dev:local` - Start Vite with local workerd/D1
+- `bun run db:migrate` - Apply checked-in local D1 migrations
+- `bun run db:generate` - Generate a reviewed SQLite/D1 migration
+- `bun run db:sync` - Sync local editorial metadata and grading fixtures
+- `bun run cf:db:migrate:preview` - Apply migrations to the isolated remote preview target
 
-* `bun run db:up` / `bun run db:stop` - Start/stop local PostgreSQL without deleting data
-
-* `bun run db:push` - Sync schema to DB (Development)
-* `bun run db:migrate` - Apply checked-in migrations to the configured database
-* `bun run db:studio` - Open Drizzle Studio
+See [docs/LOCAL_DEVELOPMENT.md](docs/LOCAL_DEVELOPMENT.md). Unit and disposable D1 integration checks are separate from the owner's local E2E release run.
 
 ---
 
@@ -39,7 +38,7 @@ existing `.env` files and require the example local DB URL with no `DIRECT_URL`.
 
 TanStack Start uses **isomorphic loaders**. By default, it performs SSR on the initial request and behaves like a client-side SPA for subsequent navigations.
 
-* **Selective SSR**: You can disable SSR for specific routes (e.g., heavy dashboards) using the `ssr` flag:
+- **Selective SSR**: You can disable SSR for specific routes (e.g., heavy dashboards) using the `ssr` flag:
 
 ```ts
 export const Route = createFileRoute('/dashboard')({
@@ -66,8 +65,8 @@ const authMiddleware = createMiddleware().server(async ({ next, context }) => {
 export const deleteChallenge = createServerFn({ method: 'POST' })
   .middleware([authMiddleware]) // Infers 'user' into context
   .handler(async ({ context }) => {
-     const userId = context.user.id;
-     // ...
+    const userId = context.user.id;
+    // ...
   });
 ```
 
@@ -75,8 +74,8 @@ export const deleteChallenge = createServerFn({ method: 'POST' })
 
 Use `createServerFn` for all data mutations and sensitive queries.
 
-* **Always** use `.inputValidator()` with Zod for input safety.
-* **Context**: Access DB or Auth via `context` injected by middleware.
+- **Always** use `.inputValidator()` with Zod for input safety.
+- **Context**: Access DB or Auth via `context` injected by middleware.
 
 ```ts
 import { createServerFn } from '@tanstack/react-start';
@@ -94,8 +93,8 @@ export const updateXp = createServerFn({ method: 'POST' })
 
 Avoid local `useState` for filters. Use **Typesafe Search Params** to ensure filters are shareable and SEO-friendly.
 
-* **Validation**: Define the schema in the route.
-* **Navigation**: Use `Maps` to update params.
+- **Validation**: Define the schema in the route.
+- **Navigation**: Use `Maps` to update params.
 
 ```ts
 export const Route = createFileRoute('/challenges/')({
@@ -129,10 +128,10 @@ const { data } = useQuery({
 
 ### 6. Project Directory Structure
 
-* `src/routes/` - File-based routes (standard)
-* `src/server/` - All `.fn.ts` (Server Functions) and `.mw.ts` (Middleware)
-* `src/components/ui/` - Shadcn/ui atomic components
-* `src/db/` - Drizzle schemas and client config
+- `src/routes/` - File-based routes (standard)
+- `src/server/` - All `.fn.ts` (Server Functions) and `.mw.ts` (Middleware)
+- `src/components/ui/` - Shadcn/ui atomic components
+- `src/db/` - Drizzle schemas and client config
 
 ---
 
@@ -142,7 +141,7 @@ const { data } = useQuery({
 2. **Prefer Server Functions**: Only use `api/` routes for external webhooks or non-React consumers.
 3. **Optimistic Updates**: Always implement optimistic UI logic in TanStack Query mutations for a "zero-latency" feel.
 4. **Isomorphic Logic**: Keep logic inside `loader` or `Server Functions`. Avoid `useEffect` for data fetching.
-5. **Environment Run**: We use `docker compose` for standing up local services (Podman also works).
+5. **Environment Run**: The migrated app uses local workerd/D1. If a PostgreSQL recovery rehearsal needs containers, prefer Podman local and isolate it from normal workloads.
 
 ---
 

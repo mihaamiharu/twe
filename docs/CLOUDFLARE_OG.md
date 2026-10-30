@@ -53,6 +53,6 @@ Known Home images are generated ahead of time, so their illustration need not en
 - Verify empty-cache generation, source changes/new locale documents, watch-mode regeneration, deployment cache invalidation and existing card identity URL stability.
 - Measure cold/warm CPU and memory for arbitrary dynamic rendering. Static common cards do not establish that arbitrary rendering fits Workers Free.
 
-The full product still needs its final Worker/Static Assets binding integration after the schema/runtime port. No PNG render, application build, tests, preview request, deployment or production change was performed for this slice.
+The full product now has its Worker/Static Assets binding configuration; actual bundle resolution and static delivery still require validation. No PNG render, application build, tests, preview request, deployment or production change was performed for this slice.
 
 References: [Cloudflare non-JavaScript modules](https://developers.cloudflare.com/workers/vite-plugin/reference/non-javascript-modules/), [Satori](https://github.com/vercel/satori), [CF WASM Satori source](https://github.com/fineshopdesign/cf-wasm/tree/main/packages/satori).

@@ -172,7 +172,7 @@ Lint, typecheck and build completed before the owner requested deferring checks.
 
 ## Workstream #249 — preview implementation
 
-An isolated TanStack Start application now lives in `spikes/cloudflare/`, with its own Vite root, TypeScript project and route tree. It shares the existing framework versions and does not import production runtime dependencies. Root `cf:*` commands operate on this spike; existing production commands/workflows remain in place.
+An isolated TanStack Start application now lives in `spikes/cloudflare/`, with its own Vite root, TypeScript project and route tree. It shares the existing framework versions and does not import production runtime dependencies. The original spike is retained through `cf:spike:*`; root `cf:*` commands now target the full migrated app. VPS workflows are archived as recovery references.
 
 - Pinned Cloudflare Vite plugin 1.66.0, Wrangler 4.154.0 (matching the plugin's Wrangler dependency), and Worker types 5.20261029.1.
 - Refreshed the existing Wrangler CLI connection with a reduced subset of its prior permissions for user/account reads, Workers writes and D1 writes.
@@ -191,4 +191,16 @@ Request middleware now defaults dynamic HTML/auth/server-function responses to p
 
 The OG source implementation now prepares 222 known static cards and retains arbitrary legacy query rendering through conditional Bun/Workers implementations. Font data is bundled from installed packages; no request-time filesystem or Google Fonts call remains in the OG handler. Only source manifests were generated; PNG rendering and runtime/visual/CPU evidence remain deferred to #256.
 
-The final full-product Static Assets integration remains pending within #250 alongside the schema/runtime port. Source generation alone is not parity evidence. See `docs/CLOUDFLARE_CONTENT.md` and `docs/CLOUDFLARE_OG.md` for scope, cache classification and the remaining work.
+The full product now has a Cloudflare Vite/Worker entry and Static Assets binding; built/runtime evidence remains pending. Source generation alone is not parity evidence. See `docs/CLOUDFLARE_CONTENT.md` and `docs/CLOUDFLARE_OG.md` for scope, cache classification and the remaining work.
+
+## Workstreams #251–#255 — integrated migration candidate
+
+The release branch now contains the full D1 schema and additive migrations, typed local/workerd bindings, Better Auth SQLite persistence, prepared atomic reward/achievement batches, D1-backed abuse windows, configurable awaited HTTP email, bounded AI/GitHub calls, and Workers-safe logging. PostgreSQL history/tools are retained for recovery. Courses remain outside the pinned baseline.
+
+Restricted snapshot export/import and full row/hash/FK/integrity reconciliation commands are implemented. Local setup and isolated D1 integration/E2E runners replace PostgreSQL containers. Manual candidate deployment and encrypted-backup workflows replace automatic VPS deployment; production still requires readiness and owner authorization.
+
+Created separate empty APAC D1 resources for the full app: twe-preview (`a57397b4-3f7f-432e-a161-04330b3a5b4b`) and twe-production (`6f6630be-ed32-4d07-ba24-24d45bb160c9`). They have not received production data. No Worker deployment, DNS switch, paid plan or VPS deletion was performed.
+
+The owner explicitly kept the email provider undecided. Generic HTTPS transport and an optional vendor adapter are prepared; preview/production do not silently choose a provider. Credentials, delivery and callback verification remain release gates.
+
+See [D1/schema/rewards](CLOUDFLARE_D1.md), [data transfer](CLOUDFLARE_DATA.md), [operations](CLOUDFLARE_OPERATIONS.md), and [cutover/rollback](CLOUDFLARE_CUTOVER.md). Source implementation is not proof of runtime parity; all unresolved checks must be recorded in #256, including the owner's local E2E run.

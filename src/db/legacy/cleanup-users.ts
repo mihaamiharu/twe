@@ -12,7 +12,7 @@ import {
   progress,
   userAchievements,
   bugReports,
-} from './schema';
+} from './postgres-schema';
 
 async function cleanupUsers() {
   console.log('🧹 Starting cleanup...\n');

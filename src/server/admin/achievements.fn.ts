@@ -17,7 +17,7 @@ export const getAdminAchievements = createServerFn({ method: 'GET' })
           icon: achievements.icon,
           rarity: achievements.rarity,
           category: achievements.category,
-          unlockCount: sql<number>`count(${userAchievements.id})::int`,
+          unlockCount: sql<number>`count(${userAchievements.id})`,
         })
         .from(achievements)
         .leftJoin(
@@ -28,9 +28,8 @@ export const getAdminAchievements = createServerFn({ method: 'GET' })
         .orderBy(achievements.slug);
 
       return { success: true, data: list };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch achievements:', error);
+    } catch {
+      console.error('Failed to fetch achievements:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

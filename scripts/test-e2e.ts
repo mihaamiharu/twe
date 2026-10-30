@@ -1,11 +1,8 @@
+import { createTestSandbox } from './test-sandbox';
 import { createServer } from 'node:net';
 
 const projectRoot = process.cwd();
 const bunExecutable = process.execPath;
-const containerName = `twe-e2e-${process.pid}-${Date.now()}`;
-const databaseName = 'twe_e2e';
-const databaseUser = 'twe_e2e';
-const databasePassword = 'twe_e2e_password';
 type SeedUser = {
   email: string;
   password: string;
@@ -20,19 +17,12 @@ const adminUser: SeedUser = {
   role: 'ADMIN',
 };
 
-type Environment = Record<string, string>;
-type ContainerRuntime = 'docker' | 'podman';
+type Environment = Record<string, string | undefined>;
 type Subprocess = ReturnType<typeof Bun.spawn>;
-type CommandResult = {
-  exitCode: number;
-  stdout: string;
-  stderr: string;
-};
 
 let appProcess: Subprocess | undefined;
 let activeProcess: Subprocess | undefined;
-let containerCreated = false;
-let containerRuntime: ContainerRuntime = 'podman';
+let sandbox: Awaited<ReturnType<typeof createTestSandbox>> | undefined;
 
 function buildEnvironment(overrides: Environment = {}): Environment {
   const inheritedEnvironment = Object.fromEntries(
@@ -78,36 +68,6 @@ async function runCommand(
       `Command failed with exit code ${exitCode}: ${command} ${args.join(' ')}`,
     );
   }
-}
-
-async function captureCommand(
-  command: string,
-  args: string[],
-  env?: Environment,
-): Promise<CommandResult> {
-  const options: {
-    env?: Environment;
-    stdout: 'pipe';
-    stderr: 'pipe';
-  } = { stdout: 'pipe', stderr: 'pipe' };
-  if (env) options.env = env;
-  const child = spawnCommand(command, args, options);
-  activeProcess = child;
-
-  const stdoutStream = child.stdout;
-  const stderrStream = child.stderr;
-  if (typeof stdoutStream === 'number' || typeof stderrStream === 'number') {
-    throw new Error(`Could not capture output from ${command}.`);
-  }
-
-  const [stdout, stderr, exitCode] = await Promise.all([
-    new Response(stdoutStream).text(),
-    new Response(stderrStream).text(),
-    child.exited,
-  ]);
-
-  if (activeProcess === child) activeProcess = undefined;
-  return { exitCode, stdout: stdout.trim(), stderr: stderr.trim() };
 }
 
 async function delay(milliseconds: number): Promise<void> {
@@ -183,53 +143,6 @@ async function resolvePort(
   });
 
   return port;
-}
-
-function resolveContainerRuntime(): ContainerRuntime {
-  const configuredRuntime = process.env.E2E_CONTAINER_RUNTIME;
-  if (configuredRuntime === undefined || configuredRuntime === '') {
-    if (Bun.which('docker')) return 'docker';
-    if (Bun.which('podman')) return 'podman';
-
-    return 'docker';
-  }
-  if (configuredRuntime === 'docker' || configuredRuntime === 'podman') {
-    return configuredRuntime;
-  }
-
-  throw new Error(
-    `E2E_CONTAINER_RUNTIME must be "podman" or "docker". Received: ${configuredRuntime}`,
-  );
-}
-
-async function ensureContainerRuntime(
-  runtime: ContainerRuntime,
-): Promise<void> {
-  const displayName = runtime === 'docker' ? 'Docker' : 'Podman';
-  let version: CommandResult;
-  try {
-    version = await captureCommand(runtime, ['--version']);
-  } catch {
-    throw new Error(
-      `${displayName} is required for E2E tests but was not found on PATH. Install Docker Desktop or Podman, start it, and retry.`,
-    );
-  }
-  if (version.exitCode !== 0) {
-    throw new Error(
-      `${displayName} is required for E2E tests. Install ${displayName} and ensure the ${runtime} command is on PATH.`,
-    );
-  }
-
-  const info = await captureCommand(runtime, ['info']);
-  if (info.exitCode === 0) return;
-
-  const serviceHint =
-    runtime === 'podman'
-      ? 'Start your intended Podman machine or service. The E2E runner will not start a machine automatically because that could activate unrelated workloads.'
-      : 'Start the Docker daemon or Docker Desktop.';
-  throw new Error(
-    `${displayName} is installed but its service is unavailable. ${serviceHint}\n${info.stderr}`,
-  );
 }
 
 async function seedUser(
@@ -318,97 +231,38 @@ async function cleanup(): Promise<boolean> {
     succeeded = false;
   }
 
-  if (containerCreated) {
-    const result = await captureCommand(containerRuntime, [
-      'rm',
-      '-f',
-      containerName,
-    ]);
-    if (result.exitCode !== 0) {
-      console.error(
-        `Could not remove disposable E2E container ${containerName}. Remove only that container manually with: ${containerRuntime} rm -f ${containerName}\n${result.stderr}`,
-      );
-      succeeded = false;
-    }
-  }
+  if (sandbox) await sandbox.dispose();
 
   return succeeded;
 }
 
 async function main(): Promise<void> {
-  containerRuntime = resolveContainerRuntime();
-  await ensureContainerRuntime(containerRuntime);
-
-  const databasePort = await resolvePort('E2E_DB_PORT');
   const appPort = await resolvePort('E2E_APP_PORT');
-  if (databasePort === appPort) {
-    throw new Error(
-      `E2E_DB_PORT and E2E_APP_PORT both resolved to ${databasePort}. Configure distinct ports, or set either value to 0 for automatic selection.`,
-    );
-  }
-  const e2eSecret = `e2e-${crypto.randomUUID()}`;
-  const authSecret = `e2e-auth-${crypto.randomUUID()}-${crypto.randomUUID()}`;
   const host = '127.0.0.1';
-  const databaseUrl = `postgresql://${databaseUser}:${databasePassword}@${host}:${databasePort}/${databaseName}`;
   const baseUrl = `http://${host}:${appPort}`;
-  const databasePortMapping = `127.0.0.1:${databasePort}:5432`;
+  sandbox = await createTestSandbox(baseUrl);
+  const e2eSecret = sandbox.e2eSecret;
   const testEnvironment: Environment = {
-    NODE_ENV: 'test',
-    DATABASE_URL: databaseUrl,
-    TEST_DATABASE_URL: databaseUrl,
-    DIRECT_URL: databaseUrl,
-    BETTER_AUTH_SECRET: authSecret,
-    BETTER_AUTH_URL: baseUrl,
-    VITE_APP_URL: baseUrl,
-    E2E_SECRET: e2eSecret,
-    REQUIRE_EMAIL_VERIFICATION: 'false',
+    ...buildEnvironment(sandbox.env),
     E2E_ADMIN_EMAIL: adminUser.email,
     E2E_ADMIN_PASSWORD: adminUser.password,
   };
-
-  console.log(
-    `Starting disposable PostgreSQL 15 container with ${containerRuntime} on ${host}:${databasePort}...`,
-  );
-  await runCommand(containerRuntime, [
-    'run',
-    '--detach',
-    '--name',
-    containerName,
-    '--label',
-    'com.twe.e2e=disposable',
-    '--publish',
-    databasePortMapping,
-    '--env',
-    `POSTGRES_DB=${databaseName}`,
-    '--env',
-    `POSTGRES_USER=${databaseUser}`,
-    '--env',
-    `POSTGRES_PASSWORD=${databasePassword}`,
-    'postgres:15-alpine',
-  ]);
-  containerCreated = true;
-
-  await waitFor('PostgreSQL readiness', async () => {
-    const result = await captureCommand(containerRuntime, [
-      'exec',
-      containerName,
-      'pg_isready',
-      '-U',
-      databaseUser,
-      '-d',
-      databaseName,
-    ]);
-    return result.exitCode === 0;
-  });
-
   console.log('Applying schema and syncing deterministic test content...');
-  await runCommand(bunExecutable, ['run', 'db:migrate'], testEnvironment);
+  await sandbox.migrate();
   await runCommand(bunExecutable, ['run', 'db:sync'], testEnvironment);
 
   console.log(`Starting test-mode app at ${baseUrl}...`);
   appProcess = spawnCommand(
-    bunExecutable,
-    ['--bun', 'vite', 'dev', '--host', host, '--port', String(appPort)],
+    'node',
+    [
+      'node_modules/vite/bin/vite.js',
+      'dev',
+      '--host',
+      host,
+      '--strictPort',
+      '--port',
+      String(appPort),
+    ],
     { env: testEnvironment },
   );
 

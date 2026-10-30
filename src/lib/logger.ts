@@ -46,6 +46,19 @@ if (env.DEV && !env.VITE_LOG_LEVEL) {
 }
 
 class Logger {
+  private writeServer(level: LogLevel, message: string): boolean {
+    if (!isServer) return false;
+    if (this.shouldLog(level)) {
+      const scope =
+        message.match(/^\[([A-Za-z][A-Za-z ]{0,40})\]/)?.[1] ?? 'application';
+      // eslint-disable-next-line security/detect-object-injection -- level is the closed debug/info/warn/error union.
+      console[level](
+        JSON.stringify({ event: 'application_log', level, scope }),
+      );
+    }
+    return true;
+  }
+
   private shouldLog(level: LogLevel): boolean {
     // In production, suppress unless enabled
     // Safe check for PROD in case it's undefined
@@ -57,9 +70,15 @@ class Logger {
     return LOG_LEVELS[level] >= LOG_LEVELS[config.level];
   }
 
-  private handler: ((level: LogLevel, message: string, args: unknown[]) => void) | null = null;
+  private handler:
+    | ((level: LogLevel, message: string, args: unknown[]) => void)
+    | null = null;
 
-  setHandler(handler: ((level: LogLevel, message: string, args: unknown[]) => void) | null) {
+  setHandler(
+    handler:
+      | ((level: LogLevel, message: string, args: unknown[]) => void)
+      | null,
+  ) {
     this.handler = handler;
   }
 
@@ -85,6 +104,7 @@ class Logger {
   }
 
   debug(message: string, ...args: unknown[]) {
+    if (this.writeServer('debug', message)) return;
     if (this.handler) {
       this.handler('debug', message, args);
       return;
@@ -95,6 +115,7 @@ class Logger {
   }
 
   info(message: string, ...args: unknown[]) {
+    if (this.writeServer('info', message)) return;
     if (this.handler) {
       this.handler('info', message, args);
       return;
@@ -105,6 +126,7 @@ class Logger {
   }
 
   warn(message: string, ...args: unknown[]) {
+    if (this.writeServer('warn', message)) return;
     if (this.handler) {
       this.handler('warn', message, args);
       return;
@@ -115,13 +137,14 @@ class Logger {
   }
 
   error(message: string, ...args: unknown[]) {
+    if (this.writeServer('error', message)) return;
     // Automatically capture exception in Sentry if passed
     const errorArg = args.find((arg) => arg instanceof Error);
     if (errorArg) {
       Sentry.captureException(errorArg);
     } else {
       // If just a message, capture as message
-      Sentry.captureMessage(message, "error");
+      Sentry.captureMessage(message, 'error');
     }
 
     if (this.handler) {

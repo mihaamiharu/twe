@@ -46,3 +46,5 @@ vps_access_guide.md
 # Agent and Conductor local data
 .agent/mihaamiharu/
 conductor/
+
+src/worker-bindings.generated.d.ts

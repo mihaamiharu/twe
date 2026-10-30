@@ -38,6 +38,7 @@ export async function readContentSources() {
     const file = join(repositoryRoot, 'content', 'challenges', `${tier}.json`);
     sourceFiles.push(file);
     try {
+      // eslint-disable-next-line security/detect-object-injection -- tier comes from the explicit active-tier allowlist.
       manifest.tiers[tier] = await readFile(file, 'utf8');
     } catch (error) {
       // Match the catalog's existing behavior for an absent optional tier.

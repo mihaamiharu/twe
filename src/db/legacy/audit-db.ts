@@ -3,7 +3,7 @@
  */
 
 import { db } from './index';
-import { challenges, tutorials } from './schema';
+import { challenges, tutorials } from './postgres-schema';
 import { getLocalizedString } from '@/lib/localized';
 
 async function audit() {

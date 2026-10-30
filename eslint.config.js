@@ -48,7 +48,7 @@ export default tseslint.config(
       'src/server/content.server.ts',
       'src/server/submissions.fn.ts',
       'src/server/tutorials.fn.ts',
-      'src/db/audit-db.ts',
+      'src/db/legacy/audit-db.ts',
     ],
     rules: {
       'security/detect-object-injection': 'off',

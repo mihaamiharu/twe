@@ -2,7 +2,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, rename, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { z } from 'zod';
 import { readContentSources } from './generate-content-manifest';
 import {
@@ -32,13 +32,12 @@ const resourcesOutput = join(
   'generated',
   'og-resources.json',
 );
-const regularFontPath = fileURLToPath(
-  import.meta
-    .resolve('@fontsource/instrument-sans/files/instrument-sans-latin-400-normal.woff'),
+const resolvePackage = createRequire(join(root, 'package.json')).resolve;
+const regularFontPath = resolvePackage(
+  '@fontsource/instrument-sans/files/instrument-sans-latin-400-normal.woff',
 );
-const boldFontPath = fileURLToPath(
-  import.meta
-    .resolve('@fontsource/instrument-sans/files/instrument-sans-latin-700-normal.woff'),
+const boldFontPath = resolvePackage(
+  '@fontsource/instrument-sans/files/instrument-sans-latin-700-normal.woff',
 );
 const inspectorImagePath = join(
   root,
@@ -96,7 +95,7 @@ async function readOgInputs() {
     ogSourceFiles.map((path) => readFile(path)),
   );
   const files = new Map(
-    ogSourceFiles.map((path, index) => [path, assetBytes[index]]),
+    ogSourceFiles.map((path, index) => [path, assetBytes.at(index)]),
   );
   const regular = files.get(regularFontPath);
   const bold = files.get(boldFontPath);
@@ -133,7 +132,7 @@ async function readOgInputs() {
     'tutorials/registry.json',
   );
   const challenges = ACTIVE_CHALLENGE_TIERS.flatMap((tier) => {
-    const content = manifest.tiers[tier];
+    const content = new Map(Object.entries(manifest.tiers)).get(tier);
     return content === undefined
       ? []
       : parseChallengeTierJson(content, `content/challenges/${tier}.json`)

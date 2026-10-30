@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { omitUndefined } from '@/lib/omit-undefined';
-import { formatZodIssues } from '@/lib/zod-errors';
+import { omitUndefined } from '../lib/omit-undefined';
+import { formatZodIssues } from '../lib/zod-errors';
 import type {
   ChallengeDefinition,
   ChallengeTierFile,
@@ -16,7 +16,7 @@ import type {
   TypeScriptEvidenceDefinition,
   TutorialRegistry,
   TutorialRegistryEntry,
-} from '@/lib/content.types';
+} from '../lib/content.types';
 
 const ContentStatusSchema = z.enum(['published', 'draft', 'coming_soon']);
 const LocalizedStringSchema = z

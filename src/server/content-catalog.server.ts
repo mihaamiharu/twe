@@ -88,6 +88,7 @@ function loadAllChallenges(): Promise<Map<string, ChallengeDefinition>> {
 
   const loaded = new Map<string, ChallengeDefinition>();
   for (const tier of ACTIVE_CHALLENGE_TIERS) {
+    // eslint-disable-next-line security/detect-object-injection -- tier comes from the explicit active-tier allowlist.
     const content = sources.tiers[tier];
     if (content === undefined) continue;
     const tierData = parseChallengeTierJson(

@@ -10,18 +10,15 @@ const originalEnvironment = {
 };
 
 describe('createGitHubIssue response validation', () => {
-  const errors: Error[] = [];
+  const errors: string[] = [];
 
   beforeEach(() => {
     process.env.GH_API_TOKEN = 'test-token';
     process.env.GH_OWNER = 'testing-with-ekki';
     process.env.GH_REPO = 'twe';
     errors.length = 0;
-    logger.setHandler((level, _message, args) => {
-      if (level !== 'error') return;
-      for (const argument of args) {
-        if (argument instanceof Error) errors.push(argument);
-      }
+    logger.setHandler((level, message) => {
+      if (level === 'error') errors.push(message);
     });
   });
 
@@ -34,17 +31,25 @@ describe('createGitHubIssue response validation', () => {
   });
 
   test('returns a validated issue response', async () => {
-    Reflect.set(globalThis, 'fetch', mock(() => Promise.resolve(new Response(
-      JSON.stringify({
-        id: 101,
-        number: 17,
-        html_url: 'https://github.com/testing-with-ekki/twe/issues/17',
-        title: 'Validated bug',
-        state: 'open',
-        extra_api_field: true,
-      }),
-      { status: 201 },
-    ))));
+    Reflect.set(
+      globalThis,
+      'fetch',
+      mock(() =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({
+              id: 101,
+              number: 17,
+              html_url: 'https://github.com/testing-with-ekki/twe/issues/17',
+              title: 'Validated bug',
+              state: 'open',
+              extra_api_field: true,
+            }),
+            { status: 201 },
+          ),
+        ),
+      ),
+    );
 
     const issue = await createGitHubIssue({
       title: 'Validated bug',
@@ -56,26 +61,32 @@ describe('createGitHubIssue response validation', () => {
   });
 
   test('rejects a structurally invalid successful response', async () => {
-    Reflect.set(globalThis, 'fetch', mock(() => Promise.resolve(new Response(
-      JSON.stringify({ id: 101, number: 17, html_url: 42, title: 'Bug' }),
-      { status: 201 },
-    ))));
+    Reflect.set(
+      globalThis,
+      'fetch',
+      mock(() =>
+        Promise.resolve(
+          new Response(
+            JSON.stringify({ id: 101, number: 17, html_url: 42, title: 'Bug' }),
+            { status: 201 },
+          ),
+        ),
+      ),
+    );
 
     expect(await createGitHubIssue({ title: 'Bug', body: 'Steps' })).toBeNull();
-    expect(errors[0]?.message).toContain('testing-with-ekki/twe');
-    expect(errors[0]?.message).toContain('html_url');
+    expect(errors[0]).toBe('[GitHub] Error creating issue.');
   });
 
   test('rejects invalid JSON with repository context', async () => {
-    Reflect.set(globalThis, 'fetch', mock(() => Promise.resolve(new Response(
-      'not-json',
-      { status: 201 },
-    ))));
+    Reflect.set(
+      globalThis,
+      'fetch',
+      mock(() => Promise.resolve(new Response('not-json', { status: 201 }))),
+    );
 
     expect(await createGitHubIssue({ title: 'Bug', body: 'Steps' })).toBeNull();
-    expect(errors[0]?.message).toBe(
-      '[GitHub] Invalid JSON response while creating issue for testing-with-ekki/twe',
-    );
+    expect(errors[0]).toBe('[GitHub] Error creating issue.');
   });
 });
 
