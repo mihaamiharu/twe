@@ -1,0 +1,14 @@
+{
+  "name": "twe-cloudflare-spike",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev --host 127.0.0.1 --port 3001",
+    "build": "CLOUDFLARE_ENV=preview vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 3001",
+    "deploy": "bun run build && wrangler deploy",
+    "typegen": "wrangler types --include-runtime false --env-interface GeneratedSpikeBindings src/worker-bindings.generated.d.ts",
+    "db:migrate": "wrangler d1 migrations apply DB --local",
+    "db:migrate:preview": "wrangler d1 migrations apply DB --env preview --remote"
+  }
+}

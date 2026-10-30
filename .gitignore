@@ -8,6 +8,10 @@ count.txt
 .nitro
 .tanstack
 .wrangler
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+spikes/cloudflare/src/worker-bindings.generated.d.ts
 .output
 .vinxi
 todos.json

@@ -1,0 +1,4 @@
+# Generate separate random values for these local-only secrets.
+# Never copy the production Better Auth secret or PostgreSQL credentials here.
+SPIKE_ACCESS_TOKEN=replace-with-a-random-local-preview-access-token
+BETTER_AUTH_SECRET=replace-with-a-separate-random-local-auth-secret

@@ -10,6 +10,13 @@
     "dev": "bun --bun vite dev --port 3000",
     "build": "NODE_ENV=production vite build",
     "preview": "vite preview --port 3000",
+    "cf:dev": "bun --cwd spikes/cloudflare run dev",
+    "cf:build": "bun --cwd spikes/cloudflare run build",
+    "cf:preview": "bun --cwd spikes/cloudflare run preview",
+    "cf:deploy": "bun --cwd spikes/cloudflare run deploy",
+    "cf:typegen": "bun --cwd spikes/cloudflare run typegen",
+    "cf:db:migrate": "bun --cwd spikes/cloudflare run db:migrate",
+    "cf:db:migrate:preview": "bun --cwd spikes/cloudflare run db:migrate:preview",
     "test": "bun test --preload ./src/tests/bun-preload.ts",
     "test:unit": "bun test --preload ./src/tests/bun-preload.ts src/tests/unit",
     "test:integration": "NODE_ENV=test DATABASE_URL=postgresql://twe_test:twe_password@localhost:5433/twe_test TEST_DATABASE_URL=postgresql://twe_test:twe_password@localhost:5433/twe_test bun test src/tests/integration",
@@ -86,6 +93,8 @@
     "zod": "^4.2.0"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "1.66.0",
+    "@cloudflare/workers-types": "5.20261029.1",
     "@eslint/js": "^9.39.2",
     "@happy-dom/global-registrator": "^20.1.0",
     "@playwright/test": "^1.61.1",
@@ -110,6 +119,7 @@
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.49.0",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "wrangler": "4.154.0"
   }
 }
