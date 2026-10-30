@@ -7,6 +7,7 @@ Welcome to the **TestingWithEkki** project documentation.
 - [**README.md**](../README.md): Quick start guide and project overview.
 - [**LOCAL_DEVELOPMENT.md**](./LOCAL_DEVELOPMENT.md): Shared Bun + Docker workflow for macOS and Windows.
 - [**CLOUDFLARE_MIGRATION.md**](./CLOUDFLARE_MIGRATION.md): Migration order, existing infrastructure inventory, and remaining production recovery work.
+- [**CLOUDFLARE_CONTENT.md**](./CLOUDFLARE_CONTENT.md): Bundled content, route/cache policy, and remaining asset/OG work.
 - [**GLOSSARY.md**](./GLOSSARY.md): Definitions of terms used in the project.
 - [**CHANGELOG.md**](./CHANGELOG.md): History of changes and versions.
 

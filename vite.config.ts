@@ -4,9 +4,11 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
+import { contentManifestPlugin } from './scripts/content-manifest.plugin';
 
 const config = defineConfig({
   plugins: [
+    contentManifestPlugin(),
     devtools(),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
