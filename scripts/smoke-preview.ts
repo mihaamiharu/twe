@@ -206,7 +206,7 @@ try {
       check(
         role === 'ADMIN'
           ? admin.response.status === 200
-          : [302, 303, 403].includes(admin.response.status),
+          : [302, 303, 307, 308, 403].includes(admin.response.status),
         'Admin role enforcement differs.',
       );
     } finally {

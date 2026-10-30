@@ -40,8 +40,8 @@ The content snapshot removes request-time filesystem dependencies, not Worker ex
 ## Remaining work in #250
 
 - Complete OG runtime/visual/crawler validation in #256. The source implementation now prepares static known cards and a conditional Workers WASM fallback for arbitrary legacy queries, with no request-time disk/font fetching. See `docs/CLOUDFLARE_OG.md` for the prepared 222-card source manifest and explicit unverified items.
-- Wire the full migrated product's `public/` output to Workers Static Assets; the current #249 Worker is only a synthetic spike, not that product deployment.
+- Full-product Static Assets wiring and protected synthetic preview deployment are complete. Keep the unrelated original spike separate.
 - Record final built asset count/maximum file size and verify editor/Wasm, media, locale fallback, sitemap/robots/canonical/redirect behavior and cache invalidation in #256.
 - Verify headers and signed-in navigation in the real runtime, including no session/profile/consent leakage through shared caches.
 
-#250 remains open. Only source generation and formatting have run; no PNG rendering, tests, lint/typecheck, build or preview requests were run for this implementation slice.
+#250 remains open for browser/visual/crawler parity and the remaining release gates. PNG generation/dimensions, bundle guards, asset sizes, local HTTP and focused hosted-preview checks are recorded in CLOUDFLARE_READINESS.md; the earlier source-only status is superseded by that evidence.

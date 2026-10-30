@@ -1,0 +1,103 @@
+{
+  "candidateCommit": "941edfd8f9061dc569ce6f6c18affe0b68152c7a",
+  "workerVersion": "bc1b3def-a274-468c-9b85-3ebf27fb2358",
+  "measuredAt": "2026-10-31 Asia/Jakarta",
+  "target": "twe-preview",
+  "data": "synthetic only",
+  "measurement": "Wrangler tail CPU; selected successful HTTP responses; small observational sample, not p99 or controlled cold-start measurement",
+  "outcomes": {
+    "ok": 39
+  },
+  "cpu": {
+    "/admin": {
+      "samples": 1,
+      "minCpuMs": 39,
+      "medianCpuMs": 39,
+      "maxCpuMs": 39
+    },
+    "/api/auth/get-session": {
+      "samples": 3,
+      "minCpuMs": 3,
+      "medianCpuMs": 5,
+      "maxCpuMs": 7
+    },
+    "/api/auth/sign-in/email": {
+      "samples": 3,
+      "minCpuMs": 192,
+      "medianCpuMs": 245,
+      "maxCpuMs": 290
+    },
+    "/api/auth/sign-out": {
+      "samples": 1,
+      "minCpuMs": 7,
+      "medianCpuMs": 7,
+      "maxCpuMs": 7
+    },
+    "/api/og (custom)": {
+      "samples": 2,
+      "minCpuMs": 170,
+      "medianCpuMs": 180.0,
+      "maxCpuMs": 190
+    },
+    "/api/og (known redirect)": {
+      "samples": 4,
+      "minCpuMs": 1,
+      "medianCpuMs": 2.0,
+      "maxCpuMs": 5
+    },
+    "/en": {
+      "samples": 3,
+      "minCpuMs": 28,
+      "medianCpuMs": 149,
+      "maxCpuMs": 229
+    },
+    "/en/learn": {
+      "samples": 4,
+      "minCpuMs": 41,
+      "medianCpuMs": 61.0,
+      "maxCpuMs": 98
+    },
+    "/en/practice": {
+      "samples": 4,
+      "minCpuMs": 71,
+      "medianCpuMs": 76.0,
+      "maxCpuMs": 129
+    },
+    "/esbuild.wasm": {
+      "samples": 2,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.0,
+      "maxCpuMs": 0
+    },
+    "/id": {
+      "samples": 1,
+      "minCpuMs": 84,
+      "medianCpuMs": 84,
+      "maxCpuMs": 84
+    },
+    "/og/static PNG": {
+      "samples": 2,
+      "minCpuMs": 0,
+      "medianCpuMs": 0.0,
+      "maxCpuMs": 0
+    },
+    "/robots.txt": {
+      "samples": 2,
+      "minCpuMs": 1,
+      "medianCpuMs": 1.0,
+      "maxCpuMs": 1
+    },
+    "/sitemap.xml": {
+      "samples": 2,
+      "minCpuMs": 5,
+      "medianCpuMs": 5.5,
+      "maxCpuMs": 6
+    },
+    "submission failure injection": {
+      "samples": 1,
+      "minCpuMs": 33,
+      "medianCpuMs": 33,
+      "maxCpuMs": 33
+    }
+  }
+}

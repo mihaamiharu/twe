@@ -27,7 +27,7 @@ The local HTTP smoke is separate from Playwright E2E. It uses only synthetic dat
 - Vite must run under Node.js 22.12+ for the Cloudflare toolchain; forcing Bun for the Vite process failed during Miniflare Worker-export probing. Bun still runs package scripts and test orchestration.
 - The build wrapper supplies a 4 GiB Node heap unless the caller already configured one. This does not change Worker runtime limits.
 - The browser editor/compiler loader is explicitly client-only. Unreferenced Monaco browser-worker assets emitted during SSR scanning are removed from the server output and retained in client Static Assets. The build fails if SSR actually references one. This reduced the dry-run gzip upload from 4,766.86 KiB to 2,744.32 KiB without removing browser editor features.
-- The bundle now fits the current Free upload limit, with limited headroom. This does not prove Free CPU feasibility, startup limits, memory limits, account quotas or deployed performance.
+- The earlier 3 MiB compressed planning threshold is superseded by the current platform documentation: 64 MiB uncompressed on both plans, with no compressed-size limit. The hosted upload is about 10.5 MiB uncompressed and startup measured 14 ms against the current one-second startup limit. Bundle/startup acceptance does not establish CPU or memory acceptance. See the current [Workers limits](https://developers.cloudflare.com/workers/platform/limits/).
 
 ## Outstanding release gates
 
@@ -36,7 +36,7 @@ The local HTTP smoke is separate from Playwright E2E. It uses only synthetic dat
 - Owner review/sign-off of the successful local D1-only write reconciliation rehearsal and the production recovery objectives.
 - Chosen/configured HTTP email provider, verified sender and actual inbox/failure behavior. The owner explicitly kept provider selection undecided; EMAIL_PROVIDER=unconfigured fails explicitly outside local/test use.
 - Preview Google callback/origin/role/existing-account checks, and real AI/GitHub upstream success/failure validation using isolated secrets.
-- Deployed CPU/memory/startup/resource measurements, including password hashing and arbitrary OG rendering, with the Free/Paid go/no-go decision. No paid service was enabled.
+- Owner Free/Paid decision: hosted samples exceed the Free CPU target for SSR, password authentication and custom OG. Startup/upload passed; controlled cold starts, memory and broader resource measurements remain pending. No paid service was enabled.
 - Owner-held recovery-key custody, GitHub environment reviewers/scoped credentials and backup enablement. Preview encrypted SQL/decrypt/local restore and Time Travel marker recovery have passed; production-scale operational timing remains pending.
 - Security/cookie/cache isolation and the complete route/feature matrix; approved cutover window and recovery objectives.
 - Production data import, Worker deployment/domain routing, at least one week of observation, then explicit VPS retirement sign-off.
@@ -54,3 +54,33 @@ A second phase added synthetic D1-only account/credential/content/progress/submi
 An encrypted export of the schema-only twe-preview database decrypted and restored into fresh disposable local D1. Authentication rejected both a wrong key and modified ciphertext; all 48 freeze triggers and the operator flag survived, with quick_check/FK checks passing. The disposable rehearsal key was discarded. This verifies the mechanism; independent owner key custody and production-data SQL recovery timing remain release gates.
 
 Preview Time Travel restored an identified pre-write bookmark after a unique synthetic operator marker was inserted. The marker disappeared and all 48 triggers remained. No production database was accessed or restored.
+
+## Hosted full-app preview — October 31, 2026
+
+Source runtime candidate: `941edfd8f9061dc569ce6f6c18affe0b68152c7a`; deployed Worker version: `bc1b3def-a274-468c-9b85-3ebf27fb2358`. Preview is protected at https://twe-preview.ekkisyam2310.workers.dev. Deployment reported 10,798.61 KiB uncompressed / 2,745.49 KiB gzip, 14 ms startup, 484 static files, and no asset change on the final upload. This is a preview deployment, with no production domain attached.
+
+The synthetic dataset reconciled all application tables: two preverified learner/admin accounts, 28 tutorials, 83 challenges, 49 test cases and 20 achievements. No production rows or production credentials were uploaded. The protected HTTP smoke passed both locales, Learn/Practice, robots/sitemap/editor WASM, unauthorized HTML/assets, private/noindex headers, known/custom OG PNGs, test-API denial, credential login, session identity/role, Secure/HttpOnly/SameSite=Lax cookies, learner admin denial, admin access and logout. An additional 18 repeated requests returned expected statuses. No Playwright/browser or real external delivery was run.
+
+Deployed verification found and corrected static-asset lookup consuming POST bodies before Better Auth. Asset lookup now runs only on GET/HEAD. Unexpected Better Call exceptions propagate to the Worker's redacted boundary; ordinary API errors retain their normal responses. The smoke recognizes the router's valid 307 access-denial redirect.
+
+Three concurrent submissions through the real authenticated server-function endpoint all succeeded; exactly one returned first-completion credit. Hosted D1 showed three attempts, one completion, 10 submission XP plus 50 achievement XP, total 60. A temporary preview-only trigger then injected a submission failure: XP, submissions, progress, reward operations and achievements were unchanged. The trigger was removed. The two local D1 auth tests also passed after the error-boundary change.
+
+### CPU feasibility decision
+
+Sanitized tail aggregates are in [the measurement report](reports/cloudflare-preview-20261031.json). These are small observational samples, not p99 claims or controlled cold starts. Network wall time is separate from CPU. Representative observed CPU ranges:
+
+| Request                                  | CPU observed             |
+| ---------------------------------------- | ------------------------ |
+| Password login                           | 192–290 ms               |
+| Learn SSR                                | 41–98 ms                 |
+| Practice SSR                             | 71–129 ms                |
+| Custom dynamic OG                        | 170–190 ms               |
+| Session lookup                           | 3–7 ms                   |
+| Known OG redirect                        | 1–5 ms                   |
+| Static WASM/PNG through the preview gate | 0 ms in captured samples |
+
+The preserved application fails the agreed Free CPU acceptance gate. Successful sampled responses do not establish reliable operation at the Free limit; Cloudflare documents limited flexibility for occasional overruns. Public HTML still uses session/consent-dependent SSR, password hashes retain the existing algorithm, and custom OG remains supported. Reducing these paths to a strict 10 ms budget would require further architecture work and new parity evidence, rather than treating low traffic as proof.
+
+Recommendation: retain the feature/data-compatible migration and use Workers Paid if the owner approves it, after local E2E and remaining release checks. The current documented account minimum is $5/month plus applicable usage charges; [pricing](https://developers.cloudflare.com/workers/platform/pricing/) and [CPU limits](https://developers.cloudflare.com/workers/platform/limits/) were checked October 31. The account's default usage model reports `standard`, but subscription read was denied by the limited OAuth scope, so billing status is unverified. No subscription, plan, budget or production route was changed.
+
+Versions verified from the installed locked candidate: TanStack Start 1.145.1, Router 1.144.0, Better Auth 1.4.15, Vite 7.3.0, Drizzle 0.45.1, Cloudflare Vite plugin 1.66.0 and Wrangler 4.154.0. D1 placement uses APAC with read replication disabled; the hosted reconciliation query was served by the primary in APAC/KIX. Preview D1 reported 425,984 bytes after the concurrency scenario; one aggregate reconciliation read scanned 12 rows. These observations are not a full per-feature query/quota budget.

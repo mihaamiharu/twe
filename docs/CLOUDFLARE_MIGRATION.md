@@ -2,7 +2,7 @@
 
 Tracking issue: [#245](https://github.com/mihaamiharu/twe/issues/245).
 Initial inventory: [#248](https://github.com/mihaamiharu/twe/issues/248).
-Reviewed on October 30, 2026.
+Initial inventory October 30, 2026; implementation evidence updated October 31. See [current readiness evidence](CLOUDFLARE_READINESS.md).
 
 ## Execution agreement
 
@@ -41,7 +41,7 @@ The separate `event-booking-platform/worker/wrangler.jsonc` names `ebp-r1` and `
 
 ### Runtime and deployment
 
-| Area                | Current implementation                                                                        | Owning issue     |
+| Area                | Baseline implementation                                                                       | Owning issue     |
 | ------------------- | --------------------------------------------------------------------------------------------- | ---------------- |
 | Production runtime  | `scripts/server.ts`: `Bun.serve`, compression and QA noindex behavior                         | #249, #250       |
 | Build               | `vite.config.ts`: TanStack Start/Vite without the Cloudflare adapter                          | #249             |
@@ -164,11 +164,11 @@ Dependencies describe integrated deliverables. With test execution deferred, a w
 - [x] Record the deployed artifact/release marker and current production schema scope; reassess any later feature additions before cutover.
 - [x] Collect anonymized production database metadata without exposing records or secrets.
 - [x] Create a current restricted production backup and a checksum-matched copy outside the VPS/repository.
-- [ ] Exercise an isolated restore and validate the restored data during #256.
+- [x] Exercise an isolated PostgreSQL restore, validate every row in private local D1, and reverse D1-only writes into fresh PostgreSQL; see readiness evidence.
 - [ ] Record maintenance-window and recovery objectives with the owner.
 - [ ] Complete consolidated validation in #256 before production release.
 
-Lint, typecheck and build completed before the owner requested deferring checks. The unit run was interrupted at that request; it is not a completed baseline. Integration and E2E were not run. No test result here establishes Workers compatibility or migration readiness.
+At baseline, checks were deferred at the owner’s request. The integrated candidate later received one consolidated non-Playwright validation pass; results and remaining gates are recorded in CLOUDFLARE_READINESS.md. The owner retains the local E2E release run.
 
 ## Workstream #249 — preview implementation
 
@@ -181,7 +181,7 @@ An isolated TanStack Start application now lives in `spikes/cloudflare/`, with i
 - Added fail-closed Basic access protection, noindex headers, isolated cookie names and local-only secret files. Production credentials/data were not copied into the spike.
 - Google OAuth, real reset/verification email flows, migrated accounts, full app SSR/content/OG and full reward behavior remain outside this fixture; the runbook lists every exclusion.
 
-Build/deploy, execution scenarios, runtime compatibility, concurrency/failure validation and CPU/resource measurements remain pending under #256. No preview Worker is deployed and no Free/Paid go/no-go decision is claimed. Keep #249 open until its deferred evidence exists. See `spikes/cloudflare/README.md` for setup and the proposed measurement thresholds.
+The isolated spike remains a historical fixture. The full product has since deployed to protected twe-preview with synthetic data; use the operations/readiness guides for current commands and measurements. Free/Paid acceptance and broader release checks remain open under #249/#256. See `spikes/cloudflare/README.md` for the original fixture’s exclusions.
 
 ## Workstream #250 — content and cache implementation
 
@@ -189,9 +189,9 @@ The catalog now reads a generated server-only snapshot instead of runtime filesy
 
 Request middleware now defaults dynamic HTML/auth/server-function responses to private/no-store, preserves successful cookie-free public crawl/image responses, and sets QA/Workers preview noindex headers. Public HTML remains dynamic initially because the root layout depends on session and consent.
 
-The OG source implementation now prepares 222 known static cards and retains arbitrary legacy query rendering through conditional Bun/Workers implementations. Font data is bundled from installed packages; no request-time filesystem or Google Fonts call remains in the OG handler. Only source manifests were generated; PNG rendering and runtime/visual/CPU evidence remain deferred to #256.
+The OG source implementation now prepares 222 known static cards and retains arbitrary legacy query rendering through conditional Bun/Workers implementations. Font data is bundled from installed packages; no request-time filesystem or Google Fonts call remains in the OG handler. The build now generates all 222 PNGs; dimensions, packaging and local/preview HTTP rendering are recorded in readiness evidence. Visual/crawler parity remains for #256.
 
-The full product now has a Cloudflare Vite/Worker entry and Static Assets binding; built/runtime evidence remains pending. Source generation alone is not parity evidence. See `docs/CLOUDFLARE_CONTENT.md` and `docs/CLOUDFLARE_OG.md` for scope, cache classification and the remaining work.
+The full product now has a deployed Cloudflare Vite/Worker entry and Static Assets binding. Build and focused runtime evidence exist; full feature/browser parity remains open. See `docs/CLOUDFLARE_CONTENT.md` and `docs/CLOUDFLARE_OG.md` for scope, cache classification and the remaining work.
 
 ## Workstreams #251–#255 — integrated migration candidate
 
@@ -199,7 +199,7 @@ The release branch now contains the full D1 schema and additive migrations, type
 
 Restricted snapshot export/import and full row/hash/FK/integrity reconciliation commands are implemented. Local setup and isolated D1 integration/E2E runners replace PostgreSQL containers. Manual candidate deployment and encrypted-backup workflows replace automatic VPS deployment; production still requires readiness and owner authorization.
 
-Created separate empty APAC D1 resources for the full app: twe-preview (`a57397b4-3f7f-432e-a161-04330b3a5b4b`) and twe-production (`6f6630be-ed32-4d07-ba24-24d45bb160c9`). They have not received production data. No Worker deployment, DNS switch, paid plan or VPS deletion was performed.
+Created separate empty APAC D1 resources for the full app: twe-preview (`a57397b4-3f7f-432e-a161-04330b3a5b4b`) and twe-production (`6f6630be-ed32-4d07-ba24-24d45bb160c9`). They have not received production data. The full-app preview Worker is deployed with synthetic data. No production deployment, DNS switch, paid-plan change or VPS deletion was performed.
 
 The owner explicitly kept the email provider undecided. Generic HTTPS transport and an optional vendor adapter are prepared; preview/production do not silently choose a provider. Credentials, delivery and callback verification remain release gates.
 
