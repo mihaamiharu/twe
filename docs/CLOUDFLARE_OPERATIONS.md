@@ -4,11 +4,11 @@ This is the release-branch operating model. Source preparation is distinct from 
 
 ## Resources
 
-| Environment          | Worker         | D1 database                          | Current state                                                            |
-| -------------------- | -------------- | ------------------------------------ | ------------------------------------------------------------------------ |
-| Local                | twe-local      | local Wrangler state                 | Created by local setup                                                   |
-| Preview              | twe-preview    | a57397b4-3f7f-432e-a161-04330b3a5b4b | Schema migrated in APAC; no app/user rows                                |
-| Production candidate | twe-production | 6f6630be-ed32-4d07-ba24-24d45bb160c9 | Created in APAC; migrations pending; no app/user rows or domain attached |
+| Environment          | Worker         | D1 database                          | Current state                                                                        |
+| -------------------- | -------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
+| Local                | twe-local      | local Wrangler state                 | Created by local setup                                                               |
+| Preview              | twe-preview    | a57397b4-3f7f-432e-a161-04330b3a5b4b | All three migrations applied in APAC; protected Worker deployed; synthetic data only |
+| Production candidate | twe-production | 6f6630be-ed32-4d07-ba24-24d45bb160c9 | Created in APAC; migrations pending; no app/user rows or domain attached             |
 
 Do not use the event-booking-platform `ebp-r1` resources or the separate synthetic migration spike as the full application's database. Read replication remains disabled. The production custom-domain route is intentionally absent until cutover. Root `cf:*` commands now target the full app; `cf:spike:*` retains the original isolated fixture.
 
@@ -67,6 +67,10 @@ The build wrapper supplies a 4 GiB Node build heap unless NODE_OPTIONS already s
 ```sh
 bun run cf:build:preview
 bun run cf:deploy
+# Empty preview only; saves synthetic learner/admin credentials privately.
+bun run cf:preview:seed /absolute/private/new-accounts.json
+# Uses private JSON files containing PREVIEW_ACCESS_TOKEN and synthetic accounts.
+bun run cf:smoke:preview /absolute/private/secrets.json /absolute/private/new-accounts.json /absolute/private/new-smoke-report.json
 ```
 
 The deploy wrapper checks the built Worker name/environment/database and required remote secret names. Production also requires a selected email transport; provider choice remains undecided. Production additionally requires TWE_RELEASE_APPROVED_SHA equal to HEAD and TWE_ALLOW_PRODUCTION_DEPLOY=yes. The manual GitHub workflow validates the pinned candidate, uses isolated GitHub environments, builds the selected target, applies additive migrations, and deploys that artifact. Configure required reviewers on cloudflare-production before enabling production credentials. Use a scoped deploy token; the workflow's GITHUB_TOKEN has only contents:read.
@@ -88,3 +92,7 @@ bun scripts/backup-d1.ts decrypt /absolute/private/preview.enc /absolute/private
 TWE_BACKUP_KEY must be available securely in the process environment. Plain SQL is created only in a mode-0700 temporary directory and removed after encryption. Decryption writes exclusively outside the checkout. Restore into a newly identified isolated D1 database; inspect the SQL's schema/history content before applying it, avoid applying CREATE statements over an already migrated target, then perform complete row/integrity and application checks. The schema-only preview export/decrypt/local restore and preview Time Travel marker rehearsal passed on October 30; see CLOUDFLARE_READINESS.md. Repeat with representative approved data/timing and independently held recovery keys before release. Never restore the live database without a write freeze and an approved data reconciliation plan.
 
 References: [Cloudflare Vite environments](https://developers.cloudflare.com/workers/vite-plugin/reference/cloudflare-environments/), [D1 limits](https://developers.cloudflare.com/d1/platform/limits/), [Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/).
+
+## Preview access handoff
+
+The full-app preview is https://twe-preview.ekkisyam2310.workers.dev. Basic username is `preview`; the generated token and synthetic account credentials are retained outside git in the operator’s restricted private-artifacts directory. Retrieve them locally rather than pasting credentials into issues, logs or source. Email remains unconfigured, so the synthetic learner/admin credentials are preverified and no real mail is sent. The seed command refuses a populated preview, reconciles all application tables and cannot select production. The HTTP smoke checks access/noindex/private caching, assets/OG, support-API denial, credential login/session/cookie flags, roles/admin access and logout; it does not replace the owner’s Playwright/browser release run.

@@ -69,7 +69,9 @@
     "migration:rehearse": "bun scripts/migration/rehearse-backup.ts",
     "migration:export:d1": "bun scripts/migration/export-d1.ts",
     "migration:restore:pg": "bun scripts/migration/restore-postgres.ts",
-    "migration:freeze": "bun scripts/migration/freeze-d1.ts"
+    "migration:freeze": "bun scripts/migration/freeze-d1.ts",
+    "cf:preview:seed": "bun --no-env-file scripts/seed-preview.ts",
+    "cf:smoke:preview": "bun --no-env-file scripts/smoke-preview.ts"
   },
   "dependencies": {
     "@cf-wasm/satori": "0.4.2",

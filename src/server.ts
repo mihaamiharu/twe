@@ -67,8 +67,12 @@ export default {
           true,
         );
       // Preview runs the Worker first so access protects assets too.
-      const asset = await env.ASSETS?.fetch(request);
-      if (asset && asset.status !== 404) return protect(asset, true);
+      // Asset lookup consumes a request body. Keep mutation bodies untouched
+      // for Start/Better Auth; only GET/HEAD can resolve a static asset.
+      if (request.method === 'GET' || request.method === 'HEAD') {
+        const asset = await env.ASSETS?.fetch(request);
+        if (asset && asset.status !== 404) return protect(asset, true);
+      }
     }
     // Block every application request: even a session read can refresh auth data.
     if (env.MAINTENANCE_MODE === 'true')

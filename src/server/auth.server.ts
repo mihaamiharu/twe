@@ -19,6 +19,10 @@ function createAuth() {
   return betterAuth({
     rateLimit: { enabled: false }, // handleAuthRequest applies atomic D1 limits.
     logger: { disabled: true },
+    // Better Call otherwise prints unexpected errors even with logging disabled.
+    // Propagate them to the Worker's redacted error boundary; API errors retain
+    // their normal status/body through Better Call's APIError handling.
+    onAPIError: { throw: true },
     // Database configuration with Drizzle adapter
     database: drizzleAdapter(db, {
       provider: 'sqlite',
