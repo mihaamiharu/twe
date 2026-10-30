@@ -62,7 +62,7 @@ Free remains conditional: accept it only after representative cold/warm paths fi
 
 ## Build/deploy ordering
 
-The build wrapper supplies a 4 GiB Node build heap unless NODE_OPTIONS already specifies a heap size; this does not change Worker runtime budgets. Select the environment at build time with CLOUDFLARE_ENV. The Vite plugin emits a resolved deploy configuration; passing --env to a later deploy does not choose another artifact.
+CI, deployment and backup workflows explicitly install Node 22 and Bun 1.4.2 rather than depending on the runner’s default Node. The build wrapper supplies a 4 GiB Node build heap unless NODE_OPTIONS already specifies a heap size; this does not change Worker runtime budgets. Select the environment at build time with CLOUDFLARE_ENV. The Vite plugin emits a resolved deploy configuration; passing --env to a later deploy does not choose another artifact.
 
 ```sh
 bun run cf:build:preview

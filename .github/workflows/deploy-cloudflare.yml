@@ -41,6 +41,9 @@ jobs:
             test "$APPROVE_PRODUCTION" = true
             test "${{ github.ref }}" = refs/heads/release/cloudflare-migration
           fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
@@ -66,6 +69,9 @@ jobs:
       TWE_ALLOW_PRODUCTION_DEPLOY: ${{ inputs.approve_production && 'yes' || 'no' }}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
