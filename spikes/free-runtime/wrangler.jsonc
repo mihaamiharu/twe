@@ -1,0 +1,16 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "twe-free-runtime-probe",
+  "account_id": "d5f9db115e5d7b5156bb210e04ecb34e",
+  "main": "worker.ts",
+  "compatibility_date": "2026-10-29",
+  "compatibility_flags": ["nodejs_compat"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "routes": [],
+  "observability": { "enabled": true, "head_sampling_rate": 1 },
+  "durable_objects": {
+    "bindings": [{ "name": "COMPUTE", "class_name": "FreeRuntimeProbe" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["FreeRuntimeProbe"] }],
+}

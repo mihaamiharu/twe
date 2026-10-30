@@ -58,7 +58,7 @@ Authenticated keys use user IDs; anonymous deployed requests use only Cloudflare
 
 Workers Logs replaces @sentry/bun. Server logger output contains level/scope rather than objects, private user strings or upstream error payloads; request failures have random correlation IDs. Client Sentry remains consent-controlled. Do not enable automatic request-header/body logging or upload snapshots as diagnostics. Inspect CPU exceeded errors, Worker 5xx, D1 errors/row usage/storage, auth failures, email failures and backup failures daily during rollout, then weekly. Treat any integrity discrepancy, repeated CPU exhaustion or sustained auth failure as a release/rollback incident.
 
-Free remains conditional: accept it only after representative cold/warm paths fit the current 10 ms CPU ceiling, with a target p99 below 8 ms and no exceeded-CPU failures in the representative run. Measure password hashing and arbitrary OG generation explicitly. Record D1 query/row usage against the current plan limits and retain headroom. Do not enable Workers Paid or external paid overages without a separate owner decision.
+Free remains conditional: accept it only after representative cold/warm paths fit the current 10 ms CPU ceiling, with a target p99 below 8 ms and no exceeded-CPU failures in the representative run. Measure password hashing and arbitrary OG generation explicitly. Record D1 query/row usage against the current plan limits and retain headroom. The owner has now required strict $0 and deferred cutover; Workers Paid and external paid overages are not an available fallback. See CLOUDFLARE_FREE_ARCHITECTURE.md for the compute redesign and its evidence gates.
 
 ## Build/deploy ordering
 

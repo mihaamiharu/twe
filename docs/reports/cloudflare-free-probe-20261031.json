@@ -1,0 +1,47 @@
+{
+  "workerVersion": "357c4e3b-a0ea-4a8d-a08b-8d2d3523ebd5",
+  "data": "public synthetic password vector; no DB or object storage",
+  "cpu": {
+    "durableObject /native": {
+      "samples": 2,
+      "minMs": 76,
+      "medianMs": 78.5,
+      "maxMs": 81
+    },
+    "durableObject /noble": {
+      "samples": 2,
+      "minMs": 142,
+      "medianMs": 145.0,
+      "maxMs": 148
+    },
+    "durableObject /ping": {
+      "samples": 2,
+      "minMs": 0,
+      "medianMs": 0.0,
+      "maxMs": 0
+    },
+    "stateless /native": {
+      "samples": 2,
+      "minMs": 0,
+      "medianMs": 0.5,
+      "maxMs": 1
+    },
+    "stateless /noble": {
+      "samples": 1,
+      "minMs": 0,
+      "medianMs": 0,
+      "maxMs": 0
+    },
+    "stateless /ping": {
+      "samples": 3,
+      "minMs": 0,
+      "medianMs": 0,
+      "maxMs": 0
+    }
+  },
+  "limitations": [
+    "Current account billing unverified; documentation confirms SQLite DO availability on Free",
+    "Small observational sample; not p99 or memory/duration/quota acceptance",
+    "Not the full application"
+  ]
+}
