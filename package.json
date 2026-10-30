@@ -2,6 +2,16 @@
   "name": "twe",
   "private": true,
   "type": "module",
+  "imports": {
+    "#og-layout": {
+      "workerd": "./src/server/og-layout.cloudflare.server.ts",
+      "default": "./src/server/og-layout.bun.server.ts"
+    },
+    "#og-png": {
+      "workerd": "./src/server/og-png.cloudflare.server.ts",
+      "default": "./src/server/og-png.bun.server.ts"
+    }
+  },
   "scripts": {
     "setup": "bun scripts/local-dev.ts setup",
     "dev:local": "bun scripts/local-dev.ts dev",
@@ -33,12 +43,15 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "content:generate": "bun scripts/generate-content-manifest.ts",
+    "og:generate": "bun scripts/generate-og-assets.ts",
+    "og:manifest": "bun scripts/generate-og-assets.ts --manifest-only",
     "db:sync": "bun run content:generate && bun src/scripts/sync-tutorials.ts && bun src/scripts/sync-challenges.ts && bun src/scripts/sync-achievements.ts",
     "db:reset-curriculum": "bun src/scripts/reset-curriculum-v2.ts",
     "db:docs": "bun src/scripts/generate-solutions-doc.ts",
     "start": "bun run scripts/server.ts"
   },
   "dependencies": {
+    "@cf-wasm/satori": "0.4.2",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/instrument-sans": "^5.3.0",
     "@hookform/resolvers": "^5.2.2",
@@ -55,6 +68,7 @@
     "@radix-ui/react-tabs": "^1.1.13",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@resvg/resvg-js": "^2.6.2",
+    "@resvg/resvg-wasm": "2.6.2",
     "@sentry/bun": "^10.35.0",
     "@sentry/react": "^10.35.0",
     "@tailwindcss/vite": "^4.0.6",

@@ -14,6 +14,7 @@ import { authQueryOptions } from '@/lib/auth.query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { BASE_URL, createSeoHead, createWebsiteSchema } from '@/lib/seo';
 import i18n from '@/lib/i18n';
+import { getOgImagePath } from '@/lib/og-image';
 import { LocaleRoutes, localeParams } from '@/lib/navigation';
 
 export const Route = createFileRoute('/$locale/')({
@@ -35,7 +36,7 @@ export const Route = createFileRoute('/$locale/')({
       description: i18n.t('common:seo.description', { lng: locale }),
       path: '/',
       locale,
-      ogImage: `${BASE_URL}/api/og?type=Home`,
+      ogImage: `${BASE_URL}${getOgImagePath({ type: 'Home' })}`,
       jsonLd: [
         createWebsiteSchema({
           locale,

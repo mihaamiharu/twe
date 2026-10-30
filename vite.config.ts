@@ -5,10 +5,12 @@ import viteReact from '@vitejs/plugin-react';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
 import { contentManifestPlugin } from './scripts/content-manifest.plugin';
+import { ogAssetsPlugin } from './scripts/og-assets.plugin';
 
 const config = defineConfig({
   plugins: [
     contentManifestPlugin(),
+    ogAssetsPlugin(),
     devtools(),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({

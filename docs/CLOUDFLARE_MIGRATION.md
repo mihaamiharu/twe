@@ -189,4 +189,6 @@ The catalog now reads a generated server-only snapshot instead of runtime filesy
 
 Request middleware now defaults dynamic HTML/auth/server-function responses to private/no-store, preserves successful cookie-free public crawl/image responses, and sets QA/Workers preview noindex headers. Public HTML remains dynamic initially because the root layout depends on session and consent.
 
-The OG renderer and final full-product Static Assets integration remain pending within #250. Tests/build/runtime verification remain deferred; source generation alone is not parity evidence. See `docs/CLOUDFLARE_CONTENT.md` for scope, cache classification and the remaining work.
+The OG source implementation now prepares 222 known static cards and retains arbitrary legacy query rendering through conditional Bun/Workers implementations. Font data is bundled from installed packages; no request-time filesystem or Google Fonts call remains in the OG handler. Only source manifests were generated; PNG rendering and runtime/visual/CPU evidence remain deferred to #256.
+
+The final full-product Static Assets integration remains pending within #250 alongside the schema/runtime port. Source generation alone is not parity evidence. See `docs/CLOUDFLARE_CONTENT.md` and `docs/CLOUDFLARE_OG.md` for scope, cache classification and the remaining work.

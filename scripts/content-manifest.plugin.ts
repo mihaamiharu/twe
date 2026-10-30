@@ -5,7 +5,7 @@ import {
   generateContentManifest,
 } from './generate-content-manifest';
 
-function isContentSource(file: string) {
+export function isContentSource(file: string) {
   return contentSourceDirectories.some((directory) => {
     const path = relative(directory, file);
     return (

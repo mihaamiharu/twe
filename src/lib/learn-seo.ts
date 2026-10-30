@@ -7,6 +7,7 @@ import {
   createSeoHead,
 } from './seo';
 import i18n from './i18n';
+import { getOgImagePath } from './og-image';
 
 type LearnSeoLesson = Pick<
   TutorialCatalogListItem,
@@ -32,7 +33,7 @@ export function createLearnDetailSeoHead({ lesson, locale }: LearnSeoOptions) {
   const url = `${BASE_URL}/${locale}${path}`;
   const learnUrl = `${BASE_URL}/${locale}/learn`;
   const title = `${lesson.title} | TestingWithEkki`;
-  const ogImage = `${BASE_URL}/api/og?title=${encodeURIComponent(lesson.title)}&type=Lesson`;
+  const ogImage = `${BASE_URL}${getOgImagePath({ title: lesson.title, type: 'Lesson' })}`;
   const homeLabel = i18n.t('common:navigation.home', { lng: locale });
   const learnLabel = i18n.t('common:navigation.learn', { lng: locale });
 

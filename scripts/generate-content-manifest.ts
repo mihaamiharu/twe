@@ -24,8 +24,8 @@ function isMissingFile(error: unknown): boolean {
   return error instanceof Error && 'code' in error && error.code === 'ENOENT';
 }
 
-/** Generate server-only source data; only this build-time module uses the FS. */
-export async function generateContentManifest() {
+/** Read fresh editorial inputs for both content and OG asset generation. */
+export async function readContentSources() {
   const registryPath = join(repositoryRoot, 'tutorials', 'registry.json');
   const sourceFiles = [registryPath];
   const manifest: ContentSourceManifest = {
@@ -59,6 +59,11 @@ export async function generateContentManifest() {
     }
   }
 
+  return { manifest, sourceFiles };
+}
+
+async function writeContentManifest() {
+  const { manifest, sourceFiles } = await readContentSources();
   const output = join(
     repositoryRoot,
     'src',
@@ -90,6 +95,16 @@ export async function generateContentManifest() {
     sourceFiles,
     tutorialDocuments: Object.keys(manifest.tutorials).length,
   };
+}
+
+let generation: ReturnType<typeof writeContentManifest> | undefined;
+
+/** Coalesce concurrent Vite environment hooks into one atomic write. */
+export function generateContentManifest() {
+  generation ??= writeContentManifest().finally(() => {
+    generation = undefined;
+  });
+  return generation;
 }
 
 if (import.meta.main) {
