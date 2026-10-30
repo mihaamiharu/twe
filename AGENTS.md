@@ -6,9 +6,7 @@ This file contains guidelines for agentic coding assistants working in this repo
 
 ### Build & Dev
 
-- `bun run dev` - Start development server (Nitro + Vite)
-- `bun run setup` - Initialize local env, PostgreSQL, migrations, and content (macOS/Windows)
-- `bun run dev:local` - Start local PostgreSQL and the development server
+- `bun run dev` - Start development server (Vite + local workerd/D1)
 - `bun run build` - Build for production
 - `bun run preview` - Preview production build
 

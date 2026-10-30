@@ -17,9 +17,9 @@ The release branch ports the pinned production baseline (14 tables, PostgreSQL m
 
 Production's timestamp interpretation follows the old application's JavaScript Date/PostgreSQL serialization as UTC. Export explicitly appends UTC to timezone-less timestamp text. Milliseconds match the application's Date precision; PostgreSQL sub-millisecond fractions are truncated. Do not reinterpret stored wall clocks as the workstation's timezone.
 
-The schema retains cascades, set-null relationships, unique email/token/slug values, progress's exactly-one-target CHECK, partial user/tutorial and user/challenge uniqueness, and user/achievement uniqueness. Additional FK, leaderboard and time-based indexes are checked in. New `reward_operations` and `rate_limit_buckets` tables support the Worker write/abuse-control designs.
+The schema retains cascades, set-null relationships, unique email/token/slug values, progress's exactly-one-target CHECK, partial user/tutorial and user/challenge uniqueness, and user/achievement uniqueness. Additional FK, leaderboard and time-based indexes are checked in. New `reward_operations`, `rate_limit_buckets` and operator-only `app_control` tables support reward accounting, abuse control and a database-enforced write freeze.
 
-`drizzle/d1/0000_*.sql` creates the complete schema; `0001_*.sql` adds query indexes as a separate additive upgrade. Neither file has been applied to production. Use `bun run db:generate` for later changes and review generated SQLite rebuilds carefully: D1's foreign-key enforcement cannot be bypassed by assuming PostgreSQL or ordinary SQLite migration behavior.
+`drizzle/d1/0000_*.sql` creates the complete schema; `0001_*.sql` adds query indexes, and `0002_*.sql` adds the operator write-freeze control and triggers. Neither file has been applied to production. Use `bun run db:generate` for later changes and review generated SQLite rebuilds carefully: D1's foreign-key enforcement cannot be bypassed by assuming PostgreSQL or ordinary SQLite migration behavior.
 
 ## Binding and auth lifecycle
 
@@ -53,3 +53,9 @@ The scheduled Worker removes expired limiter entries and operation diagnostics o
 Run empty creation and incremental migration, all integration fixtures and concurrent same/different-target completions, failed attempts/retries, hint races, level boundaries, achievement eligibility, and failure rollback. Check admin/leaderboard/profile sorting and JSON/date projections. Measure D1 calls/rows and Worker CPU before selecting Free. No runtime compatibility claim follows from source generation alone.
 
 References: [D1 batch semantics](https://developers.cloudflare.com/d1/worker-api/d1-database/#batch), [D1 limits](https://developers.cloudflare.com/d1/platform/limits/).
+
+## Database freeze boundary
+
+The HTTP maintenance flag provides a 503 response; the app_control write freeze additionally blocks INSERT/UPDATE/DELETE on all core/support tables, including SQL from an invocation already in flight. Reads and operator control remain available. Freeze only after stopping new application traffic and draining admitted auth/integration requests, then verify the DB guard before export. D1 batches land wholly before the freeze or abort wholly after it.
+
+The frozen D1 exporter checks the real DB control value rather than trusting an environment assertion. The reverse restore targets a fresh PostgreSQL database, takes exclusive locks only after rejecting populated targets, restores all 14 core tables in one transaction, then verifies every normalized core column before committing. The disposable award_operation_id diagnostic field is recorded as excluded from the old schema; its source snapshot remains retained. No learner state is dropped to make a comparison pass.

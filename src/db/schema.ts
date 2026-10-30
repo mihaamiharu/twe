@@ -928,3 +928,18 @@ export const rateLimitBuckets = sqliteTable(
     expiryIdx: index('idx_rate_limit_expiry').on(table.resetAt),
   }),
 );
+
+// Operator-controlled DB guard also stops writes from requests already in flight.
+export const appControl = sqliteTable(
+  'app_control',
+  {
+    key: text('key').primaryKey(),
+    value: integer('value', { mode: 'boolean' }).notNull().default(false),
+  },
+  (table) => ({
+    valueCheck: check(
+      'app_control_value_boolean',
+      sql`${table.value} IN (0, 1)`,
+    ),
+  }),
+);

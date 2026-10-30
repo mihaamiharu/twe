@@ -58,6 +58,27 @@ function canonical(value: unknown): unknown {
   return value;
 }
 
+export function canonicalJson(value: unknown): string {
+  const text = JSON.stringify(canonical(value));
+  if (text === undefined) throw new Error('Value is not JSON serializable.');
+  return text;
+}
+
+export function postgresSelect(tableName: string): string {
+  const table = Object.hasOwn(tables, tableName)
+    ? tables[tableName]
+    : undefined;
+  if (!table) throw new Error('Unexpected PostgreSQL source table.');
+  const jsonColumns = getTableConfig(table).columns.filter(
+    (column) =>
+      column.dataType === 'json' && column.name !== 'award_operation_id',
+  );
+  const nullFlags = jsonColumns.length
+    ? `json_build_object(${jsonColumns.flatMap((column) => [`'${column.name}'`, `t."${column.name}" IS NULL`]).join(', ')})`
+    : `'{}'::json`;
+  return `SELECT row_to_json(t) AS value, ${nullFlags} AS json_nulls FROM "${tableName}" t ORDER BY id`;
+}
+
 export function hashRows(rows: Row[]): string {
   return createHash('sha256')
     .update(
@@ -75,6 +96,7 @@ export function hashRows(rows: Row[]): string {
 export function normalizeRow(
   tableName: string,
   input: Record<string, unknown>,
+  jsonSqlNulls: Record<string, boolean> = {},
 ): Row {
   const table = tables[tableName];
   if (!table) throw new Error('Unexpected source table.');
@@ -88,7 +110,13 @@ export function normalizeRow(
   const row: Row = {};
   for (const column of getTableConfig(table).columns) {
     const value = input[column.name] ?? null;
-    if (value === null) {
+    if (
+      value === null &&
+      column.dataType === 'json' &&
+      jsonSqlNulls[column.name] === false
+    ) {
+      row[column.name] = 'null';
+    } else if (value === null) {
       if (column.notNull)
         throw new Error(
           `${tableName}.${column.name}: required value is missing.`,
@@ -108,7 +136,7 @@ export function normalizeRow(
         throw new Error(`${tableName}.${column.name}: invalid boolean.`);
       row[column.name] = value ? 1 : 0;
     } else if (column.dataType === 'json') {
-      row[column.name] = JSON.stringify(canonical(value));
+      row[column.name] = canonicalJson(value);
     } else if (column.dataType === 'number') {
       if (
         typeof value !== 'number' ||

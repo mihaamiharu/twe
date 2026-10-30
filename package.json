@@ -65,7 +65,11 @@
     "migration:import": "bun scripts/migration/import-d1.ts import",
     "migration:validate": "bun scripts/migration/import-d1.ts validate",
     "cf:backup": "bun scripts/backup-d1.ts",
-    "cf:smoke": "bun scripts/smoke-cloudflare.ts"
+    "cf:smoke": "bun scripts/smoke-cloudflare.ts",
+    "migration:rehearse": "bun scripts/migration/rehearse-backup.ts",
+    "migration:export:d1": "bun scripts/migration/export-d1.ts",
+    "migration:restore:pg": "bun scripts/migration/restore-postgres.ts",
+    "migration:freeze": "bun scripts/migration/freeze-d1.ts"
   },
   "dependencies": {
     "@cf-wasm/satori": "0.4.2",

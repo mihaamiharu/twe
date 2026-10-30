@@ -4,11 +4,11 @@ This is the release-branch operating model. Source preparation is distinct from 
 
 ## Resources
 
-| Environment          | Worker         | D1 database                          | Current state                                                 |
-| -------------------- | -------------- | ------------------------------------ | ------------------------------------------------------------- |
-| Local                | twe-local      | local Wrangler state                 | Created by local setup                                        |
-| Preview              | twe-preview    | a57397b4-3f7f-432e-a161-04330b3a5b4b | Schema migrated in APAC; no app/user rows                     |
-| Production candidate | twe-production | 6f6630be-ed32-4d07-ba24-24d45bb160c9 | Schema migrated in APAC; no app/user rows; no domain attached |
+| Environment          | Worker         | D1 database                          | Current state                                                            |
+| -------------------- | -------------- | ------------------------------------ | ------------------------------------------------------------------------ |
+| Local                | twe-local      | local Wrangler state                 | Created by local setup                                                   |
+| Preview              | twe-preview    | a57397b4-3f7f-432e-a161-04330b3a5b4b | Schema migrated in APAC; no app/user rows                                |
+| Production candidate | twe-production | 6f6630be-ed32-4d07-ba24-24d45bb160c9 | Created in APAC; migrations pending; no app/user rows or domain attached |
 
 Do not use the event-booking-platform `ebp-r1` resources or the separate synthetic migration spike as the full application's database. Read replication remains disabled. The production custom-domain route is intentionally absent until cutover. Root `cf:*` commands now target the full app; `cf:spike:*` retains the original isolated fixture.
 
@@ -85,6 +85,6 @@ bun scripts/backup-d1.ts backup preview /absolute/private/preview.enc
 bun scripts/backup-d1.ts decrypt /absolute/private/preview.enc /absolute/private/restore.sql
 ```
 
-TWE_BACKUP_KEY must be available securely in the process environment. Plain SQL is created only in a mode-0700 temporary directory and removed after encryption. Decryption writes exclusively outside the checkout. Restore into a newly identified isolated D1 database; inspect the SQL's schema/history content before applying it, avoid applying CREATE statements over an already migrated target, then perform complete row/integrity and application checks. Rehearse both decrypt/restore and Time Travel to an identified pre-write bookmark before release. Never restore the live database without a write freeze and an approved data reconciliation plan.
+TWE_BACKUP_KEY must be available securely in the process environment. Plain SQL is created only in a mode-0700 temporary directory and removed after encryption. Decryption writes exclusively outside the checkout. Restore into a newly identified isolated D1 database; inspect the SQL's schema/history content before applying it, avoid applying CREATE statements over an already migrated target, then perform complete row/integrity and application checks. The schema-only preview export/decrypt/local restore and preview Time Travel marker rehearsal passed on October 30; see CLOUDFLARE_READINESS.md. Repeat with representative approved data/timing and independently held recovery keys before release. Never restore the live database without a write freeze and an approved data reconciliation plan.
 
 References: [Cloudflare Vite environments](https://developers.cloudflare.com/workers/vite-plugin/reference/cloudflare-environments/), [D1 limits](https://developers.cloudflare.com/d1/platform/limits/), [Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/).

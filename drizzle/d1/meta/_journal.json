@@ -15,6 +15,13 @@
       "when": 1793357999569,
       "tag": "0001_brave_phantom_reporter",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1793362526594,
+      "tag": "0002_young_warpath",
+      "breakpoints": true
     }
   ]
 }

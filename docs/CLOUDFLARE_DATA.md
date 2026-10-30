@@ -12,7 +12,7 @@ export TWE_SOURCE_DATABASE_URL='…'
 bun run migration:export /absolute/private/snapshot.json <deployed-40-character-commit-sha>
 ```
 
-The exporter opens one repeatable-read/read-only transaction, records migration hashes and source commit, and reads the 14 fixed tables in deterministic order. It rejects unknown source columns and invalid required values, booleans, enum strings, UUID identities, timestamps and PostgreSQL integers. JSON objects are canonicalized and tag-array order is retained. It writes normalized D1 values plus per-table counts and SHA-256 hashes using mode 0600, an enclosing mode-0700 directory, and exclusive creation. It does not reset XP, regenerate passwords/tokens, or rewrite identity values.
+The exporter opens one repeatable-read/read-only transaction, records migration hashes and source commit, and reads the 14 fixed tables in deterministic order. It rejects unknown source columns and invalid required values, booleans, enum strings, UUID identities, timestamps and PostgreSQL integers. JSON objects are canonicalized, SQL NULL remains distinct from JSON null, and tag-array order/null elements are retained. It writes normalized D1 values plus per-table counts and SHA-256 hashes using mode 0600, an enclosing mode-0700 directory, and exclusive creation. It does not reset XP, regenerate passwords/tokens, or rewrite identity values.
 
 The commit argument is an operator assertion: compare it with the actual deployed application and recorded schema before accepting the export. Earlier live inventory counts were discovery evidence while production remained writable; use the final frozen export for reconciliation.
 
@@ -23,7 +23,7 @@ bun run db:migrate                       # local D1
 bun run cf:db:migrate:preview            # dedicated remote preview D1
 ```
 
-Use a fresh target with the checked-in schema. Imports require all 14 application tables and both migration-support tables to be empty. Never import the production snapshot over synthetic preview rows or a populated production target. Do not run editorial `db:sync` over a production snapshot before recording reconciliation: syncing can deliberately change publication/content metadata.
+Use a fresh target with the checked-in schema. Imports require all 14 application tables and the reward/rate-limit support tables (the initialized operator-control row is expected) to be empty. Never import the production snapshot over synthetic preview rows or a populated production target. Do not run editorial `db:sync` over a production snapshot before recording reconciliation: syncing can deliberately change publication/content metadata.
 
 ## Import and validate
 
@@ -49,3 +49,27 @@ A completed batch may remain after a later batch fails. Rerunning import against
 Before cutover, rehearse export/import/reconciliation using representative sanitized data, and securely exercise existing-format password hashes, Google linkage, cookies, sessions, roles and expiry behavior. Record the source/target identifiers, migration hashes, counts/checksums, duration, resource usage and application smoke results. Rehearse a failed import and target recreation. Full row equality preserves source anomalies too; investigate domain anomalies rather than silently repairing historical XP during conversion.
 
 References: [D1 import/export](https://developers.cloudflare.com/d1/best-practices/import-export-data/), [D1 query API](https://developers.cloudflare.com/api/resources/d1/subresources/database/methods/query/).
+
+## Rehearse an existing backup and post-cutover rollback
+
+```sh
+# Uses an already running Podman service by default; never starts a VM.
+# Set TWE_REHEARSAL_RUNTIME=docker to use an already running Docker engine.
+bun run migration:rehearse /absolute/private/source.dump /absolute/private/new-run-directory <deployed-sha>
+```
+
+This creates a uniquely named, loopback-only, password-protected PostgreSQL 15.17 container with CPU/memory limits and memory-backed data. It restores the archive, exports a consistent normalized snapshot, imports into private local D1, and validates every row. It then adds isolated synthetic post-cutover account/content/submission/reward/contact records, freezes the D1 source, exports it, restores it into a second fresh PostgreSQL database, and verifies all core values before committing. The new fixtures exercise JSON null versus SQL NULL, text-array quoting/backslashes/null entries, hashes, hint credit and operation-owned achievements. Only the named rehearsal container/config are removed; restricted snapshots/reports/D1 state remain for review.
+
+The October 30 backup has completed this full loop locally: the original 14-table dataset (including 33 users) reconciled exactly, and all simulated D1-only writes survived the reverse restore. This is local recovery evidence, not a measured remote production cutover window or owner account-login sign-off.
+
+For a real post-cutover rollback, first block new traffic, drain requests, enable both maintenance presentation and the database freeze, and verify status:
+
+```sh
+bun run migration:freeze freeze production
+bun run migration:freeze status production
+bun run migration:export:d1 /absolute/private/frozen-d1.json <deployed-worker-sha> production
+# Point only at a NEW, EMPTY recovery database, never the populated old source.
+bun run migration:restore:pg /absolute/private/frozen-d1.json /absolute/private/recovery-report.json --apply-migrations
+```
+
+The last command requires TWE_ROLLBACK_DATABASE_URL supplied securely through the environment. It rejects populated targets, binds explicit text codecs with schema casts, verifies complete counts/hashes in one PostgreSQL transaction, and rolls back on a mismatch. It never performs a partial merge or silently drops unsupported values. A target-type incompatibility needs an explicit reviewed resolution while D1 stays frozen. Retain the D1 snapshot and diagnostic metadata. After a successful verified restore, route to one writable database only; unfreezing the wrong old/new source creates split-brain.

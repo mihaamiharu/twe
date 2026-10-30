@@ -3,6 +3,7 @@ import {
   assertPrivatePath,
   hashRows,
   normalizeRow,
+  postgresSelect,
   snapshotSchema,
   tables,
   writePrivate,
@@ -43,9 +44,14 @@ try {
       for (const name of Object.keys(tables)) {
         // Table names come only from the fixed schema map.
         const records = await transaction.unsafe<
-          { value: Record<string, unknown> }[]
-        >(`SELECT row_to_json(t) AS value FROM "${name}" t ORDER BY id`);
-        const rows = records.map((record) => normalizeRow(name, record.value));
+          {
+            value: Record<string, unknown>;
+            json_nulls: Record<string, boolean>;
+          }[]
+        >(postgresSelect(name));
+        const rows = records.map((record) =>
+          normalizeRow(name, record.value, record.json_nulls),
+        );
         // eslint-disable-next-line security/detect-object-injection -- name comes only from the fixed application table map.
         result.tables[name] = {
           rows,

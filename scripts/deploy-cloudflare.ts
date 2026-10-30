@@ -79,8 +79,6 @@ const listed = Bun.spawn(
     'wrangler',
     'secret',
     'list',
-    '--name',
-    config.name,
     '--config',
     'wrangler.jsonc',
     '--env',
