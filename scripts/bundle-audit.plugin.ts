@@ -1,4 +1,4 @@
-import { mkdir, writeFile } from 'node:fs/promises';
+import { chmod, mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type { Plugin } from 'vite';
 
@@ -6,10 +6,28 @@ export function bundleAuditPlugin(): Plugin {
   return {
     name: 'twe-bundle-boundaries',
     apply: 'build',
+    // Run after Cloudflare's output-config hook, which can emit .dev.vars.
+    enforce: 'post',
     async generateBundle(_options, bundle) {
       const name = this.environment.name;
       if (name !== 'client' && name !== 'ssr') return;
       const removedBrowserWorkers: string[] = [];
+      const removedCredentialFiles: string[] = [];
+      for (const fileName of Object.keys(bundle)) {
+        if (!/(?:^|\/)\.(?:env|dev\.vars)(?:\.|$)/.test(fileName)) continue;
+        if (name === 'client')
+          this.error('Credential files must not enter Static Assets.');
+        // Cloudflare emits resolved local vars for `vite preview`. A remote
+        // deployment artifact must never carry that local secret snapshot.
+        if (
+          ['preview', 'production'].includes(
+            process.env['CLOUDFLARE_ENV'] ?? '',
+          )
+        ) {
+          Reflect.deleteProperty(bundle, fileName);
+          removedCredentialFiles.push(fileName);
+        }
+      }
       if (name === 'ssr') {
         const chunks = Object.values(bundle).filter(
           (output) => output.type === 'chunk',
@@ -90,11 +108,29 @@ export function bundleAuditPlugin(): Plugin {
       await writeFile(
         `.wrangler/bundle-audit/${name}.json`,
         JSON.stringify(
-          { environment: name, modules, removedBrowserWorkers },
+          {
+            environment: name,
+            modules,
+            removedBrowserWorkers,
+            removedCredentialFiles,
+          },
           null,
           2,
         ),
       );
+    },
+    async writeBundle(_options, bundle) {
+      // A local-only preview may retain explicitly configured .dev.vars.
+      // Keep that generated file private, just like its source.
+      if (this.environment.name !== 'ssr') return;
+      for (const fileName of Object.keys(bundle)) {
+        if (fileName === '.dev.vars')
+          // eslint-disable-next-line security/detect-non-literal-fs-filename -- Fixed credential filename inside Vite's configured server output directory.
+          await chmod(
+            resolve(this.environment.config.build.outDir, '.dev.vars'),
+            0o600,
+          );
+      }
     },
   };
 }

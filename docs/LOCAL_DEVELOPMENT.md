@@ -56,3 +56,5 @@ Integration and E2E runners each create a disposable D1 config/state under `.wra
 ## Compute and CLI data bindings
 
 Vite and the disposable HTTP/E2E app use the same AppRuntime forwarding boundary as preview. The Worker handles security/maintenance/assets; dynamic Start requests run in the object. Local-only data scripts use a D1/vars proxy without object declarations, because Wrangler’s platform proxy does not execute the application class. Its exclusive mode-0600 temporary config stays beside the original to preserve relative paths and `.dev.vars`, then is removed after startup. The original config and secrets are never rewritten. The ignored filename pattern covers interrupted cleanup.
+
+Cloudflare dev/build bindings use explicit `.dev.vars` files and ignore the legacy `.env` fallback and inherited process variables. Run setup to create an isolated local auth secret if needed. Remote preview/production build output strips resolved local credential files; local-only preview files are mode 0600. Keep private source files and all database backups outside shared build artifacts.

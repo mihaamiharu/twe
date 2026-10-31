@@ -6,6 +6,9 @@ public/og/
 *.local
 count.txt
 .env
+.env.*
+!.env.example
+!.env.*.example
 .nitro
 .tanstack
 .wrangler
@@ -39,6 +42,15 @@ lint_*.txt
 
 # Sensitive credentials
 rclone-backup.conf
+.vscode/mcp.json
+.mcp.json
+
+# Database backups contain credentials and user records; keep outside the repo.
+*.dump
+*.pgdump
+*.backup
+/*_backup*.sql
+/*-backup*.sql
 
 # VPS Access Guide
 vps_access_guide.md

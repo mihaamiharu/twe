@@ -15,6 +15,10 @@ const child = Bun.spawn([process.execPath, 'x', 'vite', 'build'], {
     ...process.env,
     NODE_ENV: 'production',
     NODE_OPTIONS: nodeOptions,
+    // Legacy .env may contain production credentials. Build metadata must not
+    // inherit them through Cloudflare's local-preview variable fallback.
+    CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: 'false',
+    CLOUDFLARE_INCLUDE_PROCESS_ENV: 'false',
     ...(target ? { CLOUDFLARE_ENV: target } : {}),
   },
   stdin: 'inherit',

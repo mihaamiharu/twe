@@ -8,6 +8,11 @@ import { contentManifestPlugin } from './scripts/content-manifest.plugin';
 import { ogAssetsPlugin } from './scripts/og-assets.plugin';
 import { bundleAuditPlugin } from './scripts/bundle-audit.plugin';
 
+// Local Worker bindings come from explicit .dev.vars files. Legacy .env may
+// still contain VPS credentials and must not become Cloudflare preview vars.
+process.env['CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV'] = 'false';
+process.env['CLOUDFLARE_INCLUDE_PROCESS_ENV'] = 'false';
+
 const config = defineConfig({
   plugins: [
     contentManifestPlugin(),
