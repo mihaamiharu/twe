@@ -192,6 +192,18 @@ async function seedProgress(
   }
 }
 
+async function verifyUserLogin(baseUrl: string, user: SeedUser): Promise<void> {
+  const response = await fetch(`${baseUrl}/api/auth/sign-in/email`, {
+    method: 'POST',
+    headers: { 'content-type': 'application/json', origin: baseUrl },
+    body: JSON.stringify({ email: user.email, password: user.password }),
+  });
+  if (!response.ok || !response.headers.getSetCookie().length) {
+    throw new Error(`E2E authentication preflight failed (${response.status}).`);
+  }
+  await response.body?.cancel();
+}
+
 async function stopProcess(child: Subprocess | undefined): Promise<boolean> {
   if (!child) return true;
 
@@ -277,6 +289,14 @@ async function main(): Promise<void> {
 
   await seedUser(baseUrl, e2eSecret, adminUser);
   await seedProgress(baseUrl, e2eSecret, adminUser.email);
+  await verifyUserLogin(baseUrl, adminUser);
+  const preflightUser: SeedUser = {
+    email: `e2e-preflight-${crypto.randomUUID()}@example.com`,
+    password: `e2e-preflight-${crypto.randomUUID()}`,
+    name: 'E2E authentication preflight',
+  };
+  await seedUser(baseUrl, e2eSecret, preflightUser);
+  await verifyUserLogin(baseUrl, preflightUser);
 
   const forwardedArguments = process.argv
     .slice(2)

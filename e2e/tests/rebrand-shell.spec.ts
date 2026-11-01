@@ -166,17 +166,9 @@ test.describe('Rebrand V1 global shell', () => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/en');
     await page.waitForLoadState('load');
-    await page.waitForFunction(
-      () => {
-        const appWindow = window as Window & {
-          __TSS_START_OPTIONS__?: unknown;
-          $_TSR?: unknown;
-        };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
-          (appWindow.$_TSR?.initialized === true ||
-            appWindow.$_TSR === undefined);
-      },
-      undefined,
+    await expect(page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
       { timeout: 20_000 },
     );
 
@@ -212,17 +204,9 @@ test.describe('Rebrand V1 global shell', () => {
     await page.getByRole('menuitem', { name: 'Bahasa Indonesia' }).click();
     await expect(page).toHaveURL(/\/id\/?$/);
     await page.waitForLoadState('load');
-    await page.waitForFunction(
-      () => {
-        const appWindow = window as Window & {
-          __TSS_START_OPTIONS__?: unknown;
-          $_TSR?: unknown;
-        };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
-          (appWindow.$_TSR?.initialized === true ||
-            appWindow.$_TSR === undefined);
-      },
-      undefined,
+    await expect(page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
       { timeout: 20_000 },
     );
     const localizedMenuButton = page.locator(
@@ -231,6 +215,7 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(localizedMenuButton).toBeVisible();
     await expect(localizedMenuButton).toHaveAttribute('aria-expanded', 'false');
     await localizedMenuButton.click();
+    await expect(localizedMenuButton).toHaveAttribute('aria-expanded', 'true');
     await expect(
       page.getByRole('navigation', { name: 'Mobile navigation' }),
     ).toContainText('Belajar');

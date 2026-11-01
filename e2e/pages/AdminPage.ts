@@ -33,6 +33,11 @@ export class AdminPage extends BasePage {
 
   override async goto() {
     await this.page.goto('/admin');
+    await expect(this.page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
+      { timeout: 45_000 },
+    );
   }
 
   async verifyAdminVisible() {

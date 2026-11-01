@@ -48,6 +48,9 @@ export async function createTestSandbox(baseUrl: string) {
     TWE_WRANGLER_CONFIG: configPath,
     TWE_D1_PERSIST: statePath,
     CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV: 'false',
+    // Worker vars are not process variables. Subprocesses must use the same
+    // per-run secret when authorizing their test-support API requests.
+    E2E_SECRET: e2eSecret,
   };
   async function run(args: string[]) {
     const child = Bun.spawn([process.execPath, ...args], {

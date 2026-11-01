@@ -42,6 +42,8 @@ bun run test:e2e
 
 Integration and E2E runners each create a disposable D1 config/state under `.wrangler/test-runs`, apply migrations, and delete only their own directory afterward. The E2E runner chooses a free application port (override E2E_APP_PORT if needed), syncs content, starts a test-mode Worker, seeds synthetic users/progress, and passes a per-run secret to support APIs. No Docker/Podman service or database port is needed. Use the runner rather than invoking support endpoints against the normal local app.
 
+The runner passes that same per-run secret to Playwright for isolated account creation and verifies user/admin login before starting the browser suite. Do not set `E2E_SECRET` in the legacy `.env`; the generated sandbox value takes precedence. To rerun the affected auth/navigation checks first, use `bun run test:e2e -- e2e/tests/admin.spec.ts e2e/tests/tutorials.spec.ts e2e/tests/rebrand-shell.spec.ts`.
+
 `bun run test:ci` combines lint/typecheck/unit/D1 integration/build; E2E remains an explicit separate run. The migration owner will run E2E locally before release. See [operations](CLOUDFLARE_OPERATIONS.md), [data transfer](CLOUDFLARE_DATA.md), and [cutover](CLOUDFLARE_CUTOVER.md) for the remaining release gates.
 
 ## Troubleshooting
