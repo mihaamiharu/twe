@@ -20,5 +20,14 @@
     "owner inbox/spam confirmation",
     "real verification/reset flow validation",
     "overall Free-plan resource and recovery acceptance"
-  ]
+  ],
+  "source_commit": "62e3127",
+  "full_preview_version": "188bb551-ef79-40ac-a4d2-1accb2db1dff",
+  "full_preview_smtp_secrets_configured": true,
+  "protected_preview_http_smoke": {
+    "completed": true,
+    "request_count": 21,
+    "external_mail_sent_by_smoke": false
+  },
+  "temporary_mail_checker_removed": true
 }
