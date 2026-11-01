@@ -7,9 +7,9 @@ This plan prepares D1 backups without a VPS, paid service or production cutover.
 1. Create independent preview/production AES-256 recovery keys in the owner's macOS login Keychain; verify readback. Keep the private recovery records, which contain identifiers but no key values.
 2. Validate authenticated archive metadata, legacy decryption, wrong-key/tamper rejection, exact resource selection and the production-readiness guard.
 3. Install the workflow on the default branch through a workflow-only bootstrap PR. Its checked-out backup code is pinned separately to a reviewed full release-branch commit SHA. A manual request must match that pin.
-4. Configure dedicated `cloudflare-backups-preview` and `cloudflare-backups-production` environments, restricted to workflows on `main`. Use a separate account-scoped D1 Read API token and the matching recovery key. Do not copy the broader CLI OAuth credential or deployment token.
+4. Configure dedicated `cloudflare-backups-preview` and `cloudflare-backups-production` environments, restricted to workflows on `main`. Use a separate TWE-account-scoped D1 export token and the matching recovery key. The native export rejected D1 Read; the owner explicitly approved D1 Edit after reviewing its broader database modification/deletion capability. Do not copy the broader CLI OAuth credential or deployment token.
 5. Run the preview workflow, download its encrypted artifact and recover it using the independent Keychain copy. Record the run URL and restore evidence.
-6. After approved production cutover/import and a successful manual production backup, set production readiness to the exact production database UUID and enable scheduling. Do not set those flags during preparation.
+6. After approved production cutover/import, set production readiness to the exact production database UUID, run a manual production backup and independently recover its artifact, then enable scheduling. Do not set those flags during preparation.
 
 ## Owner key custody
 
@@ -33,16 +33,18 @@ The Keychain copy is independent of GitHub and its artifact storage. Keep a seco
 
 Each backup environment needs:
 
-| Kind                | Name                          | Value                                                           |
-| ------------------- | ----------------------------- | --------------------------------------------------------------- |
-| Secret              | `CLOUDFLARE_D1_READ_TOKEN`    | Dedicated D1 Read token for the TWE Cloudflare account          |
-| Secret              | `TWE_BACKUP_KEY`              | Matching 32-byte canonical base64 key from the owner's Keychain |
-| Variable            | `CLOUDFLARE_ACCOUNT_ID`       | Account ID pinned in `wrangler.jsonc`                           |
-| Variable            | `TWE_BACKUP_KEY_ID`           | Matching public `sha256:` key ID                                |
-| Variable            | `TWE_BACKUP_SOURCE_SHA`       | Reviewed full SHA containing the backup tooling/config          |
-| Production variable | `TWE_PRODUCTION_BACKUP_READY` | Production D1 UUID, set only after cutover/import readiness     |
+| Kind                | Name                          | Value                                                                                       |
+| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
+| Secret              | `CLOUDFLARE_D1_EXPORT_TOKEN`  | Dedicated D1 Edit token scoped only to the TWE account; owner-approved native export access |
+| Secret              | `TWE_BACKUP_KEY`              | Matching 32-byte canonical base64 key from the owner's Keychain                             |
+| Variable            | `CLOUDFLARE_ACCOUNT_ID`       | Account ID pinned in `wrangler.jsonc`                                                       |
+| Variable            | `TWE_BACKUP_KEY_ID`           | Matching public `sha256:` key ID                                                            |
+| Variable            | `TWE_BACKUP_SOURCE_SHA`       | Reviewed full SHA containing the backup tooling/config                                      |
+| Production variable | `TWE_PRODUCTION_BACKUP_READY` | Production D1 UUID, set only after cutover/import readiness                                 |
 
 Repository variable `TWE_BACKUPS_ENABLED=true` enables scheduled **production** runs. Leave it absent/false during preparation. Preview is manual only. Environment branch restrictions should allow `main` only; use no per-run reviewers for unattended backups. Do not remove protections from unrelated deployment environments. The production database UUID guard is enforced in the backup CLI too, including manual local runs.
+
+On November 1, a dedicated D1 Read token verified as active and could read preview database metadata (HTTP 200), but both the direct native SQL export endpoint and Wrangler export failed with HTTP 401 / Cloudflare code 10000. After explicit owner approval, the same token was limited to Account → D1 → Edit on account `d5f9db115e5d7b5156bb210e04ecb34e`; native preview export then passed. This credential has database write/delete capability despite the backup workflow performing only exports. It has no Worker, DNS, billing, user or other-account permissions. The old read-token secret name was replaced by `CLOUDFLARE_D1_EXPORT_TOKEN` in both environments. Keep the environment restrictions and reviewed source pin in place; do not describe this credential as read-only.
 
 The workflow uses pinned action revisions, read-only `GITHUB_TOKEN`, checkout without persisted Git credentials, and a 15-minute timeout. Cloudflare credentials/recovery keys are present only in the export step. Its source SHA comes from the protected environment variable; dispatch cannot select arbitrary code to receive secrets. All SQL is temporary/private and removed after authenticated encryption. Upload paths list only the encrypted archive, its checksum and a non-secret manifest.
 
@@ -62,4 +64,6 @@ Rotate by creating a **new** private record/Keychain entry, installing the new k
 
 Independent preview/production Keychain entries were created and read back on November 1. The preview key completed remote export, v2 encryption, checksum verification, independent Keychain decryption, schema-first preparation and fresh isolated local workerd/D1 restore. All 214 rows across 18 tables matched the decrypted archive, integrity/FK checks passed, and all 48 freeze triggers survived and enforced a blocked write. The production key cannot decrypt that preview artifact, and the unmigrated production backup is blocked before export. Plaintext SQL and disposable local state were removed. Focused crypto/restore tests and workflow validation cover the implementation. See [the setup report](reports/cloudflare-backup-setup-20261101.json), including the development-rehearsal source-pin limitation.
 
-The default-branch bootstrap merge, restricted GitHub environments/secrets, dedicated D1 Read token, actual Actions run/artifact recovery and production schedule enablement still require their recorded setup steps. The existing production/qa environments and VPS deployment were not modified. The bootstrap PR must be reviewed with the existing main-branch CI/deployment behavior in mind; merging it is a separate action from preparing this code.
+The owner approved and configured both GitHub backup environments, matching Keychain recovery-key secrets, account/source/key-ID variables, and the dedicated D1 export token. Each environment allows only the `main` branch. The production-readiness variable remains absent and scheduling remains disabled. The export token passed a native preview export after the explicitly approved D1 Edit adjustment.
+
+The default-branch bootstrap merge and an actual Actions run/artifact recovery remain pending. The existing production/qa environments and VPS deployment were not modified. The bootstrap PR must be reviewed with the existing main-branch CI/deployment behavior in mind; merging it is a separate action from preparing this code. Main is protected; skipped required checks are not approval to bypass branch protection. Production scheduling still requires the later cutover/readiness steps.

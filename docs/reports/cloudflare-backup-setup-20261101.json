@@ -15,8 +15,8 @@
   "freeze_triggers": 48,
   "restored_freeze_enforced": true,
   "plaintext_and_disposable_state_removed": true,
-  "github_environments_configured": false,
-  "scoped_ci_token_configured": false,
+  "github_environments_configured": true,
+  "scoped_ci_token_configured": true,
   "default_branch_bootstrap_merged": false,
   "actions_backup_verified": false,
   "production_schedule_enabled": false,
@@ -26,5 +26,25 @@
     "Actions execution and independent recovery of its downloaded artifact remain pending.",
     "Synthetic preview data is not production-scale recovery timing.",
     "Login Keychain is independent of GitHub but a second owner-controlled offline copy is still recommended."
-  ]
+  ],
+  "github_environment_branch_rule": "main branch only; no tag rule",
+  "github_backup_environments": [
+    "cloudflare-backups-preview",
+    "cloudflare-backups-production"
+  ],
+  "cloudflare_export_token_permission": "Account D1 Edit; only account d5f9db115e5d7b5156bb210e04ecb34e",
+  "broader_d1_edit_access_explicitly_owner_approved": true,
+  "d1_read_token_metadata_http_status": 200,
+  "d1_read_token_export_http_status": 401,
+  "d1_read_export_error_code": 10000,
+  "approved_d1_edit_token_preview_native_export_passed": true,
+  "scoped_token_archive_checksum_verified": true,
+  "scoped_token_archive_owner_key_decryption_passed": true,
+  "scoped_token_archive_schema_first_preparation": {
+    "tables": 18,
+    "rows": 214
+  },
+  "scoped_token_export_tooling_source_sha": "ab24af9e873c86476bf2b91bb940095cd27283ff",
+  "token_value_logged_or_committed": false,
+  "legacy_read_token_secret_name_replaced": true
 }
