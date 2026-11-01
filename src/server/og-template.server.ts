@@ -2,6 +2,7 @@ import { HomeOgImageTemplate } from '../components/home-og-image-template';
 import { OgImageTemplate } from '../components/og-image-template';
 import type { OgImageParams } from '../lib/og-params';
 import type { OgRenderOptions, OgResources } from './og-types';
+import { loadOgFallbackFonts } from './og-fonts.server';
 
 const optionsCache = new WeakMap<OgResources, OgRenderOptions>();
 
@@ -10,7 +11,7 @@ function decodeBase64(value: string): ArrayBuffer {
     .buffer;
 }
 
-export function getOgRenderOptions(resources: OgResources): OgRenderOptions {
+function baseRenderOptions(resources: OgResources): OgRenderOptions {
   const cached = optionsCache.get(resources);
   if (cached) return cached;
   const options: OgRenderOptions = {
@@ -33,6 +34,21 @@ export function getOgRenderOptions(resources: OgResources): OgRenderOptions {
   };
   optionsCache.set(resources, options);
   return options;
+}
+
+export async function getOgRenderOptions(
+  resources: OgResources,
+  params: OgImageParams,
+): Promise<OgRenderOptions> {
+  const base = baseRenderOptions(resources);
+  const fallback = await loadOgFallbackFonts(
+    `${params.title} ${params.type} ${params.difficulty ?? ''} ${params.xp ?? ''}`,
+  );
+  // Keep the small Latin options stable. Fallback bytes have their own bounded
+  // cache; the workerd adapter also bounds retained Satori font loaders.
+  return fallback.length
+    ? { ...base, fonts: [...base.fonts, ...fallback] }
+    : base;
 }
 
 export function getOgElement(params: OgImageParams, resources: OgResources) {

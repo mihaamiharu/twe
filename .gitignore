@@ -3,6 +3,7 @@ node_modules
 dist
 dist-ssr
 public/og/
+public/og-fonts/
 *.local
 count.txt
 .env

@@ -3,6 +3,10 @@
   "private": true,
   "type": "module",
   "imports": {
+    "#og-font-asset": {
+      "workerd": "./src/server/og-font-asset.cloudflare.server.ts",
+      "default": "./src/server/og-font-asset.bun.server.ts"
+    },
     "#smtp-socket": {
       "workerd": "./src/server/smtp-socket.cloudflare.server.ts",
       "default": "./src/server/smtp-socket.unavailable.server.ts"
@@ -82,7 +86,6 @@
     "cf:measure:preview": "bun --no-env-file scripts/measure-preview.ts"
   },
   "dependencies": {
-    "@cf-wasm/satori": "0.4.2",
     "@fontsource/ibm-plex-mono": "^5.3.0",
     "@fontsource/instrument-sans": "^5.3.0",
     "@hookform/resolvers": "^5.2.2",
@@ -135,6 +138,10 @@
     "@cloudflare/vite-plugin": "1.66.0",
     "@cloudflare/workers-types": "5.20261029.1",
     "@eslint/js": "^9.39.2",
+    "@fontsource/noto-emoji": "5.3.2",
+    "@fontsource/noto-sans": "5.3.0",
+    "@fontsource/noto-sans-arabic": "5.3.0",
+    "@fontsource/noto-sans-jp": "5.3.1",
     "@happy-dom/global-registrator": "^20.1.0",
     "@playwright/test": "^1.61.1",
     "@resvg/resvg-js": "^2.6.2",
@@ -159,7 +166,7 @@
     "jsonc-parser": "3.3.1",
     "postgres": "^3.4.7",
     "prettier": "^3.7.4",
-    "satori": "^0.19.1",
+    "satori": "0.63.2",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.49.0",

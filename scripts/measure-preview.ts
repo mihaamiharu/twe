@@ -272,7 +272,7 @@ async function main() {
         'Test-only API was enabled.',
       );
     }
-    // Exceed the 16-entry image cache to observe bounded eviction/memory behavior.
+    // Exceed the eight-entry image cache to exercise eviction under memory sampling.
     for (let index = 0; index < 24; index++) await image(index);
     for (let round = 0; round < 2; round++) {
       if (round) await Bun.sleep(11_000); // Respect the existing shared-IP auth rate window.

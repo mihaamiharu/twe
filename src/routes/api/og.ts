@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { getStaticOgPath } from '@/lib/og-image';
+import { OgRenderError } from '@/server/og-errors.server';
 
 export const Route = createFileRoute('/api/og')({
   server: {
@@ -30,7 +31,15 @@ export const Route = createFileRoute('/api/og')({
               'Cache-Control': 'public, max-age=3600',
             },
           });
-        } catch {
+        } catch (error) {
+          if (error instanceof OgRenderError)
+            return new Response(error.message, {
+              status: error.status,
+              headers: {
+                'Cache-Control': 'private, no-store',
+                ...(error.status === 503 ? { 'Retry-After': '1' } : {}),
+              },
+            });
           console.error('[OG] Image rendering failed.');
           return new Response(null, {
             status: 302,

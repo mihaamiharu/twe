@@ -8,12 +8,15 @@ import {
 } from '../lib/og-params';
 import { getOgElement, getOgRenderOptions } from './og-template.server';
 import type { OgResources } from './og-types';
+import { OgRenderError } from './og-errors.server';
 
 const resources: OgResources = bundledResources;
 const cache = new Map<string, ArrayBuffer>();
 const pending = new Map<string, Promise<ArrayBuffer>>();
-const MAX_CACHE_BYTES = 8 * 1024 * 1024;
-const MAX_CACHE_ENTRIES = 16;
+const MAX_CACHE_BYTES = 2 * 1024 * 1024;
+const MAX_CACHE_ENTRIES = 8;
+const MAX_PENDING_RENDERS = 4;
+let renderTail: Promise<void> = Promise.resolve();
 let cacheBytes = 0;
 
 function remember(key: string, image: ArrayBuffer) {
@@ -51,15 +54,26 @@ export async function renderDynamicOg(
   }
   const existing = pending.get(key);
   if (existing) return existing;
-  const operation = (async () => {
+  if (pending.size >= MAX_PENDING_RENDERS)
+    throw new OgRenderError(
+      503,
+      'Image rendering is busy. Please retry shortly.',
+    );
+  // Font parsing, Yoga layout and rasterization share one memory budget.
+  // Serialize distinct renders; coalesce duplicates and bound the waiting queue.
+  const operation = renderTail.then(async () => {
     const svg = await renderOgSvg(
       getOgElement(params, resources),
-      getOgRenderOptions(resources),
+      await getOgRenderOptions(resources, params),
     );
     const image = await renderOgPng(svg);
     remember(key, image);
     return image;
-  })();
+  });
+  renderTail = operation.then(
+    () => {},
+    () => {},
+  );
   pending.set(key, operation);
   try {
     return await operation;

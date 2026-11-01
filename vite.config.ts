@@ -7,6 +7,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { contentManifestPlugin } from './scripts/content-manifest.plugin';
 import { ogAssetsPlugin } from './scripts/og-assets.plugin';
 import { bundleAuditPlugin } from './scripts/bundle-audit.plugin';
+import { satoriWorkerdPlugin } from './scripts/satori-workerd.plugin';
 
 // Local Worker bindings come from explicit .dev.vars files. Legacy .env may
 // still contain VPS credentials and must not become Cloudflare preview vars.
@@ -17,6 +18,7 @@ const config = defineConfig({
   plugins: [
     contentManifestPlugin(),
     ogAssetsPlugin(),
+    satoriWorkerdPlugin(),
     cloudflare({
       configPath: process.env['TWE_WRANGLER_CONFIG'] || 'wrangler.jsonc',
       persistState: {

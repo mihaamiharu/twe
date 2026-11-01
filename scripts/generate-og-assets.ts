@@ -21,6 +21,7 @@ import {
   parseTutorialRegistryJson,
 } from '../src/server/content-validation';
 import type { OgResources } from '../src/server/og-types';
+import { generateOgFonts, ogFontSourceFiles } from './generate-og-fonts';
 
 const root = resolve(import.meta.dirname, '..');
 const statePath = join(root, '.tanstack', 'og-images.json');
@@ -56,6 +57,9 @@ export const ogSourceFiles = [
   join(root, 'bun.lock'),
   regularFontPath,
   boldFontPath,
+  ...ogFontSourceFiles,
+  join(root, 'scripts/generate-og-fonts.ts'),
+  join(root, 'src/server/og-fonts.server.ts'),
 ];
 
 function isMissing(error: unknown) {
@@ -90,6 +94,7 @@ interface Card {
 }
 
 async function readOgInputs() {
+  await generateOgFonts();
   const { manifest, sourceFiles } = await readContentSources();
   const assetBytes = await Promise.all(
     ogSourceFiles.map((path) => readFile(path)),
@@ -224,7 +229,7 @@ async function buildOgAssets() {
     if (!exists || previous[card.path] !== card.fingerprint) {
       const svg = await renderOgSvg(
         getOgElement(card.params, inputs.resources),
-        getOgRenderOptions(inputs.resources),
+        await getOgRenderOptions(inputs.resources, card.params),
       );
       const png = await renderOgPng(svg);
       await writeAtomic(output, new Uint8Array(png));

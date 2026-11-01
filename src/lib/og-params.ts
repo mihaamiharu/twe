@@ -12,8 +12,31 @@ export interface OgImageParams {
   xp: string | null;
 }
 
+const graphemes = new Intl.Segmenter('en', { granularity: 'grapheme' });
+
+function boundedText(value: string, limit: number): string {
+  const parts: string[] = [];
+  const normalized = value
+    .slice(0, 4096)
+    .normalize('NFC')
+    .replace(/\s+/gu, ' ')
+    .trim();
+  let units = 0;
+  for (const { segment } of graphemes.segment(normalized)) {
+    if (
+      parts.length === limit ||
+      segment.length > 64 ||
+      units + segment.length > limit * 8
+    )
+      return parts.join('') + '…';
+    parts.push(segment);
+    units += segment.length;
+  }
+  return parts.join('');
+}
+
 export function normalizeOgParams(input: OgImageInput): OgImageParams {
-  const type = input.type || 'Challenge';
+  const type = boundedText(input.type || 'Challenge', 32) || 'Challenge';
   if (type.toLowerCase() === 'home') {
     return {
       title: 'TestingWithEkki',
@@ -23,13 +46,14 @@ export function normalizeOgParams(input: OgImageInput): OgImageParams {
     };
   }
   return {
-    title: input.title || 'TestingWithEkki',
+    title:
+      boundedText(input.title || 'TestingWithEkki', 200) || 'TestingWithEkki',
     type,
-    difficulty: input.difficulty || null,
+    difficulty: input.difficulty ? boundedText(input.difficulty, 16) : null,
     xp:
       input.xp === undefined || input.xp === null || input.xp === ''
         ? null
-        : String(input.xp),
+        : boundedText(String(input.xp), 12),
   };
 }
 

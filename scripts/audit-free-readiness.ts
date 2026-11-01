@@ -6,12 +6,30 @@ import { z } from 'zod';
 import { readJsonConfig } from './json-config';
 import { writePrivate, assertPrivatePath } from './migration/model';
 
-const [outputArgument] = process.argv.slice(2);
+const [outputArgument, windowStartArgument, windowEndArgument] =
+  process.argv.slice(2);
 if (!outputArgument)
   throw new Error('Specify an absolute private audit report path.');
 const outputPath = assertPrivatePath(outputArgument);
 
 async function main() {
+  const window =
+    windowStartArgument || windowEndArgument
+      ? z
+          .object({
+            start: z.string().datetime(),
+            end: z.string().datetime(),
+          })
+          .parse({ start: windowStartArgument, end: windowEndArgument })
+      : undefined;
+  if (
+    window &&
+    (Date.parse(window.end) <= Date.parse(window.start) ||
+      Date.parse(window.end) - Date.parse(window.start) > 3_600_000)
+  )
+    throw new Error(
+      'The optional audit window must be positive and at most one hour.',
+    );
   const config = z
     .object({ account_id: z.string().regex(/^[a-f0-9]{32}$/) })
     .parse(await readJsonConfig('wrangler.jsonc'));
@@ -69,23 +87,22 @@ async function main() {
     avg: numericMap.optional(),
     quantiles: numericMap.optional(),
   });
-  const parsed = z
-    .object({
-      errors: z.unknown().nullable().optional(),
-      data: z.object({
-        viewer: z.object({
-          accounts: z.array(
-            z.object({
-              workersInvocationsAdaptive: z.array(metric),
-              durableObjectsInvocationsAdaptiveGroups: z.array(metric),
-              durableObjectsPeriodicGroups: z.array(metric),
-              d1AnalyticsAdaptiveGroups: z.array(metric),
-            }),
-          ),
-        }),
+  const analyticsSchema = z.object({
+    errors: z.unknown().nullable().optional(),
+    data: z.object({
+      viewer: z.object({
+        accounts: z.array(
+          z.object({
+            workersInvocationsAdaptive: z.array(metric),
+            durableObjectsInvocationsAdaptiveGroups: z.array(metric),
+            durableObjectsPeriodicGroups: z.array(metric),
+            d1AnalyticsAdaptiveGroups: z.array(metric),
+          }),
+        ),
       }),
-    })
-    .parse(analytics);
+    }),
+  });
+  const parsed = analyticsSchema.parse(analytics);
   if (parsed.errors)
     throw new Error('Cloudflare analytics returned incomplete evidence.');
   const account = parsed.data.viewer.accounts[0];
@@ -155,11 +172,56 @@ async function main() {
   const previewPeriods = account.durableObjectsPeriodicGroups.filter((row) =>
     previewNamespaces.has(row.dimensions['namespaceId'] ?? ''),
   );
+  let studyWindow;
+  if (window) {
+    const queryInWindow = query.replaceAll(
+      `date_gt:"${previousDay}"`,
+      `datetime_geq:"${window.start}",datetime_leq:"${window.end}"`,
+    );
+    const result = analyticsSchema.parse(
+      await request('/graphql', { query: queryInWindow }),
+    );
+    const measured = result.data.viewer.accounts[0];
+    if (
+      result.errors ||
+      !measured ||
+      result.data.viewer.accounts.length !== 1 ||
+      Object.values(measured).some((rows) => rows.length >= 1000)
+    )
+      throw new Error('Incomplete bounded-window analytics.');
+    const periods = measured.durableObjectsPeriodicGroups.filter((row) =>
+      previewNamespaces.has(row.dimensions['namespaceId'] ?? ''),
+    );
+    const invocations = measured.durableObjectsInvocationsAdaptiveGroups.filter(
+      (row) => row.dimensions['scriptName'] === 'twe-preview',
+    );
+    const gateway = measured.workersInvocationsAdaptive.filter(
+      (row) => row.dimensions['scriptName'] === 'twe-preview',
+    );
+    studyWindow = {
+      ...window,
+      gatewayRequests: sum(gateway, 'requests'),
+      gatewayErrors: sum(gateway, 'errors'),
+      gatewayMaxCpuMs: maximum(gateway, 'cpuTime') / 1000,
+      objectRequests: sum(invocations, 'requests'),
+      objectInvocationErrors: sum(invocations, 'errors'),
+      objectDurationGbSeconds: sum(periods, 'duration'),
+      objectPeriodicGroups: periods.length,
+      objectPeriodicPeakMemoryBytes: periods.length
+        ? maximum(periods, 'memoryUsageBytes')
+        : null,
+      objectExceededMemoryErrors: sum(periods, 'exceededMemoryErrors'),
+      objectExceededCpuErrors: sum(periods, 'exceededCpuErrors'),
+      limitation:
+        'Provider sampling/lag and periodic memory can miss peaks; this window can include other preview activity. Empty periodic groups are not zero memory.',
+    };
+  }
   const report = {
     capturedAt: new Date().toISOString(),
     utcDay: today,
     target: 'TWE account; all returned resources',
     billingPlanVerifiedByThisApi: false,
+    ...(studyWindow ? { studyWindow } : {}),
     accountWorkers: {
       requests,
       errors: sum(account.workersInvocationsAdaptive, 'errors'),
