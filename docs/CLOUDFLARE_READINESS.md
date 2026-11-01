@@ -1,6 +1,6 @@
-# Migration candidate evidence — October 30, 2026
+# Migration candidate evidence — through November 1, 2026
 
-This report records implementation validation, not production release approval. The owner will run Playwright E2E locally first. Production still runs on the VPS/Tunnel.
+This report records implementation validation, not production release approval. The owner completed the local Playwright run on November 1; hosted integration, resource/recovery and cutover gates remain. Production still runs on the VPS/Tunnel.
 
 ## Completed checks
 
@@ -31,17 +31,23 @@ The local HTTP smoke is separate from Playwright E2E. It uses only synthetic dat
 
 ## Outstanding release gates
 
-- Owner's local Playwright E2E and browser/visual parity, including preview noindex/access, navigation, editor hydration and all OG layouts/Unicode/crawlers.
+- Hosted preview browser/visual parity, including preview noindex/access and all OG layouts/Unicode/crawlers. The owner's local automated E2E gate passed; the two intentionally skipped external bug-report flows still need separate coverage.
 - Repeat/time the remote cutover rehearsal on the approved candidate. The restricted backup has now passed local PostgreSQL restore, full-data D1 import and reverse PostgreSQL restore with simulated post-cutover writes.
 - Owner review/sign-off of the successful local D1-only write reconciliation rehearsal and the production recovery objectives.
 - Chosen/configured HTTP email provider, verified sender and actual inbox/failure behavior. The owner explicitly kept provider selection undecided; EMAIL_PROVIDER=unconfigured fails explicitly outside local/test use.
 - Preview Google callback/origin/role/existing-account checks, and real AI/GitHub upstream success/failure validation using isolated secrets.
-- Strict $0 owner decision: cutover is deferred while the compute architecture is revised. The original hosted samples exceed the ordinary Worker Free CPU target for SSR, password authentication and custom OG. Startup/upload passed; controlled cold starts, memory and broader resource measurements remain pending. No paid service was enabled.
+- Strict $0 acceptance: the revised AppRuntime candidate addressed the gateway CPU problem in captured samples, but Free-account status, controlled cold starts, memory/object duration and account-wide quota headroom remain unverified. No paid service was enabled; cutover stays deferred pending acceptance.
 - Owner-held recovery-key custody, GitHub environment reviewers/scoped credentials and backup enablement. Preview encrypted SQL/decrypt/local restore and Time Travel marker recovery have passed; production-scale operational timing remains pending.
 - Security/cookie/cache isolation and the complete route/feature matrix; approved cutover window and recovery objectives.
 - Production data import, Worker deployment/domain routing, at least one week of observation, then explicit VPS retirement sign-off.
 
 Keep #248–#257 acceptance criteria open wherever these runtime/operational gates still lack evidence. See the data, operations and cutover runbooks for the remaining procedures.
+
+## Owner's local E2E — November 1, 2026
+
+The owner supplied the final `bun run test:e2e` output for release candidate `29fcc35`: **130 passed, 2 skipped, 0 failed** in 6.1 minutes. Local Allure results independently match that final run. Earlier failed runs in the pasted terminal history preceded the disposable seeding-secret fix and are superseded by the final result.
+
+The two skipped cases in `e2e/tests/bugs.spec.ts` intentionally avoid creating real GitHub issues. They are not evidence of successful external GitHub delivery. The final run covers local synthetic accounts/data through the same Worker/AppRuntime/D1 compute boundary as preview; it does not validate real email, Google OAuth, production account login, hosted quotas or production migration/retirement. No browser suite was rerun on the owner's behalf.
 
 ## Local full-data recovery rehearsal
 
