@@ -17,13 +17,13 @@
   "plaintext_and_disposable_state_removed": true,
   "github_environments_configured": true,
   "scoped_ci_token_configured": true,
-  "default_branch_bootstrap_merged": false,
-  "actions_backup_verified": false,
+  "default_branch_bootstrap_merged": true,
+  "actions_backup_verified": true,
   "production_schedule_enabled": false,
   "production_accessed": false,
   "limitations": [
     "Development rehearsal ran with uncommitted backup changes; its recorded HEAD is not an exact source snapshot. CI must use the reviewed full release SHA.",
-    "Actions execution and independent recovery of its downloaded artifact remain pending.",
+    "The later Actions artifact recovery used the verified immutable tooling pin; see cloudflare-actions-backup-recovery-20261101.json.",
     "Synthetic preview data is not production-scale recovery timing.",
     "Login Keychain is independent of GitHub but a second owner-controlled offline copy is still recommended."
   ],
@@ -46,5 +46,9 @@
   },
   "scoped_token_export_tooling_source_sha": "ab24af9e873c86476bf2b91bb940095cd27283ff",
   "token_value_logged_or_committed": false,
-  "legacy_read_token_secret_name_replaced": true
+  "legacy_read_token_secret_name_replaced": true,
+  "backup_tooling_source_pin": "ab24af9e873c86476bf2b91bb940095cd27283ff",
+  "actions_run_url": "https://github.com/mihaamiharu/twe/actions/runs/41317166118",
+  "actions_recovery_report": "cloudflare-actions-backup-recovery-20261101.json",
+  "temporary_plaintext_api_token_file_removed": true
 }

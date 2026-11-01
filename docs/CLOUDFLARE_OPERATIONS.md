@@ -87,6 +87,8 @@ Owner: mihaamiharu. Proposed operational targets: RPO <=24 hours and RTO <=60 mi
 
 `backup-cloudflare.yml` is prepared for encrypted production exports at 02:15 and 14:15 Asia/Jakarta with 30-day retention, a 4 MiB archive cap, separate preview/production backup environments and source/key/database pins. Scheduling stays disabled until the default-branch bootstrap and post-cutover production-readiness gates are complete. See [backup automation and owner-key custody](CLOUDFLARE_BACKUPS.md) for setup, independent login-Keychain records, exact variables/secrets, failure handling and rotation. Store the 32-byte base64 recovery key independently of GitHub and the encrypted archives. No plaintext SQL is uploaded. Backup failure must be visible in Actions notifications; do not mute it. The scheduled workflow is inert until enabled.
 
+The workflow-only bootstrap is now installed on `main` and manual preview Actions backup/recovery is verified; see [run 41317166118](https://github.com/mihaamiharu/twe/actions/runs/41317166118) and [the recovery report](reports/cloudflare-actions-backup-recovery-20261101.json). Dedicated main-only backup environments hold separate recovery keys and an owner-approved TWE-account D1 Edit export token. D1 Read could read metadata but was rejected by native SQL export; this credential is explicitly not read-only. Production readiness/scheduling remain disabled until cutover/import and a verified production backup. Full application migration remains on the release branch and no VPS deployment was triggered.
+
 ```sh
 # Keep the recovery key in a password manager/secret store, not command history.
 bun scripts/backup-d1.ts backup preview /absolute/private/preview.enc
