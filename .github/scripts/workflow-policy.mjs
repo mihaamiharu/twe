@@ -46,7 +46,7 @@ export function validatePublicBackup(workflow) {
     'Public backup handoff must not grant token permissions.',
   );
   assert(
-    !/\bsecrets\s*(?:\.|\[)|upload-artifact|backup-d1\.ts|d1 export/.test(
+    !/\bsecrets\b|upload-artifact|backup-d1\.ts|d1 export/i.test(
       JSON.stringify(workflow),
     ),
     'Public backup workflow must not access credentials or export/upload data.',
@@ -116,7 +116,7 @@ export function validateVault(workflow) {
   for (const step of job.steps) {
     if (step !== exportStep)
       assert(
-        !/\bsecrets\s*(?:\.|\[)/.test(JSON.stringify(step)),
+        !/\bsecrets\b/i.test(JSON.stringify(step)),
         'Credentials may exist only in the export step.',
       );
   }

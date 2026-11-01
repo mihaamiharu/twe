@@ -13,10 +13,15 @@ test('public handoff cannot regain credential or archive access', () => {
     readFileSync('.github/workflows/backup-cloudflare.yml', 'utf8'),
   );
   validatePublicBackup(workflow);
-  workflow.jobs.handoff.steps.push({
-    run: 'echo ${{ secrets.TWE_BACKUP_KEY }}',
-  });
-  assert.throws(() => validatePublicBackup(workflow));
+  for (const expression of [
+    'secrets.TWE_BACKUP_KEY',
+    'toJSON(secrets)',
+    "SECRETS['TWE_BACKUP_KEY']",
+  ]) {
+    const exposed = structuredClone(workflow);
+    exposed.jobs.handoff.steps.push({ run: `echo \${{ ${expression} }}` });
+    assert.throws(() => validatePublicBackup(exposed));
+  }
 });
 test('vault rejects public visibility, movable source, broad uploads and credential exposure', () => {
   const original = document(
