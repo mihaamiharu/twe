@@ -13,7 +13,22 @@ const handleStart = createStartHandler(defaultStreamHandler);
 // compute boundary for SSR, existing password hashes and arbitrary OG images.
 // Never create an object per user/request: one stable instance bounds duration.
 export class AppRuntime extends DurableObject<RuntimeEnv> {
+  private readonly bootId = crypto.randomUUID();
+  private hasHandledRequest = false;
+
   override async fetch(request: Request): Promise<Response> {
+    if (!this.hasHandledRequest) {
+      this.hasHandledRequest = true;
+      // One non-sensitive event per object lifetime lets a live preview tail
+      // distinguish a real cold object start from repeated warm requests.
+      console.info(
+        JSON.stringify({
+          event: 'application_runtime_started',
+          bootId: this.bootId,
+          appEnv: this.env.APP_ENV,
+        }),
+      );
+    }
     try {
       return await handleStart(request);
     } catch {

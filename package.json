@@ -77,7 +77,9 @@
     "migration:restore:pg": "bun scripts/migration/restore-postgres.ts",
     "migration:freeze": "bun scripts/migration/freeze-d1.ts",
     "cf:preview:seed": "bun --no-env-file scripts/seed-preview.ts",
-    "cf:smoke:preview": "bun --no-env-file scripts/smoke-preview.ts"
+    "cf:smoke:preview": "bun --no-env-file scripts/smoke-preview.ts",
+    "cf:audit:free": "bun --no-env-file scripts/audit-free-readiness.ts",
+    "cf:measure:preview": "bun --no-env-file scripts/measure-preview.ts"
   },
   "dependencies": {
     "@cf-wasm/satori": "0.4.2",

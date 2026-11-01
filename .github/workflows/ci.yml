@@ -3,8 +3,10 @@ name: CI Tests
 on:
   push:
     branches: ['main']
+    paths-ignore: ['.github/**', 'docs/**', 'eslint.config.js']
   pull_request:
     branches: ['main']
+    paths-ignore: ['.github/**', 'docs/**', 'eslint.config.js']
 
 permissions:
   contents: read

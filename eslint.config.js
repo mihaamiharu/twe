@@ -55,6 +55,19 @@ export default tseslint.config(
     },
   },
   {
+    // Standalone Node workflow checks use their own locked YAML dependency and
+    // fixture tests; they are not part of the application's TypeScript project.
+    files: ['.github/scripts/**/*.mjs'],
+    extends: [tseslint.configs.disableTypeChecked],
+    languageOptions: {
+      globals: {
+        process: 'readonly',
+        console: 'readonly',
+        structuredClone: 'readonly',
+      },
+    },
+  },
+  {
     ignores: [
       'node_modules/**',
       'dist/**',
