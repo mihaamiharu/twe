@@ -8,7 +8,7 @@
   "owner_authorized_messages": 1,
   "accepted_messages": 1,
   "smtp_elapsed_ms": 2174,
-  "inbox_delivery_confirmed": false,
+  "inbox_delivery_confirmed": true,
   "retry_policy": "no automatic retry; durable single-attempt claim",
   "socket_lifecycle": "request-owned; closed in finally; 20-second exchange deadline",
   "focused_unit_checks": {
@@ -17,7 +17,6 @@
   },
   "production_modified": false,
   "remaining": [
-    "owner inbox/spam confirmation",
     "real verification/reset flow validation",
     "overall Free-plan resource and recovery acceptance"
   ],
@@ -29,5 +28,10 @@
     "request_count": 21,
     "external_mail_sent_by_smoke": false
   },
-  "temporary_mail_checker_removed": true
+  "temporary_mail_checker_removed": true,
+  "inbox_confirmation": {
+    "source": "owner confirmation in chat",
+    "date": "2026-11-01",
+    "folder": "inbox"
+  }
 }
