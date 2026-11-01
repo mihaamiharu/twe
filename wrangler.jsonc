@@ -1,6 +1,7 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "twe-local",
+  "account_id": "d5f9db115e5d7b5156bb210e04ecb34e",
   "main": "src/server.ts",
   "compatibility_date": "2026-10-29",
   "compatibility_flags": ["nodejs_compat"],

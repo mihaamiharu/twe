@@ -69,6 +69,7 @@
     "migration:import": "bun scripts/migration/import-d1.ts import",
     "migration:validate": "bun scripts/migration/import-d1.ts validate",
     "cf:backup": "bun scripts/backup-d1.ts",
+    "cf:backup:keys": "bun scripts/backup-keys.ts",
     "cf:backup:prepare-restore": "bun scripts/prepare-d1-restore.ts",
     "cf:smoke": "bun scripts/smoke-cloudflare.ts",
     "migration:rehearse": "bun scripts/migration/rehearse-backup.ts",

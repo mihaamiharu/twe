@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-01",
+  "scope": "owner-Keychain v2 encrypted synthetic-preview archive; fresh isolated local workerd/D1 restore",
+  "keychain_preview_readback_verified": true,
+  "keychain_production_readback_verified": true,
+  "independent_target_keys": true,
+  "archive_checksum_verified": true,
+  "production_key_rejects_preview_archive_without_plaintext": true,
+  "unmigrated_production_export_blocked": true,
+  "tables": 18,
+  "rows": 214,
+  "decrypted_and_restored_complete_row_hashes_equal": true,
+  "quick_check": "ok",
+  "foreign_key_errors": 0,
+  "freeze_triggers": 48,
+  "restored_freeze_enforced": true,
+  "plaintext_and_disposable_state_removed": true,
+  "github_environments_configured": false,
+  "scoped_ci_token_configured": false,
+  "default_branch_bootstrap_merged": false,
+  "actions_backup_verified": false,
+  "production_schedule_enabled": false,
+  "production_accessed": false,
+  "limitations": [
+    "Development rehearsal ran with uncommitted backup changes; its recorded HEAD is not an exact source snapshot. CI must use the reviewed full release SHA.",
+    "Actions execution and independent recovery of its downloaded artifact remain pending.",
+    "Synthetic preview data is not production-scale recovery timing.",
+    "Login Keychain is independent of GitHub but a second owner-controlled offline copy is still recommended."
+  ]
+}

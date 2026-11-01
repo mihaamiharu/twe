@@ -37,7 +37,7 @@ The local HTTP smoke is separate from Playwright E2E. It uses only synthetic dat
 - Spacemail SMTP was selected and one authorized hosted TLS message was accepted on November 1. The owner confirmed inbox arrival. Verify real verification/reset behavior; unit checks cover rejected auth/recipients, timeouts and injection. See the Spacemail report.
 - Preview Google callback/origin/role/existing-account checks, and real AI/GitHub upstream success/failure validation using isolated secrets.
 - Strict $0 acceptance: the revised AppRuntime candidate addressed the gateway CPU problem in captured samples, but Free-account status, controlled cold starts, memory/object duration and account-wide quota headroom remain unverified. No paid service was enabled; cutover stays deferred pending acceptance.
-- Owner-held recovery-key custody, GitHub environment reviewers/scoped credentials and backup enablement. Preview encrypted SQL/decrypt/local restore and Time Travel marker recovery have passed; production-scale operational timing remains pending.
+- Independent preview/production recovery keys are verified in the owner's login Keychain. Restricted GitHub backup environments/scoped credentials, default-branch workflow bootstrap, an Actions artifact recovery and backup enablement remain pending. Preview encrypted SQL/decrypt/local restore and Time Travel marker recovery have passed; production-scale operational timing remains pending. See [backup setup](CLOUDFLARE_BACKUPS.md).
 - Security/cookie/cache isolation and the complete route/feature matrix; approved cutover window and recovery objectives.
 - Production data import, Worker deployment/domain routing, at least one week of observation, then explicit VPS retirement sign-off.
 

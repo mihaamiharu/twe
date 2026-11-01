@@ -85,7 +85,7 @@ The legacy VPS workflows are archived under `.github/legacy-vps/`; merging the m
 
 Owner: mihaamiharu. Proposed operational targets: RPO <=24 hours and RTO <=60 minutes, subject to measured rehearsal and explicit release sign-off. Cloudflare Free currently provides seven days of D1 Time Travel; this is a recovery window, not an independent long-term backup.
 
-`backup-cloudflare.yml` writes a daily AES-256-GCM encrypted SQL export with 30-day artifact retention once TWE_BACKUPS_ENABLED=true is set after rehearsal. It uses a separate cloudflare-backups GitHub environment, D1-read-only token and TWE_BACKUP_KEY. Store the 32-byte base64 recovery key independently of GitHub and the encrypted archives. No plaintext SQL is uploaded. Backup failure must be visible in Actions notifications; do not mute it. The scheduled workflow is inert until enabled.
+`backup-cloudflare.yml` is prepared for encrypted production exports at 02:15 and 14:15 Asia/Jakarta with 30-day retention, a 4 MiB archive cap, separate preview/production backup environments and source/key/database pins. Scheduling stays disabled until the default-branch bootstrap and post-cutover production-readiness gates are complete. See [backup automation and owner-key custody](CLOUDFLARE_BACKUPS.md) for setup, independent login-Keychain records, exact variables/secrets, failure handling and rotation. Store the 32-byte base64 recovery key independently of GitHub and the encrypted archives. No plaintext SQL is uploaded. Backup failure must be visible in Actions notifications; do not mute it. The scheduled workflow is inert until enabled.
 
 ```sh
 # Keep the recovery key in a password manager/secret store, not command history.
