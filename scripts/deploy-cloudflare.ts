@@ -18,8 +18,12 @@ const config = z
     name: z.string(),
     vars: z.object({
       APP_ENV: z.string(),
-      EMAIL_PROVIDER: z.enum(['http', 'resend', 'unconfigured']).optional(),
+      EMAIL_PROVIDER: z
+        .enum(['smtp', 'http', 'resend', 'unconfigured'])
+        .optional(),
       EMAIL_HTTP_URL: z.string().url().optional(),
+      SMTP_HOST: z.string().optional(),
+      SMTP_PORT: z.string().optional(),
     }),
     d1_databases: z.array(bindingSchema),
     durable_objects: z.object({
@@ -77,9 +81,11 @@ if (target === 'production') {
       'Production deploy requires the approved candidate SHA and explicit release authorization.',
     );
   if (
-    !['http', 'resend'].includes(config.vars.EMAIL_PROVIDER ?? '') ||
+    !['smtp', 'http', 'resend'].includes(config.vars.EMAIL_PROVIDER ?? '') ||
     (config.vars.EMAIL_PROVIDER === 'http' &&
-      !config.vars.EMAIL_HTTP_URL?.startsWith('https://'))
+      !config.vars.EMAIL_HTTP_URL?.startsWith('https://')) ||
+    (config.vars.EMAIL_PROVIDER === 'smtp' &&
+      (!config.vars.SMTP_HOST || config.vars.SMTP_PORT !== '465'))
   )
     throw new Error(
       'Select/configure the email transport before production deployment.',
@@ -113,7 +119,6 @@ const required =
     ? ['BETTER_AUTH_SECRET', 'PREVIEW_ACCESS_TOKEN']
     : [
         'BETTER_AUTH_SECRET',
-        'EMAIL_API_KEY',
         'EMAIL_FROM',
         'GOOGLE_CLIENT_ID',
         'GOOGLE_CLIENT_SECRET',
@@ -123,6 +128,12 @@ const required =
         'GH_REPO',
         'ADMIN_EMAIL',
       ];
+if (['smtp', 'http', 'resend'].includes(config.vars.EMAIL_PROVIDER ?? '')) {
+  required.push('EMAIL_FROM');
+  if (config.vars.EMAIL_PROVIDER === 'smtp')
+    required.push('SMTP_USER', 'SMTP_PASSWORD');
+  else required.push('EMAIL_API_KEY');
+}
 const missing = required.filter((name) => !secretNames.has(name));
 if (missing.length)
   throw new Error(

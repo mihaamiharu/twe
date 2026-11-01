@@ -196,12 +196,12 @@ The full product now has a deployed Cloudflare Vite/Worker entry and Static Asse
 
 ## Workstreams #251–#255 — integrated migration candidate
 
-The release branch now contains the full D1 schema and additive migrations, typed local/workerd bindings, Better Auth SQLite persistence, prepared atomic reward/achievement batches, D1-backed abuse windows, configurable awaited HTTP email, bounded AI/GitHub calls, and Workers-safe logging. PostgreSQL history/tools are retained for recovery. Courses remain outside the pinned baseline.
+The release branch now contains the full D1 schema and additive migrations, typed local/workerd bindings, Better Auth SQLite persistence, prepared atomic reward/achievement batches, D1-backed abuse windows, configurable awaited SMTP/HTTP email, bounded AI/GitHub calls, and Workers-safe logging. PostgreSQL history/tools are retained for recovery. Courses remain outside the pinned baseline.
 
 Restricted snapshot export/import and full row/hash/FK/integrity reconciliation commands are implemented. Local setup and isolated D1 integration/E2E runners replace PostgreSQL containers. Manual candidate deployment and encrypted-backup workflows replace automatic VPS deployment; production still requires readiness and owner authorization.
 
 Created separate empty APAC D1 resources for the full app: twe-preview (`a57397b4-3f7f-432e-a161-04330b3a5b4b`) and twe-production (`6f6630be-ed32-4d07-ba24-24d45bb160c9`). They have not received production data. The full-app preview Worker is deployed with synthetic data. No production deployment, DNS switch, paid-plan change or VPS deletion was performed.
 
-The owner explicitly kept the email provider undecided. Generic HTTPS transport and an optional vendor adapter are prepared; preview/production do not silently choose a provider. Credentials, delivery and callback verification remain release gates.
+The owner initially kept email undecided, then selected the existing Spacemail provider on November 1. A Workers TLS SMTP adapter now retains that provider directly; generic HTTPS and optional vendor adapters remain available. One authorized hosted email was accepted; inbox confirmation, real auth email flows, replacement integration credentials and callback verification remain release gates.
 
 See [D1/schema/rewards](CLOUDFLARE_D1.md), [data transfer](CLOUDFLARE_DATA.md), [operations](CLOUDFLARE_OPERATIONS.md), and [cutover/rollback](CLOUDFLARE_CUTOVER.md). Source implementation is not proof of runtime parity; all unresolved checks must be recorded in #256, including the owner's local E2E run.

@@ -1,6 +1,6 @@
 # Strict $0 architecture work — October 31, 2026
 
-The owner chose a strict $0 target and deferred production cutover. This supersedes the Paid recommendation in the first hosted-preview report. No billing change, production import or domain change is authorized by this investigation. Existing passwords, sessions, data, SSR/SEO, admin functions and custom OG behavior remain in scope. Email stays provider-undecided behind configurable HTTP transport.
+The owner chose a strict $0 target and deferred production cutover. This supersedes the Paid recommendation in the first hosted-preview report. No billing change, production import or domain change is authorized by this investigation. Existing passwords, sessions, data, SSR/SEO, admin functions and custom OG behavior remain in scope. The original provider-undecided HTTP preparation was superseded on November 1 by the owner’s selection of existing Spacemail SMTP; HTTP remains supported. SMTP sockets must close within each bounded request so they do not retain object-active duration.
 
 ## Proposed compute layout
 

@@ -17,7 +17,11 @@ export interface RuntimeEnv {
   REQUIRE_EMAIL_VERIFICATION?: string;
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
-  EMAIL_PROVIDER?: 'http' | 'resend' | 'disabled' | 'unconfigured';
+  EMAIL_PROVIDER?: 'smtp' | 'http' | 'resend' | 'disabled' | 'unconfigured';
+  SMTP_HOST?: string;
+  SMTP_PORT?: string;
+  SMTP_USER?: string;
+  SMTP_PASSWORD?: string;
   EMAIL_HTTP_URL?: string;
   EMAIL_API_KEY?: string;
   EMAIL_FROM?: string;

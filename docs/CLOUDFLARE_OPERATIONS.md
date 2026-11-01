@@ -32,7 +32,7 @@ Local secrets live in ignored `.dev.vars`; environment-specific `.dev.vars.previ
 
 - BETTER_AUTH_SECRET and BETTER_AUTH_URL: retain the production secret/origin for session compatibility; use isolated preview values.
 - GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: preserve production Google linkage. Add the isolated preview callback separately rather than replacing the production callback.
-- EMAIL_PROVIDER / EMAIL_HTTP_URL / EMAIL_API_KEY / EMAIL_FROM: see the undecided provider contract below.
+- EMAIL_PROVIDER / EMAIL_FROM: selected preview/production-candidate transport is Spacemail SMTP. SMTP_HOST / SMTP_PORT are configuration; SMTP_USER / SMTP_PASSWORD are Worker secrets. HTTP transports retain EMAIL_HTTP_URL / EMAIL_API_KEY.
 - ADMIN_EMAIL: notification destination.
 - DEEPSEEK_API_KEY: existing HTTP AI integration, with bounded timeout and retries disabled.
 - GH_API_TOKEN / GH_OWNER / GH_REPO: bug-report issue integration, with timeout and awaited completion.
@@ -42,11 +42,15 @@ Local secrets live in ignored `.dev.vars`; environment-specific `.dev.vars.previ
 
 The Worker supports nodejs_compat only for supported libraries/APIs. Runtime OG layout/PNG use workerd-selected WASM implementations; native Bun/build and legacy PostgreSQL modules must be absent from the final Worker graph.
 
-## Email decision remains open
+## Existing Spacemail delivery
 
-The owner explicitly chose to keep the provider undecided and add configurable HTTP transport. No provider account, paid plan, sender or deliverability claim has been selected. Preview/production explicitly set EMAIL_PROVIDER=unconfigured until configuration is chosen. Missing/disabled production email fails explicitly; email-dependent product features have not been removed.
+On November 1 the owner selected the existing provider and admin@testingwithekki.com. The inventoried VPS already uses Spacemail at mail.spacemail.com:465 with implicit TLS. EMAIL_PROVIDER=smtp uses Workers outbound TLS sockets directly; it adds no VPS relay, external gateway or new mail-provider subscription. Local/test delivery remains disabled by default. The checked-in production candidate selects this transport, but no production Worker configuration or VPS service was changed.
 
-The generic `EMAIL_PROVIDER=http` contract POSTs JSON `{from,to,subject,html,text?,replyTo?}` to the configured HTTPS EMAIL_HTTP_URL with Bearer EMAIL_API_KEY. It follows no redirects, waits up to 20 seconds and accepts only a successful HTTP status. A vendor with a different contract needs an adapter or a gateway exposing this contract. An optional `resend` adapter is present, but is not selected by default. `disabled` delivery is accepted only in local/test environments and does not print mail contents or tokens.
+The adapter accepts only port 465 with TLS from connection start, requires the sender to match the authenticated mailbox, bounds message/reply size and the entire exchange to 20 seconds, and closes its request-owned socket in finally. It encodes UTF-8 MIME, rejects header/envelope injection, redacts provider errors and performs no automatic retry after an uncertain DATA outcome. No connection pooling, timers or persistent sockets remain in AppRuntime; open sockets would otherwise extend object-active duration. SMTP_HOST/SMTP_PORT are trusted operator configuration, never request inputs.
+
+One explicitly authorized, clearly labeled email from/to the owner's admin mailbox was accepted by Spacemail from an isolated hosted Cloudflare object in 2,174 ms. Durable state recorded the single send attempt; no second message occurred. SMTP acceptance does not prove inbox arrival. See [the sanitized report](reports/cloudflare-spacemail-20261101.json); real verification/reset flows and inbox/spam confirmation remain release checks.
+
+The retained `EMAIL_PROVIDER=http` contract POSTs JSON `{from,to,subject,html,text?,replyTo?}` to the configured HTTPS EMAIL_HTTP_URL with Bearer EMAIL_API_KEY. It follows no redirects, waits up to 20 seconds and accepts only a successful HTTP status. A vendor with a different contract needs an adapter or a gateway exposing this contract. An optional `resend` adapter remains available. `disabled` delivery is accepted only in local/test environments and does not print mail contents or tokens.
 
 Verification/reset/newsletter delivery is awaited and reports failure. Pending newsletter rows permit a later retry/resend. Optional contact/bug notifications are awaited within the request lifecycle but their failure does not undo the saved submission. There are no untracked mail/GitHub promises. Delivery acceptance is not proof that mail arrived; perform inbox/spam/failure checks before release.
 
@@ -73,7 +77,7 @@ bun run cf:preview:seed /absolute/private/new-accounts.json
 bun run cf:smoke:preview /absolute/private/secrets.json /absolute/private/new-accounts.json /absolute/private/new-smoke-report.json
 ```
 
-The deploy wrapper checks the built Worker name/environment/database and required remote secret names. Production also requires a selected email transport; provider choice remains undecided. Production additionally requires TWE_RELEASE_APPROVED_SHA equal to HEAD and TWE_ALLOW_PRODUCTION_DEPLOY=yes. The manual GitHub workflow validates the pinned candidate, uses isolated GitHub environments, builds the selected target, applies additive migrations, and deploys that artifact. Configure required reviewers on cloudflare-production before enabling production credentials. Use a scoped deploy token; the workflow's GITHUB_TOKEN has only contents:read.
+The deploy wrapper checks the built Worker name/environment/database and required remote secret names. Both targets require the selected transport’s secret names; SMTP requires SMTP_USER/SMTP_PASSWORD/EMAIL_FROM, while HTTP requires EMAIL_API_KEY/EMAIL_FROM. Production validates its TLS/HTTPS transport configuration before deployment. Production additionally requires TWE_RELEASE_APPROVED_SHA equal to HEAD and TWE_ALLOW_PRODUCTION_DEPLOY=yes. The manual GitHub workflow validates the pinned candidate, uses isolated GitHub environments, builds the selected target, applies additive migrations, and deploys that artifact. Configure required reviewers on cloudflare-production before enabling production credentials. Use a scoped deploy token; the workflow's GITHUB_TOKEN has only contents:read.
 
 The legacy VPS workflows are archived under `.github/legacy-vps/`; merging the migration no longer automatically deploys a Worker build into a VPS container. CI still validates main/PRs. Release-branch pushes do not execute those suites. Incompatible future schema changes need an expand/contract release plan; a Worker version rollback cannot undo D1 schema or data changes. A migration failure must stop deployment; a deployment failure leaves the prior Worker against a backward-compatible schema.
 
@@ -95,7 +99,7 @@ References: [Cloudflare Vite environments](https://developers.cloudflare.com/wor
 
 ## Preview access handoff
 
-The full-app preview is https://twe-preview.ekkisyam2310.workers.dev. Basic username is `preview`; the generated token and synthetic account credentials are retained outside git in the operator’s restricted private-artifacts directory. Retrieve them locally rather than pasting credentials into issues, logs or source. Email remains unconfigured, so the synthetic learner/admin credentials are preverified and no real mail is sent. The seed command refuses a populated preview, reconciles all application tables and cannot select production. The HTTP smoke checks access/noindex/private caching, assets/OG, support-API denial, credential login/session/cookie flags, roles/admin access and logout; it does not replace the owner’s Playwright/browser release run.
+The full-app preview is https://twe-preview.ekkisyam2310.workers.dev. Basic username is `preview`; the generated token and synthetic account credentials are retained outside git in the operator’s restricted private-artifacts directory. Retrieve them locally rather than pasting credentials into issues, logs or source. Synthetic learner/admin credentials are preverified; the HTTP smoke does not trigger real email. The SMTP test has separate explicit owner authorization. The seed command refuses a populated preview, reconciles all application tables and cannot select production. The HTTP smoke checks access/noindex/private caching, assets/OG, support-API denial, credential login/session/cookie flags, roles/admin access and logout; it does not replace the owner’s Playwright/browser release run.
 
 ## AppRuntime compute boundary
 

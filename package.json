@@ -3,6 +3,10 @@
   "private": true,
   "type": "module",
   "imports": {
+    "#smtp-socket": {
+      "workerd": "./src/server/smtp-socket.cloudflare.server.ts",
+      "default": "./src/server/smtp-socket.unavailable.server.ts"
+    },
     "#og-layout": {
       "workerd": "./src/server/og-layout.cloudflare.server.ts",
       "default": "./src/server/og-layout.bun.server.ts"

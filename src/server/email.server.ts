@@ -1,5 +1,5 @@
 /**
- * Email service — awaited HTTP delivery
+ * Email service — awaited SMTP or HTTP delivery
  *
  * Features:
  * - Email verification for new registrations
@@ -9,6 +9,8 @@
 
 import { logger } from '@/lib/logger';
 import { getRuntimeEnv } from '#platform';
+import { openSmtpSocket } from '#smtp-socket';
+import { sendSmtpMail } from './smtp.server';
 
 interface Mail {
   from: string;
@@ -26,6 +28,20 @@ async function sendMail(mail: Mail): Promise<void> {
     (env.APP_ENV === 'local' || env.APP_ENV === 'test')
   )
     return;
+  if (env.EMAIL_PROVIDER === 'smtp') {
+    if (!env.EMAIL_FROM) throw new Error('Outbound email is not configured.');
+    await sendSmtpMail(
+      {
+        host: env.SMTP_HOST ?? '',
+        port: Number(env.SMTP_PORT ?? '465'),
+        user: env.SMTP_USER ?? '',
+        password: env.SMTP_PASSWORD ?? '',
+      },
+      { ...mail, from: env.EMAIL_FROM },
+      openSmtpSocket,
+    );
+    return;
+  }
   if (
     !['resend', 'http'].includes(env.EMAIL_PROVIDER ?? '') ||
     !env.EMAIL_API_KEY ||

@@ -1,0 +1,24 @@
+{
+  "date": "2026-11-01",
+  "provider": "existing Spacemail mailbox",
+  "transport": "SMTP implicit TLS",
+  "host": "mail.spacemail.com",
+  "port": 465,
+  "compute": "isolated hosted Cloudflare Durable Object using the application SMTP adapter",
+  "owner_authorized_messages": 1,
+  "accepted_messages": 1,
+  "smtp_elapsed_ms": 2174,
+  "inbox_delivery_confirmed": false,
+  "retry_policy": "no automatic retry; durable single-attempt claim",
+  "socket_lifecycle": "request-owned; closed in finally; 20-second exchange deadline",
+  "focused_unit_checks": {
+    "passed": 7,
+    "failed": 0
+  },
+  "production_modified": false,
+  "remaining": [
+    "owner inbox/spam confirmation",
+    "real verification/reset flow validation",
+    "overall Free-plan resource and recovery acceptance"
+  ]
+}

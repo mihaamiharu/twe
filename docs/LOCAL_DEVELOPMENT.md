@@ -51,7 +51,7 @@ The runner passes that same per-run secret to Playwright for isolated account cr
 - Missing auth secret: run setup or add a sufficiently long random BETTER_AUTH_SECRET to `.dev.vars`.
 - Missing table: apply local migrations before syncing or starting features that read D1.
 - Test support API returns 403: normal local mode intentionally denies it; use the disposable E2E runner.
-- Email is unavailable: choose/configure an HTTP transport for preview/production. Disabled email is allowed only locally/in tests.
+- Email is unavailable: configure the selected Spacemail TLS SMTP credentials for preview/production, or an explicitly selected HTTP transport. Disabled email is allowed only locally/in tests.
 - Wrong deploy environment: rebuild with cf:build:preview or cf:build:production; the deploy wrapper rejects mismatched artifacts.
 - Preserve `.env`, PostgreSQL volumes and recovery files while migrating; do not remove the old infrastructure until post-cutover sign-off.
 

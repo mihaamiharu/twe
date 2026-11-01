@@ -40,7 +40,9 @@
       },
       "vars": {
         "APP_ENV": "preview",
-        "EMAIL_PROVIDER": "unconfigured",
+        "EMAIL_PROVIDER": "smtp",
+        "SMTP_HOST": "mail.spacemail.com",
+        "SMTP_PORT": "465",
         "BETTER_AUTH_URL": "https://twe-preview.ekkisyam2310.workers.dev",
         "REQUIRE_EMAIL_VERIFICATION": "true",
       },
@@ -70,7 +72,9 @@
       "preview_urls": false,
       "vars": {
         "APP_ENV": "production",
-        "EMAIL_PROVIDER": "unconfigured",
+        "EMAIL_PROVIDER": "smtp",
+        "SMTP_HOST": "mail.spacemail.com",
+        "SMTP_PORT": "465",
         "BETTER_AUTH_URL": "https://testingwithekki.com",
         "REQUIRE_EMAIL_VERIFICATION": "true",
       },
