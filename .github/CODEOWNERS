@@ -1,0 +1,15 @@
+# Workflow/security changes require the owner's review. PR authors cannot
+# approve their own PR: use the contributor fork and owner review flow.
+/.github/ @mihaamiharu
+/scripts/backup* @mihaamiharu
+/scripts/backup/ @mihaamiharu
+/scripts/migration/ @mihaamiharu
+/scripts/json-config.ts @mihaamiharu
+/scripts/deploy-cloudflare.ts @mihaamiharu
+/scripts/build-cloudflare.ts @mihaamiharu
+/src/server.ts @mihaamiharu
+/src/runtime/ @mihaamiharu
+/wrangler.jsonc @mihaamiharu
+/package.json @mihaamiharu
+/bun.lock @mihaamiharu
+/eslint.config.js @mihaamiharu

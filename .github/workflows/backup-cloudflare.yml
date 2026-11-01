@@ -1,102 +1,19 @@
-name: Encrypted D1 recovery backup
+name: Private backup handoff
 
 on:
-  schedule:
-    # 02:15 and 14:15 Asia/Jakarta; margin against the proposed 24-hour RPO.
-    - cron: '15 7,19 * * *'
   workflow_dispatch:
-    inputs:
-      target:
-        description: Backup target (production requires post-cutover readiness)
-        type: choice
-        options: [preview, production]
-        default: preview
-        required: true
-      approved_sha:
-        description: Full SHA matching this backup environment's approved source pin
-        type: string
-        required: true
 
-permissions:
-  contents: read
-concurrency:
-  group: d1-recovery-backup-${{ inputs.target || 'production' }}
-  cancel-in-progress: false
+permissions: {}
+
 jobs:
-  backup:
-    if: github.repository == 'mihaamiharu/twe' && (github.event_name == 'workflow_dispatch' || vars.TWE_BACKUPS_ENABLED == 'true')
-    environment: cloudflare-backups-${{ inputs.target || 'production' }}
+  handoff:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
-    env:
-      TARGET: ${{ inputs.target || 'production' }}
+    timeout-minutes: 1
     steps:
-      - name: Validate default-branch workflow and approved backup source
-        id: pin
-        env:
-          SOURCE_SHA: ${{ vars.TWE_BACKUP_SOURCE_SHA }}
-          INPUT_SHA: ${{ inputs.approved_sha }}
-          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
-          KEY_ID: ${{ vars.TWE_BACKUP_KEY_ID }}
-          PRODUCTION_READY: ${{ vars.TWE_PRODUCTION_BACKUP_READY }}
-        run: |
-          test "$GITHUB_REF" = "refs/heads/$DEFAULT_BRANCH"
-          [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
-          [[ "$KEY_ID" =~ ^sha256:[a-f0-9]{64}$ ]]
-          case "$TARGET" in preview|production) ;; *) exit 1 ;; esac
-          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
-            test "$INPUT_SHA" = "$SOURCE_SHA"
-          fi
-          if [ "$TARGET" = production ]; then
-            test -n "$PRODUCTION_READY"
-          fi
-          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          ref: ${{ steps.pin.outputs.source_sha }}
-          persist-credentials: false
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
-        with:
-          node-version: '22'
-      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
-        with:
-          bun-version: 1.4.2
-      - run: bun install --frozen-lockfile
-      - name: Export and authenticate-encrypt the exact target
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_EXPORT_TOKEN }}
-          TWE_BACKUP_KEY: ${{ secrets.TWE_BACKUP_KEY }}
-          TWE_BACKUP_KEY_ID: ${{ vars.TWE_BACKUP_KEY_ID }}
-          TWE_BACKUP_KEY_TARGET: ${{ env.TARGET }}
-          TWE_BACKUP_SOURCE_SHA: ${{ steps.pin.outputs.source_sha }}
-          TWE_PRODUCTION_BACKUP_READY: ${{ vars.TWE_PRODUCTION_BACKUP_READY }}
-          TWE_BACKUP_MAX_BYTES: '4194304'
-        run: |
-          test -n "$CLOUDFLARE_ACCOUNT_ID"
-          test -n "$CLOUDFLARE_API_TOKEN"
-          test -n "$TWE_BACKUP_KEY"
-          mkdir -m 700 -p .wrangler/encrypted-backup
-          bun --no-env-file scripts/backup-d1.ts backup "$TARGET" .wrangler/encrypted-backup/database.enc
-      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
-        with:
-          name: twe-d1-${{ env.TARGET }}-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            .wrangler/encrypted-backup/database.enc
-            .wrangler/encrypted-backup/database.enc.sha256
-            .wrangler/encrypted-backup/database.enc.manifest.json
-          retention-days: 30
-          if-no-files-found: error
-          # The three exact encrypted-output paths are inside hidden .wrangler/.
-          include-hidden-files: true
-          compression-level: 0
-      - name: Record recovery handoff
-        if: always()
+      - name: Open the owner-controlled recovery vault
         run: |
           {
-            echo "Backup target: $TARGET"
-            echo "Backup code: ${{ steps.pin.outputs.source_sha }}"
-            echo "Retention: 30 days. Archive cap: 4 MiB. Keys live in the owner's separate login Keychain."
-            echo "A failed run is a backup incident; use the last successful artifact and investigate immediately."
-            echo "Recover with the matching key ID, authenticate-decrypt, prepare schema-first SQL, and restore to an empty isolated target."
+            echo 'D1 recovery backups run in the private mihaamiharu/twe-backups repository.'
+            echo 'Use its default-branch workflow with the exact approved tooling SHA.'
+            echo 'This public workflow performs no exports and uploads no recovery archives.'
           } >> "$GITHUB_STEP_SUMMARY"
