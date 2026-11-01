@@ -1,0 +1,137 @@
+{
+  "dateJakarta": "2026-11-02",
+  "scope": "Private recovery storage and strict-$0 preview readiness; no production cutover/VPS change",
+  "privateBackup": {
+    "status": "passed",
+    "repository": "mihaamiharu/twe-backups",
+    "run": 41357633519,
+    "recovery": {
+      "workflowRun": 41357633519,
+      "artifact": 13103439438,
+      "private": true,
+      "sourceCommit": "ab24af9e873c86476bf2b91bb940095cd27283ff",
+      "zipSha256": "64ea65aef25957aa279b62a182dafd277d8eb087634745fd9dea7c256a2c719b",
+      "independentKeychainDecryption": true,
+      "localD1Restore": true,
+      "tables": 18,
+      "rows": 214,
+      "allRowsEqual": true,
+      "foreignKeyCheck": "pass",
+      "quickCheck": "ok",
+      "freezeTriggers": 48,
+      "frozenUpdateRejected": true
+    },
+    "publicSecretCopiesRemoved": 4,
+    "oldDedicatedExportTokenRevoked": true,
+    "productionScheduleEnabled": false
+  },
+  "workflowProtection": {
+    "status": "pending merge",
+    "pr": 260,
+    "author": "mihaamiharu",
+    "requiredCheck": "Workflow policy",
+    "checkRun": 41358796314,
+    "checkConclusion": "success",
+    "requiredCheckSource": "GitHub Actions",
+    "dismissStaleApprovals": true,
+    "codeOwnerReviewRequired": true,
+    "adminBypassDisabled": true
+  },
+  "previewStudy": {
+    "status": "HTTP checks passed; visual review failed",
+    "workerVersion": "226e31ff-e9d5-4484-adc1-83f892ee6070",
+    "requests": 84,
+    "concurrencyCap": 8,
+    "uniqueOgImages": 32,
+    "fullE2ERun": false,
+    "ogVisualFindings": [
+      "Cyrillic, Arabic, Japanese and emoji missing-glyph boxes.",
+      "Long custom titles overlap surrounding card content.",
+      "Escaped markup and Latin accents rendered visibly."
+    ],
+    "cacheEvidence": "32 unique renders exceed the 16-entry cache, but no cache hit/eviction telemetry was added."
+  },
+  "coldWarm": {
+    "workerVersion": "c5652949-db39-4924-8ce2-4eec94400be8",
+    "classification": "First tailed SSR booted AppRuntime; immediate second request reused it.",
+    "cold": {
+      "clientWallMs": 653,
+      "gatewayCpuMs": 1,
+      "objectCpuMs": 31,
+      "objectWallMs": 219,
+      "bootEventCount": 1
+    },
+    "warm": {
+      "clientWallMs": 299,
+      "gatewayCpuMs": 1,
+      "objectCpuMs": 32,
+      "objectWallMs": 209,
+      "bootEventCount": 0
+    },
+    "limitations": [
+      "Single pair, not production p99 or load capacity.",
+      "Tail CPU units are milliseconds; GraphQL gateway CPU was converted from microseconds separately.",
+      "No request headers, cookies, auth links, bodies or user records retained in tail evidence."
+    ]
+  },
+  "bootProbeSourceBlob": "ee6d2506b9f68caf78317e71ffd52f86bfa298d3",
+  "emailAuth": {
+    "status": "passed",
+    "verificationMessages": 1,
+    "resetMessages": 1,
+    "bothArrivedAndLinksWorked": true,
+    "oldPasswordRejected": true,
+    "newPasswordLoginPassed": true,
+    "temporaryPreviewAccountRemoved": true,
+    "unrelatedMailRead": false
+  },
+  "freeReadiness": {
+    "workersFreePlanVerifiedInDashboard": true,
+    "githubFreeAndExistingZeroActionsBudgetVerified": true,
+    "billingChanged": false,
+    "previewGatewayMaxCpuMs": 5.934,
+    "previewObjectPeriodicPeakMemoryBytes": 121434660,
+    "conservativeMemoryHeadroomBytes": 6565340,
+    "observedExceededCpuErrors": 0,
+    "observedExceededMemoryErrors": 0,
+    "capacityAccepted": false,
+    "limitations": [
+      "Partial UTC day, sampled/lagged metrics across setup and probes, not isolated study cost.",
+      "Periodic memory can miss transient peaks.",
+      "Small cold/warm pair and bounded request study do not establish production p99 or burst capacity.",
+      "All active namespaces share account quotas; preview plus production must be budgeted together."
+    ]
+  },
+  "remainingGates": [
+    {
+      "gate": "main workflow handoff",
+      "status": "pending owner merge decision",
+      "next": "Merge personal PR #260 with the required policy check enforced."
+    },
+    {
+      "gate": "OG visual parity",
+      "status": "failed",
+      "next": "Fix font coverage and long-title layout; repeat visual QA with a bounded memory study."
+    },
+    {
+      "gate": "memory and burst capacity",
+      "status": "not accepted",
+      "next": "Reduce/justify object peak memory and measure representative bursts with sufficient headroom."
+    },
+    {
+      "gate": "Google OAuth",
+      "status": "blocked",
+      "next": "Recover an account with access to historical project 548549555288 or authorize a replacement preview OAuth project/client. MFA is complete but resourcemanager.projects.get is still missing; deletion is not established."
+    },
+    {
+      "gate": "AI and GitHub provider success flows",
+      "status": "blocked",
+      "next": "Configure replacement preview credentials and obtain permission for bounded provider calls; current preview secret names do not include these providers."
+    },
+    {
+      "gate": "production release and VPS retirement",
+      "status": "deferred",
+      "next": "Owner E2E, approved production data/cutover/recovery, observation and resolution of the separate VM workload."
+    }
+  ]
+}

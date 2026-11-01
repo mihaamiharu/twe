@@ -147,6 +147,14 @@ async function main() {
     account.durableObjectsPeriodicGroups,
     'memoryUsageBytes',
   );
+  const previewNamespaces = new Set(
+    namespaceList.result
+      .filter((namespace) => namespace.script === 'twe-preview')
+      .map((namespace) => namespace.id),
+  );
+  const previewPeriods = account.durableObjectsPeriodicGroups.filter((row) =>
+    previewNamespaces.has(row.dimensions['namespaceId'] ?? ''),
+  );
   const report = {
     capturedAt: new Date().toISOString(),
     utcDay: today,
@@ -182,6 +190,18 @@ async function main() {
       ),
       periodicPeakMemoryBytes: peakMemory,
       conservativeMemoryHeadroomBytes: 128_000_000 - peakMemory,
+    },
+    previewObjects: {
+      requests: sum(
+        account.durableObjectsInvocationsAdaptiveGroups.filter(
+          (row) => row.dimensions['scriptName'] === 'twe-preview',
+        ),
+        'requests',
+      ),
+      durationGbSeconds: sum(previewPeriods, 'duration'),
+      periodicPeakMemoryBytes: maximum(previewPeriods, 'memoryUsageBytes'),
+      exceededCpuErrors: sum(previewPeriods, 'exceededCpuErrors'),
+      exceededMemoryErrors: sum(previewPeriods, 'exceededMemoryErrors'),
     },
     accountD1: {
       rowsRead,

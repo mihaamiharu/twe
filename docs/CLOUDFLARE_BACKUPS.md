@@ -6,8 +6,8 @@ This plan prepares D1 backups without a VPS, paid service or production cutover.
 
 1. Create independent preview/production AES-256 recovery keys in the owner's macOS login Keychain; verify readback. Keep the private recovery records, which contain identifiers but no key values.
 2. Validate authenticated archive metadata, legacy decryption, wrong-key/tamper rejection, exact resource selection and the production-readiness guard.
-3. Install the workflow on the default branch through a workflow-only bootstrap PR. Its checked-out backup code is pinned separately to a reviewed full release-branch commit SHA. A manual request must match that pin.
-4. Configure dedicated `cloudflare-backups-preview` and `cloudflare-backups-production` environments, restricted to workflows on `main`. Use a separate TWE-account-scoped D1 export token and the matching recovery key. The native export rejected D1 Read; the owner explicitly approved D1 Edit after reviewing its broader database modification/deletion capability. Do not copy the broader CLI OAuth credential or deployment token.
+3. Install the workflow in the owner-controlled private `mihaamiharu/twe-backups` default branch. Its checked-out public backup code is pinned separately to a reviewed full release-branch commit SHA. A manual request must match that pin. The public application workflow is only a credential-free handoff.
+4. Configure private-vault repository secrets and variables; GitHub Free private environments do not provide the public repository’s environment protections. Restrict vault write access to the owner. Use a separate TWE-account-scoped D1 export token and the matching recovery key. The native export rejected D1 Read; the owner explicitly approved D1 Edit after reviewing its broader database modification/deletion capability. Do not copy the broader CLI OAuth credential or deployment token.
 5. Run the preview workflow, download its encrypted artifact and recover it using the independent Keychain copy. Record the run URL and restore evidence.
 6. After approved production cutover/import, set production readiness to the exact production database UUID, run a manual production backup and independently recover its artifact, then enable scheduling. Do not set those flags during preparation.
 
@@ -31,22 +31,21 @@ The Keychain copy is independent of GitHub and its artifact storage. Keep a seco
 
 ## GitHub configuration
 
-Each backup environment needs:
+The private vault needs these **repository** settings. Never restore backup secret copies in the public app.
 
-| Kind                | Name                          | Value                                                                                       |
-| ------------------- | ----------------------------- | ------------------------------------------------------------------------------------------- |
-| Secret              | `CLOUDFLARE_D1_EXPORT_TOKEN`  | Dedicated D1 Edit token scoped only to the TWE account; owner-approved native export access |
-| Secret              | `TWE_BACKUP_KEY`              | Matching 32-byte canonical base64 key from the owner's Keychain                             |
-| Variable            | `CLOUDFLARE_ACCOUNT_ID`       | Account ID pinned in `wrangler.jsonc`                                                       |
-| Variable            | `TWE_BACKUP_KEY_ID`           | Matching public `sha256:` key ID                                                            |
-| Variable            | `TWE_BACKUP_SOURCE_SHA`       | Reviewed full SHA containing the backup tooling/config                                      |
-| Production variable | `TWE_PRODUCTION_BACKUP_READY` | Production D1 UUID, set only after cutover/import readiness                                 |
+| Kind | Name | Value |
+| --- | --- | --- |
+| Secret | `CLOUDFLARE_D1_EXPORT_TOKEN` | Dedicated TWE-account D1 Edit export token |
+| Secret | `TWE_BACKUP_KEY_PREVIEW` | Matching owner-Keychain preview key |
+| Secret | `TWE_BACKUP_KEY_PRODUCTION` | Matching owner-Keychain production key |
+| Variable | `CLOUDFLARE_ACCOUNT_ID` | Account pinned in `wrangler.jsonc` |
+| Variable | `TWE_BACKUP_SOURCE_SHA` | Reviewed immutable public backup tooling SHA |
+| Variable | `TWE_BACKUP_KEY_ID_PREVIEW` | Matching preview SHA-256 key ID |
+| Variable | `TWE_BACKUP_KEY_ID_PRODUCTION` | Matching production SHA-256 key ID |
+| Variable, later only | `TWE_PRODUCTION_BACKUP_READY` | Exact migrated production database UUID |
+| Variable, later only | `TWE_BACKUPS_ENABLED` | `true` only after production recovery sign-off |
 
-Repository variable `TWE_BACKUPS_ENABLED=true` enables scheduled **production** runs. Leave it absent/false during preparation. Preview is manual only. Environment branch restrictions should allow `main` only; use no per-run reviewers for unattended backups. Do not remove protections from unrelated deployment environments. The production database UUID guard is enforced in the backup CLI too, including manual local runs.
-
-On November 1, a dedicated D1 Read token verified as active and could read preview database metadata (HTTP 200), but both the direct native SQL export endpoint and Wrangler export failed with HTTP 401 / Cloudflare code 10000. After explicit owner approval, the same token was limited to Account → D1 → Edit on account `d5f9db115e5d7b5156bb210e04ecb34e`; native preview export then passed. This credential has database write/delete capability despite the backup workflow performing only exports. It has no Worker, DNS, billing, user or other-account permissions. The old read-token secret name was replaced by `CLOUDFLARE_D1_EXPORT_TOKEN` in both environments. Keep the environment restrictions and reviewed source pin in place; do not describe this credential as read-only.
-
-The workflow uses pinned action revisions, read-only `GITHUB_TOKEN`, checkout without persisted Git credentials, and a 15-minute timeout. Cloudflare credentials/recovery keys are present only in the export step. Its source SHA comes from the protected environment variable; dispatch cannot select arbitrary code to receive secrets. All SQL is temporary/private and removed after authenticated encryption. Upload paths list only the encrypted archive, its checksum and a non-secret manifest.
+The last two flags are currently absent. The installed workflow also refuses execution outside the private vault's default branch or after a visibility change. It pins action revisions, uses read-only `GITHUB_TOKEN`, disables checkout credential persistence and caps jobs at 10 minutes. Export credentials/keys are supplied only to the export step. The source pin prevents manual dispatch from choosing arbitrary code to receive secrets. Its D1 Edit token permits database modification/deletion because native export rejected D1 Read; it must never be described as read-only. All plaintext SQL is temporary/private and removed after authenticated encryption. Upload paths list exactly the encrypted archive, checksum and non-secret manifest. See the [vault template and runbook](../.github/backup-vault/README.md).
 
 ## Schedule, retention and failure handling
 
@@ -64,10 +63,8 @@ Rotate by creating a **new** private record/Keychain entry, installing the new k
 
 Independent preview/production Keychain entries were created and read back on November 1. The preview key completed remote export, v2 encryption, checksum verification, independent Keychain decryption, schema-first preparation and fresh isolated local workerd/D1 restore. All 214 rows across 18 tables matched the decrypted archive, integrity/FK checks passed, and all 48 freeze triggers survived and enforced a blocked write. The production key cannot decrypt that preview artifact, and the unmigrated production backup is blocked before export. Plaintext SQL and disposable local state were removed. Focused crypto/restore tests and workflow validation cover the implementation. See [the setup report](reports/cloudflare-backup-setup-20261101.json), including the development-rehearsal source-pin limitation.
 
-The owner approved and configured both GitHub backup environments, matching Keychain recovery-key secrets, account/source/key-ID variables, and the dedicated D1 export token. Each environment allows only the `main` branch. The production-readiness variable remains absent and scheduling remains disabled. The export token passed a native preview export after the explicitly approved D1 Edit adjustment.
+The original public workflow bootstrap [PR #258](https://github.com/mihaamiharu/twe/pull/258) and synthetic [run 41317166118](https://github.com/mihaamiharu/twe/actions/runs/41317166118) remain historical evidence. Future production backup artifacts must use private storage.
 
-The owner approved workflow-only [bootstrap PR #258](https://github.com/mihaamiharu/twe/pull/258), merged as `8b7db868ff48556b9a4a6400de1a73ea78cd4a4e` with an explicit `[skip ci]` squash message. Only the backup workflow was added to `main`; branch protections were unchanged. No CI/VPS deployment run was started for that merge. Application migration work remains on the release branch.
+On November 2, Jakarta time, the owner approved private-vault credential migration. Private [run 41357633519](https://github.com/mihaamiharu/twe-backups/actions/runs/41357633519) completed in 23 seconds using tooling `ab24af9e873c86476bf2b91bb940095cd27283ff`. Its ZIP digest was `64ea65aef25957aa279b62a182dafd277d8eb087634745fd9dea7c256a2c719b`. The exact three encrypted outputs, archive checksum/metadata, independent Keychain decryption, 214-row/18-table local D1 reconciliation, integrity/FK checks and 48 enforced freeze triggers passed. Plaintext and disposable local state were removed. Only after that recovery passed were all four public backup-secret copies removed and the old `TWE automated D1 backup export` token revoked. The new token is confined to the private vault; the two independent owner-Keychain entries remain intact.
 
-[Preview Actions run 41317166118](https://github.com/mihaamiharu/twe/actions/runs/41317166118) passed in 22 seconds using approved tooling source `ab24af9e873c86476bf2b91bb940095cd27283ff`. Both backup environments retain this exact verified tooling pin; the later setup/evidence changes do not change the CLI implementation. The 201,355-byte downloaded ZIP matched GitHub's digest and contained exactly the encrypted archive, checksum and non-secret manifest. Its archive checksum, target/database/source/key IDs and independent Keychain decryption passed. Fresh isolated local workerd/D1 restore reconciled all 214 rows across 18 tables; integrity/FK checks and all 48 freeze triggers passed. Recovery plaintext and disposable state were removed. See [the Actions recovery report](reports/cloudflare-actions-backup-recovery-20261101.json).
-
-Manual preview backup/recovery is verified. The existing production/qa environments and VPS deployment were not modified. Repository `TWE_BACKUPS_ENABLED` and production `TWE_PRODUCTION_BACKUP_READY` are absent; production scheduling stays disabled until the later approved cutover/import, manual production backup and independent artifact recovery. The preview rehearsal does not establish production-scale recovery timing or authorize VPS retirement.
+The actual account is GitHub Free with an existing account-wide $0 Actions budget marked Usage blocked. No billing settings were changed. Private Actions usage shares the account's included allowance; monitor other repositories too. The public handoff/workflow-review changes are in [hardening PR #260](https://github.com/mihaamiharu/twe/pull/260), pending owner review and merge. Production/QA environments and the VPS deployment remain unchanged. Production scheduling stays disabled until approved cutover/import, manual production backup and independent artifact recovery. Preview recovery does not establish production-scale RTO or authorize VPS retirement.

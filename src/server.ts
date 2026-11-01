@@ -24,6 +24,8 @@ export class AppRuntime extends DurableObject<RuntimeEnv> {
       console.info(
         JSON.stringify({
           event: 'application_runtime_started',
+          level: 'info',
+          scope: 'AppRuntime',
           bootId: this.bootId,
           appEnv: this.env.APP_ENV,
         }),
@@ -37,6 +39,8 @@ export class AppRuntime extends DurableObject<RuntimeEnv> {
       console.error(
         JSON.stringify({
           event: 'application_request_failed',
+          level: 'error',
+          scope: 'AppRuntime',
           requestId: crypto.randomUUID(),
         }),
       );
