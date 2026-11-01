@@ -1,5 +1,5 @@
-# Workflow/security changes require the owner's review. PR authors cannot
-# approve their own PR: use the contributor fork and owner review flow.
+# Sensitive paths belong to the personal @mihaamiharu account.
+# Owner inspection and required policy checks precede merge.
 /.github/ @mihaamiharu
 /scripts/backup* @mihaamiharu
 /scripts/backup/ @mihaamiharu

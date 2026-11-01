@@ -26,7 +26,7 @@
     "productionScheduleEnabled": false
   },
   "workflowProtection": {
-    "status": "pending merge",
+    "status": "passed",
     "pr": 260,
     "author": "mihaamiharu",
     "requiredCheck": "Workflow policy",
@@ -35,7 +35,13 @@
     "requiredCheckSource": "GitHub Actions",
     "dismissStaleApprovals": true,
     "codeOwnerReviewRequired": true,
-    "adminBypassDisabled": true
+    "adminBypassDisabled": true,
+    "mergeCommit": "0d6086eebe42cdcbad4e648170ed5e3081f07894",
+    "mergedAt": "2026-11-01T22:57:36Z",
+    "ownerMergeApproved": true,
+    "postMergePolicyRun": 41359704745,
+    "postMergePolicyConclusion": "success",
+    "applicationCiOrVpsDeploymentStarted": false
   },
   "previewStudy": {
     "status": "HTTP checks passed; visual review failed",
@@ -103,11 +109,6 @@
     ]
   },
   "remainingGates": [
-    {
-      "gate": "main workflow handoff",
-      "status": "pending owner merge decision",
-      "next": "Merge personal PR #260 with the required policy check enforced."
-    },
     {
       "gate": "OG visual parity",
       "status": "failed",
