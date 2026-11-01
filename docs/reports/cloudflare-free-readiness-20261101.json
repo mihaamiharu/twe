@@ -1,0 +1,89 @@
+{
+  "date": "2026-11-01",
+  "captured_at_utc": "2026-11-01T10:54:11.142881+00:00",
+  "usage_window": "UTC day starting 2026-11-01; partial day, not a traffic forecast",
+  "runtime_version": "188bb551-ef79-40ac-a4d2-1accb2db1dff",
+  "billing_plan_verified": false,
+  "free_allowances": {
+    "worker_requests_per_day": 100000,
+    "gateway_cpu_ms": 10,
+    "durable_object_requests_per_day": 100000,
+    "durable_object_duration_gb_seconds_per_day": 13000,
+    "d1_rows_read_per_day": 5000000,
+    "d1_rows_written_per_day": 100000,
+    "d1_total_storage_bytes": 5000000000,
+    "d1_database_count": 10
+  },
+  "account_workers_reported": {
+    "requests": 116,
+    "errors": 0,
+    "subrequests": 151
+  },
+  "preview_gateway": [
+    {
+      "status": "success",
+      "requests": 113,
+      "errors": 0,
+      "max_cpu_ms": 5.934,
+      "provider_estimated_p99_cpu_ms": 5.194,
+      "max_memory_bytes": 29126497
+    }
+  ],
+  "account_objects_reported": {
+    "requests": 85,
+    "invocation_errors": 0,
+    "duration_gb_seconds": 2.0662827520000002,
+    "active_seconds": 16.142834,
+    "exceeded_cpu_errors": 0,
+    "exceeded_memory_errors": 0,
+    "peak_periodic_memory_bytes": 116876938,
+    "conservative_headroom_below_128000000_bytes": 11123062
+  },
+  "account_d1_reported": {
+    "rowsRead": 3773,
+    "rowsWritten": 121
+  },
+  "inventory": {
+    "listed_d1_databases": 4,
+    "reported_d1_file_size_bytes": 745472,
+    "live_durable_namespaces": 2,
+    "all_live_namespaces_sqlite": true,
+    "twe_namespaces": [
+      "twe-free-runtime-probe_FreeRuntimeProbe",
+      "twe-preview_AppRuntime"
+    ]
+  },
+  "duration_budget_inference": {
+    "allocation_gb": 0.128,
+    "one_continuously_active_object_gb_seconds_per_day": 11059.2,
+    "remaining_account_duration_gb_seconds": 1940.7999999999993,
+    "remaining_other_object_active_hours": 4.2118055555555545,
+    "two_continuously_active_objects_exceed_free": true
+  },
+  "bounded_workload": {
+    "completed": true,
+    "requests": 28,
+    "all_status_200": true,
+    "concurrent_initial_tasks": 6,
+    "mixed_rounds": 2,
+    "unique_dynamic_og_images": 12,
+    "between_round_idle_seconds": 11,
+    "max_client_wall_ms": 1566,
+    "external_delivery": false
+  },
+  "rate_limit_observation": "An earlier unspaced round correctly received 429 after the third shared-IP sign-in inside the 10-second inactivity window. No limiter settings changed. Partial runs are not counted as passes.",
+  "limitations": [
+    "Small synthetic/protected workload; provider percentile estimates are not production p99 acceptance",
+    "Periodic memory samples can miss transient peaks; observed memory headroom is limited",
+    "Partial-day analytics can lag and resource attribution may change; not billing proof",
+    "Actual Free subscription/no-paid-overage status remains unverified",
+    "Controlled hosted cold starts, larger traffic forecast/load and independent recovery-key custody remain pending",
+    "Production and DNS untouched; Google OAuth deferred, not removed"
+  ],
+  "sources": [
+    "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+    "https://developers.cloudflare.com/durable-objects/observability/metrics-and-analytics/",
+    "https://developers.cloudflare.com/workers/platform/limits/",
+    "https://developers.cloudflare.com/d1/platform/pricing/"
+  ]
+}

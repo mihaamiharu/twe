@@ -1,0 +1,52 @@
+{
+  "date": "2026-11-01",
+  "completed": true,
+  "source": "isolated remote twe-preview; synthetic data only",
+  "destination": "fresh private local workerd/D1",
+  "tables": 18,
+  "rows": 214,
+  "per_table_counts": {
+    "accounts": 2,
+    "achievements": 20,
+    "app_control": 1,
+    "bug_reports": 0,
+    "challenges": 83,
+    "contact_messages": 0,
+    "d1_migrations": 3,
+    "newsletter_subscribers": 0,
+    "progress": 2,
+    "rate_limit_buckets": 9,
+    "reward_operations": 6,
+    "sessions": 2,
+    "submissions": 6,
+    "test_cases": 49,
+    "tutorials": 28,
+    "user_achievements": 1,
+    "users": 2,
+    "verification": 0
+  },
+  "all_source_and_restored_row_hashes_equal": true,
+  "source_unchanged": true,
+  "quick_check": "ok",
+  "foreign_key_errors": 0,
+  "freeze_triggers": 48,
+  "restored_freeze_enforced": true,
+  "wrong_key_rejected_without_plaintext": true,
+  "tampered_ciphertext_rejected_without_plaintext": true,
+  "phase_seconds": {
+    "remote_encrypted_export": 5.014,
+    "decrypt": 0.052,
+    "prepare_schema_first_sql": 0.234,
+    "wrong_key_rejected": 0.051,
+    "tampered_ciphertext_rejected": 0.046,
+    "restore_local_workerd": 1.521
+  },
+  "export_decrypt_prepare_restore_subtotal_seconds": 6.821,
+  "bug_fixed": "Raw D1 SQL interleaves child-table inserts before parent-table creation. Recovery preparation emits all tables before data, then indexes/views/triggers.",
+  "production_accessed": false,
+  "limitations": [
+    "Synthetic preview data, not production-scale remote cutover timing",
+    "Ephemeral rehearsal key discarded; independent owner key custody remains pending",
+    "Production backup enablement, recovery objectives and release approval remain pending"
+  ]
+}
