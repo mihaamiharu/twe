@@ -1,0 +1,102 @@
+name: Private encrypted D1 recovery backup
+
+on:
+  schedule:
+    # 02:15 and 14:15 Asia/Jakarta. Production remains opt-in after cutover.
+    - cron: '15 7,19 * * *'
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Backup target; production requires migrated-database readiness
+        type: choice
+        options: [preview, production]
+        default: preview
+        required: true
+      approved_sha:
+        description: Exact full SHA matching the owner's approved tooling pin
+        type: string
+        required: true
+
+permissions:
+  contents: read
+concurrency:
+  group: private-d1-backup-${{ inputs.target || 'production' }}
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    # Never publish recovery artifacts if somebody changes vault visibility.
+    if: github.repository == 'mihaamiharu/twe-backups' && github.event.repository.private == true && (github.event_name == 'workflow_dispatch' || vars.TWE_BACKUPS_ENABLED == 'true')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TARGET: ${{ inputs.target || 'production' }}
+    steps:
+      - name: Validate private default-branch workflow and approved source
+        id: pin
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          SOURCE_SHA: ${{ vars.TWE_BACKUP_SOURCE_SHA }}
+          INPUT_SHA: ${{ inputs.approved_sha }}
+          KEY_ID: ${{ vars[inputs.target == 'preview' && 'TWE_BACKUP_KEY_ID_PREVIEW' || 'TWE_BACKUP_KEY_ID_PRODUCTION'] }}
+          PRODUCTION_READY: ${{ vars.TWE_PRODUCTION_BACKUP_READY }}
+        run: |
+          test "$GITHUB_REF" = "refs/heads/$DEFAULT_BRANCH"
+          [[ "$SOURCE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$KEY_ID" =~ ^sha256:[a-f0-9]{64}$ ]]
+          case "$TARGET" in preview|production) ;; *) exit 1 ;; esac
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then
+            test "$INPUT_SHA" = "$SOURCE_SHA"
+          fi
+          if [ "$TARGET" = production ]; then
+            test -n "$PRODUCTION_READY"
+          fi
+          echo "source_sha=$SOURCE_SHA" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: mihaamiharu/twe
+          ref: ${{ steps.pin.outputs.source_sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: '22'
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - name: Export and authenticate-encrypt the exact target
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_EXPORT_TOKEN }}
+          TWE_BACKUP_KEY: ${{ secrets[inputs.target == 'preview' && 'TWE_BACKUP_KEY_PREVIEW' || 'TWE_BACKUP_KEY_PRODUCTION'] }}
+          TWE_BACKUP_KEY_ID: ${{ vars[inputs.target == 'preview' && 'TWE_BACKUP_KEY_ID_PREVIEW' || 'TWE_BACKUP_KEY_ID_PRODUCTION'] }}
+          TWE_BACKUP_KEY_TARGET: ${{ env.TARGET }}
+          TWE_BACKUP_SOURCE_SHA: ${{ steps.pin.outputs.source_sha }}
+          TWE_PRODUCTION_BACKUP_READY: ${{ vars.TWE_PRODUCTION_BACKUP_READY }}
+          TWE_BACKUP_MAX_BYTES: '4194304'
+        run: |
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$TWE_BACKUP_KEY"
+          mkdir -m 700 -p .wrangler/encrypted-backup
+          bun --no-env-file scripts/backup-d1.ts backup "$TARGET" .wrangler/encrypted-backup/database.enc
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
+        with:
+          name: twe-d1-${{ env.TARGET }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            .wrangler/encrypted-backup/database.enc
+            .wrangler/encrypted-backup/database.enc.sha256
+            .wrangler/encrypted-backup/database.enc.manifest.json
+          retention-days: 30
+          if-no-files-found: error
+          include-hidden-files: true
+          compression-level: 0
+      - name: Record recovery handoff
+        if: always()
+        run: |
+          {
+            echo "Target: $TARGET; tooling: ${{ steps.pin.outputs.source_sha }}"
+            echo "Private encrypted archives only; retention 30 days; archive cap 4 MiB."
+            echo "Use the independently held matching owner Keychain key for recovery."
+            echo "Any failed/missed backup or last-success age above 24 hours requires investigation."
+          } >> "$GITHUB_STEP_SUMMARY"
