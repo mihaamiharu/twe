@@ -65,7 +65,7 @@ jobs:
       - name: Export and authenticate-encrypt the exact target
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_READ_TOKEN }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_D1_EXPORT_TOKEN }}
           TWE_BACKUP_KEY: ${{ secrets.TWE_BACKUP_KEY }}
           TWE_BACKUP_KEY_ID: ${{ vars.TWE_BACKUP_KEY_ID }}
           TWE_BACKUP_KEY_TARGET: ${{ env.TARGET }}
