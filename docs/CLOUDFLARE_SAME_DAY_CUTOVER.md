@@ -1,5 +1,7 @@
 # Same-day cutover and VPS reuse
 
+Current outcome: **production is on Cloudflare and TWE hosting on the VPS is retired**. The existing VM is retained for remote development. [The November 2 execution record](reports/cloudflare-production-cutover-20261102.json) supersedes pre-cutover status below; remaining Google/progress spot checks and the first scheduled backup are listed explicitly.
+
 Owner direction, November 2, 2026: remove the seven-day retirement hold. The website has low traffic and the VPS is needed for remote development. Retire the TWE hosting stack after immediate cutover/recovery checks pass, while keeping the VM available for development. This plan does not call for VM cancellation, reinstallation, disk wiping or deletion of recovery assets.
 
 This supersedes the time-based hold in earlier reports. Monitoring continues after the move on Cloudflare; it does not require the old stack to stay running or reserve the machine. Strict $0 Cloudflare hosting and no paid fallback remain in force.

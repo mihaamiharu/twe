@@ -1,6 +1,6 @@
 # PostgreSQL to D1 data runbook
 
-Production remains on the VPS until local/preview readiness and a cutover window are approved. Empty TWE-specific preview/production D1 resources are configuration preparation, not migrated production data. The separate `ebp-r1-prod` resource and synthetic `twe-migration-preview` spike are excluded.
+Production now runs on D1 after the owner-approved November 2 cutover. The final frozen 507-row/34-user source snapshot reconciled exactly before opening writes; the old VPS database is stopped. See [the cutover record](reports/cloudflare-production-cutover-20261102.json). The commands below remain recovery/operator procedures, not instructions to rerun an import over live production. Synthetic preview remains separate. The separate `ebp-r1-prod` resource and synthetic `twe-migration-preview` spike are excluded.
 
 ## Export and transform
 

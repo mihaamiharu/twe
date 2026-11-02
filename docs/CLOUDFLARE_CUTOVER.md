@@ -1,5 +1,7 @@
 # Readiness, cutover and retirement
 
+Current outcome: **production is on Cloudflare and TWE hosting on the VPS is retired**. The existing VM is retained for remote development. [The November 2 execution record](reports/cloudflare-production-cutover-20261102.json) supersedes pre-cutover status below; remaining Google/progress spot checks and the first scheduled backup are listed explicitly.
+
 This runbook is preparation for #256/#257. It does not authorize a DNS switch, production import, paid plan, data discard or VPS deletion. The owner wants local E2E first. The owner removed the seven-day hold on November 2: follow [the same-day cutover and VPS reuse plan](CLOUDFLARE_SAME_DAY_CUTOVER.md). Retain verified recovery assets off the VPS; reclaim the website stack after immediate checks pass, keeping the VM for remote development.
 
 Use [the November 2 execution plan](CLOUDFLARE_RELEASE_PLAN.md) for current evidence, phase order, ownership and acceptance gates. This document owns the cutover and rollback procedure.
