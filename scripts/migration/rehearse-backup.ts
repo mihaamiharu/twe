@@ -4,7 +4,12 @@ import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { z } from 'zod';
 import { createTestSandbox } from '../test-sandbox';
-import { assertPrivatePath, snapshotSchema, writePrivate } from './model';
+import {
+  assertPrivatePath,
+  hashRows,
+  snapshotSchema,
+  writePrivate,
+} from './model';
 
 const [dumpPath, outputPath, sourceCommit] = process.argv.slice(2);
 if (
@@ -81,6 +86,8 @@ const report = {
   postgresVersion: '',
   importVerified: false,
   rollbackVerified: false,
+  authCompatibilityVerified: null as boolean | null,
+  partialImportTargetRejected: null as boolean | null,
   elapsedMs: 0,
   failure: '',
 };
@@ -124,6 +131,10 @@ try {
             'exec',
             container,
             'pg_isready',
+            // The image's temporary bootstrap server accepts Unix sockets and
+            // then shuts down. TCP is enabled only for the final server.
+            '--host',
+            '127.0.0.1',
             '-U',
             'postgres',
             '-d',
@@ -229,6 +240,108 @@ try {
   report.importVerified = z
     .object({ completed: z.literal(true) })
     .safeParse(imported).success;
+  const legacyFixture = process.env['TWE_LEGACY_AUTH_FIXTURE'];
+  if (legacyFixture) {
+    assertPrivatePath(legacyFixture);
+    const authReportPath = join(output, 'account-compatibility-report.json');
+    await capture([
+      process.execPath,
+      'scripts/migration/check-account-compatibility.ts',
+      snapshotPath,
+      authReportPath,
+      legacyFixture,
+    ]);
+    const authReport: unknown = JSON.parse(
+      await readFile(authReportPath, 'utf8'),
+    );
+    report.authCompatibilityVerified = z
+      .object({ completed: z.literal(true) })
+      .safeParse(authReport).success;
+    if (!report.authCompatibilityVerified)
+      throw new Error('Isolated account compatibility failed.');
+  }
+  if (snapshot.tables['users']?.rows.length) {
+    // Model an interrupted parent-first import using a separate target that
+    // contains just the first source user. A retry must refuse it, not reset it.
+    const partial = await createTestSandbox('http://localhost:3000');
+    const partialState = join(output, 'partial-import-state');
+    const partialEnv = { ...partial.env, TWE_D1_PERSIST: partialState };
+    const partialSnapshotPath = join(output, 'partial-import-snapshot.json');
+    const partialSnapshot = {
+      ...snapshot,
+      tables: Object.fromEntries(
+        Object.entries(snapshot.tables).map(([name, table]) => {
+          const rows = name === 'users' ? table.rows.slice(0, 1) : [];
+          return [name, { rows, count: rows.length, sha256: hashRows(rows) }];
+        }),
+      ),
+    };
+    await writePrivate(partialSnapshotPath, partialSnapshot);
+    try {
+      await capture(
+        [
+          process.execPath,
+          'x',
+          'wrangler',
+          'd1',
+          'migrations',
+          'apply',
+          'DB',
+          '--local',
+          '--config',
+          partial.configPath,
+          '--persist-to',
+          partialState,
+        ],
+        { env: partialEnv },
+      );
+      await capture(
+        [
+          process.execPath,
+          'scripts/migration/import-d1.ts',
+          'import',
+          partialSnapshotPath,
+          join(output, 'partial-seed-report.json'),
+          'local',
+        ],
+        { env: partialEnv },
+      );
+      const rejectionPath = join(output, 'partial-rejection-report.json');
+      const retry = await capture(
+        [
+          process.execPath,
+          'scripts/migration/import-d1.ts',
+          'import',
+          snapshotPath,
+          rejectionPath,
+          'local',
+        ],
+        { env: partialEnv, allowFailure: true },
+      );
+      const rejected = z
+        .object({ completed: z.literal(false), failure: z.string() })
+        .parse(JSON.parse(await readFile(rejectionPath, 'utf8')) as unknown);
+      if (
+        retry.code === 0 ||
+        !rejected.failure.startsWith('Target is not empty.')
+      )
+        throw new Error('Partial import retry was not rejected before writes.');
+      await capture(
+        [
+          process.execPath,
+          'scripts/migration/import-d1.ts',
+          'validate',
+          partialSnapshotPath,
+          join(output, 'partial-unchanged-report.json'),
+          'local',
+        ],
+        { env: partialEnv },
+      );
+      report.partialImportTargetRejected = true;
+    } finally {
+      await partial.dispose();
+    }
+  }
   await capture([process.execPath, 'scripts/migration/rehearsal-writes.ts'], {
     env: { ...env, TWE_REHEARSAL_SYNTHETIC_WRITES: 'yes' },
   });
