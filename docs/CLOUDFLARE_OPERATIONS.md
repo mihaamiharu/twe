@@ -1,6 +1,6 @@
 # Workers/D1 development and operations
 
-This is the release-branch operating model. Source preparation is distinct from verified release readiness. Production DNS still targets the VPS Tunnel; no migration deployment/cutover has been authorized by a successful local test yet.
+This is the release-branch operating model. Source preparation is distinct from verified release readiness. Production DNS still targets the VPS Tunnel. The owner-approved production Worker is prepared in maintenance without a public route; a data import and traffic cutover remain separately gated.
 
 Current execution and activation gates: [release plan](CLOUDFLARE_RELEASE_PLAN.md), [production checklist](CLOUDFLARE_PRODUCTION_CHECKLIST.md), and [fresh rehearsal/candidate evidence](reports/cloudflare-release-rehearsal-20261102.json).
 
@@ -10,7 +10,7 @@ Current execution and activation gates: [release plan](CLOUDFLARE_RELEASE_PLAN.m
 | -------------------- | -------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
 | Local                | twe-local      | local Wrangler state                 | Created by local setup                                                               |
 | Preview              | twe-preview    | a57397b4-3f7f-432e-a161-04330b3a5b4b | All three migrations applied in APAC; protected Worker deployed; synthetic data only |
-| Production candidate | twe-production | 6f6630be-ed32-4d07-ba24-24d45bb160c9 | Created in APAC; migrations pending; no app/user rows or domain attached             |
+| Production candidate | twe-production | 6f6630be-ed32-4d07-ba24-24d45bb160c9 | Standby Worker deployed in maintenance; migrations pending; no app/user rows or domain attached             |
 
 Do not use the event-booking-platform `ebp-r1` resources or the separate synthetic migration spike as the full application's database. Read replication remains disabled. The production custom-domain route is intentionally absent until cutover. Root `cf:*` commands now target the full app; `cf:spike:*` retains the original isolated fixture.
 
@@ -33,7 +33,7 @@ The final candidate should run lint, typecheck, unit/D1 integration checks and a
 Local secrets live in ignored `.dev.vars`; environment-specific `.dev.vars.preview`/`.dev.vars.production` must contain their own complete secrets. Runtime secrets belong to Wrangler, never VITE\_ variables, source manifests, GitHub issues or exported logs.
 
 - BETTER_AUTH_SECRET and BETTER_AUTH_URL: retain the production secret/origin for session compatibility; use isolated preview values.
-- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: use the separate [replacement Google clients](CLOUDFLARE_GOOGLE_OAUTH.md). Preview is installed; production is retained in owner Keychain until approved release preparation. Preserve Google provider account IDs and user linkage; never copy the preview pair into production.
+- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: use the separate [replacement Google clients](CLOUDFLARE_GOOGLE_OAUTH.md). Separate preview and production pairs are installed in their corresponding Workers and retained in owner Keychain; production remains inactive in maintenance. The Google audience is now External / In production, with identity scopes only. Preserve Google provider account IDs and user linkage; never copy the preview pair into production.
 - EMAIL_PROVIDER / EMAIL_FROM: selected preview/production-candidate transport is Spacemail SMTP. SMTP_HOST / SMTP_PORT are configuration; SMTP_USER / SMTP_PASSWORD are Worker secrets. HTTP transports retain EMAIL_HTTP_URL / EMAIL_API_KEY.
 - ADMIN_EMAIL: notification destination.
 - DEEPSEEK_API_KEY / AI_HINT_DAILY_LIMIT: existing DeepSeek credit with bounded prompts/output, no retries and an atomic shared D1 request cap. Missing cap disables new generation; see [activation and preview test limits](CLOUDFLARE_AI_HINTS.md).
@@ -46,7 +46,7 @@ The Worker supports nodejs_compat only for supported libraries/APIs. Runtime OG 
 
 ## Existing Spacemail delivery
 
-On November 1 the owner selected the existing provider and admin@testingwithekki.com. The inventoried VPS already uses Spacemail at mail.spacemail.com:465 with implicit TLS. EMAIL_PROVIDER=smtp uses Workers outbound TLS sockets directly; it adds no VPS relay, external gateway or new mail-provider subscription. Local/test delivery remains disabled by default. The checked-in production candidate selects this transport, but no production Worker configuration or VPS service was changed.
+On November 1 the owner selected the existing provider and admin@testingwithekki.com. The inventoried VPS already uses Spacemail at mail.spacemail.com:465 with implicit TLS. EMAIL_PROVIDER=smtp uses Workers outbound TLS sockets directly; it adds no VPS relay, external gateway or new mail-provider subscription. Local/test delivery remains disabled by default. The production standby Worker now has this transport and the preserved mailbox credentials configured. No extra test delivery was sent during standby setup, and the live TWE VPS service remains unchanged.
 
 The adapter accepts only port 465 with TLS from connection start, requires the sender to match the authenticated mailbox, bounds message/reply size and the entire exchange to 20 seconds, and closes its request-owned socket in finally. It encodes UTF-8 MIME, rejects header/envelope injection, redacts provider errors and performs no automatic retry after an uncertain DATA outcome. No connection pooling, timers or persistent sockets remain in AppRuntime; open sockets would otherwise extend object-active duration. SMTP_HOST/SMTP_PORT are trusted operator configuration, never request inputs.
 

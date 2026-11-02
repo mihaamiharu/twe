@@ -28,7 +28,9 @@
       "target": "preview",
       "name": "TWE Cloudflare Preview",
       "type": "Web application",
-      "javascriptOrigins": ["https://twe-preview.ekkisyam2310.workers.dev"],
+      "javascriptOrigins": [
+        "https://twe-preview.ekkisyam2310.workers.dev"
+      ],
       "redirectUris": [
         "https://twe-preview.ekkisyam2310.workers.dev/api/auth/callback/google"
       ],
@@ -40,8 +42,12 @@
       "target": "production",
       "name": "TWE Cloudflare Production",
       "type": "Web application",
-      "javascriptOrigins": ["https://testingwithekki.com"],
-      "redirectUris": ["https://testingwithekki.com/api/auth/callback/google"],
+      "javascriptOrigins": [
+        "https://testingwithekki.com"
+      ],
+      "redirectUris": [
+        "https://testingwithekki.com/api/auth/callback/google"
+      ],
       "separateCredentialPair": true,
       "keychainReadbackVerified": true,
       "installedInRuntime": false
@@ -53,7 +59,11 @@
     "authorizationHost": "accounts.google.com",
     "expectedClient": true,
     "redirectUri": "https://twe-preview.ekkisyam2310.workers.dev/api/auth/callback/google",
-    "scopes": ["email", "openid", "profile"],
+    "scopes": [
+      "email",
+      "openid",
+      "profile"
+    ],
     "responseType": "code",
     "statePresent": true,
     "cookiesPresent": true,
@@ -106,5 +116,18 @@
     "logoutAndRepeatSignInVerified": false,
     "migratedExistingAccountVerified": false,
     "personalScreenshotPublished": false
+  },
+  "publishingFollowUp": {
+    "dateJakarta": "2026-11-02",
+    "publishingStatus": "In production",
+    "explicitFinalOwnerApproval": true,
+    "identityScopesUnchanged": true,
+    "scopeVerificationRequired": false,
+    "brandingVerified": false,
+    "brandingDisplayedToUsers": false,
+    "productionPairInstalledInStandbyWorker": true,
+    "productionWebsiteTrafficChanged": false,
+    "supersedesInitialTestingAndKeychainOnlyState": true,
+    "evidence": "cloudflare-production-setup-20261102.json"
   }
 }
