@@ -126,17 +126,18 @@
     },
     {
       "gate": "AI and GitHub provider success flows",
-      "status": "bounded preview success flows passed; release validation and ongoing AI budget open",
-      "next": "See cloudflare-github-intake-20261102.json and cloudflare-ai-hints-20261102.json. One private issue and one authenticated synthetic AI hint passed with cleanup. New AI generation is disabled after the approved test. Agree ongoing allowances and complete failure/race/browser release checks before production activation."
+      "status": "bounded preview flows passed; final failure/browser checks pending",
+      "next": "Existing DeepSeek credit use is owner-approved; activate bounded caps with production configuration. See the provider reports and the fresh release execution report. No extra real provider call is included in generic validation."
     },
     {
       "gate": "production release and VPS retirement",
-      "status": "deferred",
-      "next": "Owner E2E, approved production data/cutover/recovery, observation and resolution of the separate VM workload."
+      "status": "preparation implemented; owner final checks and cutover pending",
+      "next": "Fresh 507-row forward/reverse/account/partial-import rehearsal and 784 unit/30 D1 checks passed. Complete owner E2E, Google/production configuration and the go/no-go record; cut over, observe for at least a week, then retire. Owner-approved dummy shutdown is complete."
     }
   ],
   "followupOgAndMemoryReport": "cloudflare-og-readiness-20261102.json",
   "followupGoogleOAuthReport": "cloudflare-google-oauth-20261102.json",
   "followupGitHubIntakeReport": "cloudflare-github-intake-20261102.json",
-  "followupAiHintsReport": "cloudflare-ai-hints-20261102.json"
+  "followupAiHintsReport": "cloudflare-ai-hints-20261102.json",
+  "followupReleaseExecutionReport": "cloudflare-release-rehearsal-20261102.json"
 }

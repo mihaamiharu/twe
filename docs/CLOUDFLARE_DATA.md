@@ -62,6 +62,10 @@ This creates a uniquely named, loopback-only, password-protected PostgreSQL 15.1
 
 The October 30 backup has completed this full loop locally: the original 14-table dataset (including 33 users) reconciled exactly, and all simulated D1-only writes survived the reverse restore. This is local recovery evidence, not a measured remote production cutover window or owner account-login sign-off.
 
+The November 2 refresh contains 34 users and 34 accounts (22 credential, 12 Google). Its forward/reverse rehearsal and partial-import refusal passed. The optional `TWE_LEGACY_AUTH_FIXTURE=/private/legacy-synthetic.json` adds `check-account-compatibility.ts` before synthetic post-cutover writes: it compares all original auth rows, exercises a synthetic hash and signed cookie produced by the deployed auth library, rejects wrong passwords/tampered cookies/expired sessions, removes only its own synthetic user and reconciles source auth rows again. It requires a private state directory, disposable test configuration and disabled email. Never pass real user passwords or production cookies as the synthetic fixture. See [the execution evidence](reports/cloudflare-release-rehearsal-20261102.json); real owner login/Google callbacks remain release checks.
+
+The runner now waits for the final PostgreSQL TCP listener. Its temporary image-bootstrap server accepts Unix sockets and then shuts down, so socket-only readiness could race restore. It also seeds a separate target with one source user, verifies a full retry fails before overwriting that partial import, and reconciles the partial target unchanged. Only isolated targets/configurations are cleaned up.
+
 For a real post-cutover rollback, first block new traffic, drain requests, enable both maintenance presentation and the database freeze, and verify status:
 
 ```sh

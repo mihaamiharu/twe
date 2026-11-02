@@ -2,6 +2,8 @@
 
 Prepared November 2, 2026. Owner: `mihaamiharu`. Implementation remains on `release/cloudflare-migration`. [#245](https://github.com/mihaamiharu/twe/issues/245) is the umbrella; [#256](https://github.com/mihaamiharu/twe/issues/256) owns readiness, cutover and observation; [#257](https://github.com/mihaamiharu/twe/issues/257) owns retirement. No additional tracking issues are needed for this plan.
 
+Execution has started. The fresh source/data/account rehearsal and discontinued dummy workload are recorded in [the November 2 execution report](reports/cloudflare-release-rehearsal-20261102.json). [The production checklist](CLOUDFLARE_PRODUCTION_CHECKLIST.md) owns the configuration manifest and concrete go/no-go inputs. The starting-evidence table below records the baseline before this execution.
+
 The outcome is production on Cloudflare Free with all existing accounts and learning data preserved, independent recovery, and no remaining dependency on the VPS. Existing Spacemail and owner-approved DeepSeek credit remain external integrations. Strict $0 applies to the new hosting architecture; a paid Cloudflare fallback is excluded.
 
 ## Starting evidence

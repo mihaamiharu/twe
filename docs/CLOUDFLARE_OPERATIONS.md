@@ -2,6 +2,8 @@
 
 This is the release-branch operating model. Source preparation is distinct from verified release readiness. Production DNS still targets the VPS Tunnel; no migration deployment/cutover has been authorized by a successful local test yet.
 
+Current execution and activation gates: [release plan](CLOUDFLARE_RELEASE_PLAN.md), [production checklist](CLOUDFLARE_PRODUCTION_CHECKLIST.md), and [fresh rehearsal/candidate evidence](reports/cloudflare-release-rehearsal-20261102.json).
+
 ## Resources
 
 | Environment          | Worker         | D1 database                          | Current state                                                                        |

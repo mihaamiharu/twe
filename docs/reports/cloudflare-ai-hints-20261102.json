@@ -60,7 +60,7 @@
     "https://api-docs.deepseek.com/api/get-user-balance/"
   ],
   "remaining": [
-    "Approve an ongoing per-environment AI allowance before re-enabling new generation; preview remains capped at zero.",
+    "Apply the owner-approved existing DeepSeek credit and bounded operating cap during production configuration; preview remains disabled after the one-shot test.",
     "Consolidated full tests and owner browser/E2E, including failure/race cases and completed challenges.",
     "Review multilingual hint quality, user privacy guidance, billing reconciliation and the production/account-wide budget.",
     "Production data/cutover/recovery and VPS retirement remain separately gated."
@@ -123,5 +123,12 @@
     "exactGenerationChargeEstablished": false,
     "limitation": "Two account-balance samples showed no visible movement; rounding, billing delay and unrelated account activity prevent an exact per-call charge claim. This is not evidence of free API usage."
   },
-  "qualityObservation": "The English hint identified a class selector used where an attribute selector was needed and gave an unrelated attribute-selector syntax example. One short CSS example does not establish multilingual or other challenge-type quality."
+  "qualityObservation": "The English hint identified a class selector used where an attribute selector was needed and gave an unrelated attribute-selector syntax example. One short CSS example does not establish multilingual or other challenge-type quality.",
+  "continuedUseApproval": {
+    "dateJakarta": "2026-11-02",
+    "existingDeepSeekCreditApproved": true,
+    "initialProductionCapPlanned": 25,
+    "previewCapChangedSinceTest": false,
+    "providerDecisionReopened": false
+  }
 }

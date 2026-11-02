@@ -1,0 +1,271 @@
+{
+  "dateJakarta": "2026-11-02",
+  "scope": "Fresh read-only source inventory, local forward/reverse/account/partial-import rehearsal, production preparation and owner-approved dummy retirement; no TWE cutover",
+  "planCommit": "95d7b7a180b30c42d6c905248adbc960ee3837c7",
+  "rehearsalToolingCommit": "2a05eba49e33a7b8344a85e2ab3481f219c4dcf2",
+  "validationCandidate": "6dcc9fd88917aab1b368996d5c6222a7dfed1d1e",
+  "source": {
+    "commit": "c0e0b18a8e6ff15a409feea43d178df1984a49b0",
+    "revisionEvidence": {
+      "builtReleaseMarkersMatched": 2,
+      "comparedSourceFiles": [
+        "package.json",
+        "bun.lock",
+        "scripts/server.ts",
+        "src/db/schema.ts",
+        "src/server/auth.server.ts",
+        "src/lib/sentry.config.ts"
+      ],
+      "allComparedSourceFilesMatched": true,
+      "ociBaseLabelsUsedAsAppRevision": false
+    },
+    "schema": {
+      "sourceMigrationRecords": 6,
+      "checkedInSqlFiles": 6,
+      "allMigrationHashesMatched": true
+    },
+    "postgresVersion": "15.17",
+    "sourceWritesPaused": false,
+    "archiveBytes": 112141,
+    "archiveSha256": "38262910b3b52fd61ded2aa7d86d0eb50cf38457febc317808c23f8c6f85f2e1",
+    "transferChecksumMatched": true,
+    "sourceCounts": {
+      "users": 34,
+      "sessions": 78,
+      "accounts": 34,
+      "verification": 5,
+      "tutorials": 29,
+      "challenges": 109,
+      "test_cases": 72,
+      "submissions": 88,
+      "progress": 20,
+      "achievements": 20,
+      "user_achievements": 15,
+      "bug_reports": 1,
+      "newsletter_subscribers": 1,
+      "contact_messages": 1
+    },
+    "sourceApplicationTables": 14,
+    "sourceRows": 507,
+    "rawArtifactsPublic": false,
+    "productionDataUploadedToCloudflare": false
+  },
+  "localRehearsal": {
+    "completed": true,
+    "forwardImportVerified": true,
+    "reverseRestoreVerified": true,
+    "authCompatibilityVerified": true,
+    "partialImportTargetRejected": true,
+    "partialTargetUnchangedAfterRejection": true,
+    "totalElapsedMs": 10804,
+    "runtime": "already-running local Docker; Podman was stopped",
+    "containers": "uniquely named loopback-only PostgreSQL 15.17, limited CPU/memory and tmpfs",
+    "productionRtoEstablished": false,
+    "firstAttempt": {
+      "completed": false,
+      "elapsedMs": 2835,
+      "failure": "Unix-socket readiness observed the image bootstrap server before shutdown",
+      "resolution": "wait for the final TCP listener before restore"
+    },
+    "reverseScope": "Complete supported PostgreSQL core columns and simulated post-cutover writes; D1-only control/support tables have no legacy PostgreSQL equivalent"
+  },
+  "accountCompatibility": {
+    "completed": true,
+    "sourceCommit": "c0e0b18a8e6ff15a409feea43d178df1984a49b0",
+    "legacyBetterAuthVersion": "1.4.15",
+    "sourceUserCount": 34,
+    "sourceAccountCount": 34,
+    "sourceSessionCount": 78,
+    "credentialHashCount": 22,
+    "googleAccountCount": 12,
+    "sourceAuthRowsMatchedBefore": true,
+    "sourceAuthRowsMatchedAfter": true,
+    "duplicateNormalizedEmails": 0,
+    "duplicateProviderIdentities": 0,
+    "legacyPasswordAndNormalizationAccepted": true,
+    "wrongPasswordRejected": true,
+    "legacySignedCookieAccepted": true,
+    "tamperedCookieRejected": true,
+    "expiredSessionRejected": true,
+    "syntheticFixturesRemoved": true,
+    "realExistingPasswordLoginPerformed": false,
+    "liveGoogleCallbackPerformed": false,
+    "productionSecretUsed": false,
+    "failure": ""
+  },
+  "productionPreparation": {
+    "productionWorkerPresent": false,
+    "productionApplicationTablesPresent": false,
+    "productionCustomDomainPresent": false,
+    "currentTunnelRoutingVerifiedInDashboard": true,
+    "routingRollbackRecordRetainedPrivately": true,
+    "apiDnsReadStatus": 403,
+    "mailDnsChanged": false,
+    "productionSecretsInstalled": false,
+    "productionBackupScheduleEnabled": false
+  },
+  "freeAccountEvidence": {
+    "capturedAt": "2026-11-02T09:50:28.093Z",
+    "utcDay": "2026-11-02",
+    "accountWorkers": {
+      "requests": 163,
+      "errors": 0,
+      "remainingDailyRequests": 99837
+    },
+    "previewGateway": [
+      {
+        "status": "success",
+        "requests": 160,
+        "errors": 0,
+        "maxCpuMs": 3.735,
+        "estimatedP99CpuMs": 2.963,
+        "sampling": 1.0389610389610389
+      },
+      {
+        "status": "clientDisconnected",
+        "requests": 3,
+        "errors": 0,
+        "maxCpuMs": 1.512,
+        "estimatedP99CpuMs": 1.512,
+        "sampling": 1
+      }
+    ],
+    "accountObjects": {
+      "requests": 109,
+      "remainingDailyRequests": 99891,
+      "durationGbSeconds": 11.889284607999997,
+      "remainingDailyGbSeconds": 12988.110715392,
+      "exceededCpuErrors": 0,
+      "exceededMemoryErrors": 0,
+      "periodicPeakMemoryBytes": 110846709,
+      "conservativeMemoryHeadroomBytes": 17153291
+    },
+    "accountD1": {
+      "rowsRead": 1497,
+      "rowsWritten": 113,
+      "remainingDailyRowsRead": 4998503,
+      "remainingDailyRowsWritten": 99887
+    },
+    "listedDatabases": 4,
+    "listedObjectNamespaces": 2,
+    "planReverifiedByMetricsApi": false,
+    "capacityAccepted": false,
+    "limitations": [
+      "Partial UTC day with provider sampling/lag, not traffic forecast or production p99.",
+      "Periodic memory can miss transient peaks; sum all active namespaces when forecasting duration.",
+      "API metric allowances do not establish plan/billing state; verify the dashboard separately.",
+      "Listed database file sizes can be absent; missing sizes are not zero storage."
+    ],
+    "currentOfficialReferences": [
+      "https://developers.cloudflare.com/workers/platform/limits/",
+      "https://developers.cloudflare.com/durable-objects/platform/pricing/",
+      "https://developers.cloudflare.com/d1/platform/pricing/"
+    ]
+  },
+  "dummyWorkload": {
+    "ownerDecision": "Discontinue; owner identified it as a disposable dummy",
+    "containersStopped": 2,
+    "restartDisabled": true,
+    "filesOrVolumesDeleted": false,
+    "dnsChanged": false,
+    "separateCloudflareMigrationRequired": false,
+    "tweProcessAndStartUnchanged": true,
+    "twePostgresAndTunnelStillRunning": true,
+    "twePublicHttpStatusAfterStop": 200
+  },
+  "validation": {
+    "targetedMigrationLint": "passed with zero warnings",
+    "typecheck": "passed",
+    "legacyAccountChecks": "passed",
+    "smtpFixtureChecks": {
+      "passed": 7,
+      "failed": 0
+    },
+    "firstConsolidatedAttempt": {
+      "unitPassed": 780,
+      "unitFailed": 4,
+      "cause": "Happy DOM global WritableStream is the classic Node stream; SMTP fixture needed WHATWG streams",
+      "productionMailCodeChanged": false
+    },
+    "consolidatedFinal": {
+      "status": "passed",
+      "sourceCommit": "6dcc9fd88917aab1b368996d5c6222a7dfed1d1e",
+      "lint": "passed",
+      "typecheck": "passed",
+      "unitTests": {
+        "passed": 784,
+        "failed": 0,
+        "files": 76
+      },
+      "d1IntegrationTests": {
+        "passed": 30,
+        "failed": 0,
+        "isolatedProcesses": 8
+      },
+      "build": "production passed",
+      "playwrightRunByAgent": false
+    },
+    "ownerFinalCandidatePlaywright": "pending; owner retains execution"
+  },
+  "remaining": [
+    "Owner local E2E and actual existing-account/Google/browser checks.",
+    "Google publishing, production configuration/credential review, final Free workload decision and approved maintenance/cutover window.",
+    "Final frozen source export/import, production private backup/recovery and scheduled activation.",
+    "At least seven successful observation days and explicit retirement/renewal cancellation sign-off.",
+    "Confirm provider renewal/cancellation day and final recovery retention."
+  ],
+  "tweProductionChanged": false,
+  "vpsDeleted": false,
+  "billingChanged": false,
+  "productionTrafficBaseline": {
+    "source": "Signed-in Cloudflare production-zone Requests analytics",
+    "window": "Last 24 hours, as displayed",
+    "totalRequestsDisplayed": "4.57k",
+    "approximateTotalRequests": 4570,
+    "totalTransferDisplayed": "53.25 MB",
+    "totalVisitsDisplayed": "451",
+    "cacheHitRateDisplayed": "10.77%",
+    "fiveXxErrorsDisplayed": "0",
+    "fiveXxRateDisplayed": "0.00%",
+    "roundedDashboardValues": true,
+    "limitations": [
+      "Zone-level requests include cached, bot and static traffic; they are not a measurement of future Worker/DO invocations.",
+      "One displayed window does not establish peak load or future growth.",
+      "No client IPs, paths, request headers or user records were collected."
+    ],
+    "dateJakarta": "2026-11-02",
+    "recordedAt": "2026-11-02T10:18:47.185695+00:00"
+  },
+  "freeBudgetInterpretation": {
+    "gatewayAndObjectBudgetsSeparate": true,
+    "oneConstantObjectAllocationGb": 0.128,
+    "oneContinuouslyActiveProductionObjectGbSecondsPerDay": 11059.2,
+    "currentDailyDurationAllowanceGbSeconds": 13000,
+    "remainingForAllOtherObjectsGbSecondsPerDay": 1940.8,
+    "equivalentOtherObjectActiveHours": 4.21,
+    "previewAndProbeMustBeLimited": true,
+    "observedZoneRequestsAsFractionOfDailyGatewayAllowance": 0.0457,
+    "productionWorkloadAcceptance": "ready for review with limitations; not a load guarantee",
+    "notes": [
+      "The always-active single-object figure is a conservative allocation calculation, not measured billing.",
+      "All other object namespaces and previews share the remaining account allowance.",
+      "Actual Worker/D1 activity must still be verified during maintenance/cutover and observation."
+    ]
+  },
+  "productionArtifact": {
+    "sourceCommit": "6dcc9fd88917aab1b368996d5c6222a7dfed1d1e",
+    "packagingDryRun": "passed",
+    "uploadUncompressedKiB": 12506.88,
+    "uploadGzipKiB": 3412.12,
+    "retainedPrivately": true,
+    "archiveBytes": 38360550,
+    "archiveSha256": "9034e822b7d7b1a22b15a92678794b7598fc9da9b6940b5b3b91ce2ea52d29d5",
+    "targetAndOriginVerified": true,
+    "d1AndAppRuntimeVerified": true,
+    "workersDevDisabled": true,
+    "productionDomainNotAttached": true,
+    "largestClientAssetBytes": 13509049,
+    "knownCredentialMaterialAbsent": true,
+    "productionDeployed": false
+  }
+}

@@ -57,7 +57,7 @@
     "syntheticD1ReportsRemoved": 1
   },
   "next": [
-    "See cloudflare-ai-hints-20261102.json for the subsequently approved single AI success check; agree ongoing allowances before re-enabling generation.",
+    "See cloudflare-ai-hints-20261102.json for the subsequent single AI check and continued-use approval; apply the bounded cap during production configuration.",
     "During consolidated release validation, verify hosted notification-failure persistence and owner browser/E2E flows.",
     "Rotate the intake token before December 2 expiry; separately approve production configuration and cutover."
   ],
