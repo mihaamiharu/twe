@@ -2,7 +2,7 @@
   "dialog": {
     "title": "Laporkan Bug",
     "trigger": "Laporkan Bug",
-    "description": "Bantu kami meningkatkan kualitas dengan melaporkan masalah yang kamu temukan. Mohon berikan informasi sedetail mungkin."
+    "description": "Jelaskan masalahnya agar dapat kami periksa secara privat. Jangan sertakan kata sandi, kunci API, atau informasi pribadi yang sensitif."
   },
   "form": {
     "title": {
@@ -42,7 +42,7 @@
     },
     "autocapture": {
       "title": "Informasi yang ditangkap otomatis:",
-      "url": "URL halaman saat ini",
+      "url": "Alamat halaman (tanpa parameter kueri atau fragmen)",
       "browser": "Informasi browser",
       "user": "Akun pengguna kamu"
     },

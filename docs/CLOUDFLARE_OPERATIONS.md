@@ -35,7 +35,7 @@ Local secrets live in ignored `.dev.vars`; environment-specific `.dev.vars.previ
 - EMAIL_PROVIDER / EMAIL_FROM: selected preview/production-candidate transport is Spacemail SMTP. SMTP_HOST / SMTP_PORT are configuration; SMTP_USER / SMTP_PASSWORD are Worker secrets. HTTP transports retain EMAIL_HTTP_URL / EMAIL_API_KEY.
 - ADMIN_EMAIL: notification destination.
 - DEEPSEEK_API_KEY: existing HTTP AI integration, with bounded timeout and retries disabled.
-- GH_API_TOKEN / GH_OWNER / GH_REPO: bug-report issue integration, with timeout and awaited completion.
+- GH_API_TOKEN / GH_OWNER / GH_REPO: [private bug-report intake](CLOUDFLARE_GITHUB_INTAKE.md). Every delivery verifies private repository metadata before posting; metadata/POST share a 15-second deadline with no redirects or automatic retries. Do not target the public code repository or private backup vault.
 - PREVIEW_ACCESS_TOKEN: at least 32 random characters; Basic username is preview. Preview fails closed if absent, protects static assets too, and sends noindex/private headers.
 - VITE_GA_MEASUREMENT_ID: optional public analytics identifier returned only as configured.
 - MAINTENANCE_MODE=true: every application request returns 503, including session reads that might refresh auth data. Static production assets may still bypass the Worker.

@@ -9,6 +9,7 @@ import { optionalAuthMiddleware } from './auth.mw';
 import { createGitHubIssue, formatBugReportBody } from './github.server';
 import { getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
 import { createRateLimitMiddleware } from './rate-limit.mw';
+import { sanitizeBugReportPageUrl } from '@/lib/bug-report-privacy';
 
 const BugReportSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(200),
@@ -78,7 +79,7 @@ export const createBugReport = createServerFn({ method: 'POST' })
           stepsToReproduce,
           expectedBehavior,
           actualBehavior,
-          pageUrl: pageUrl || null,
+          pageUrl: sanitizeBugReportPageUrl(pageUrl),
           browserInfo: browserInfo || null,
         })
         .returning();
@@ -119,9 +120,6 @@ export const createBugReport = createServerFn({ method: 'POST' })
         expectedBehavior: report.expectedBehavior,
         actualBehavior: report.actualBehavior,
         pageUrl: report.pageUrl,
-        browserInfo: report.browserInfo,
-        reporterEmail: report.reporterEmail,
-        userId: report.userId,
       });
 
       await createGitHubIssue({
