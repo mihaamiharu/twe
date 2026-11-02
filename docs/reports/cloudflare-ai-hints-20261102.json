@@ -39,15 +39,17 @@
     "policyTestsAdded": 2,
     "testsRun": false,
     "fullSuiteRun": false,
-    "previewBuild": "pending",
-    "previewDeployment": "pending"
+    "previewBuild": "passed",
+    "previewDeployment": "passed",
+    "sourceCredentialScan": "existing key absent from source commit"
   },
   "remoteState": {
     "previewKeyInstalled": false,
     "previewCapInstalled": false,
     "generationAttempts": 0,
     "productionChanged": false,
-    "billingChanged": false
+    "billingChanged": false,
+    "previewKeyAndCapAbsenceVerified": true
   },
   "proposedTest": {
     "approval": "pending",
@@ -72,5 +74,7 @@
     "Approve Keychain owner copy, preview credential/cap installation and one bounded paid synthetic request.",
     "Consolidated full tests and owner browser/E2E.",
     "Review hint quality, completed challenge behavior, user privacy guidance and approved production/account-wide budget."
-  ]
+  ],
+  "sourceCommit": "f898c7c",
+  "previewWorkerVersion": "2f487d0b-fee1-47c7-afd5-656c69d56f11"
 }

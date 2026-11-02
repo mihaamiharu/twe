@@ -123,6 +123,7 @@ const required =
         'GOOGLE_CLIENT_ID',
         'GOOGLE_CLIENT_SECRET',
         'DEEPSEEK_API_KEY',
+        'AI_HINT_DAILY_LIMIT',
         'GH_API_TOKEN',
         'GH_OWNER',
         'GH_REPO',

@@ -12,7 +12,9 @@ Caller inputs are bounded to a 160-character slug, 16,000-character attempt, ten
 
 The client uses fixed HTTPS `api.deepseek.com`, `deepseek-flash`, explicit non-thinking mode (`reasoning_effort: none`), a 1,024-token output cap, 25-second timeout and zero automatic retries. Only a nonempty answer ending with `finish_reason: stop` is accepted and stored; truncated/interrupted answers are failures. Timeout does not prove that upstream processing or billing stopped. Logs omit prompts, code, model answers, keys and provider error bodies.
 
-## Proposed bounded preview check
+## Preview preparation and proposed bounded check
+
+Guarded source `f898c7c` passed typecheck, targeted lint and the preview build. It is deployed to preview as Worker version `2f487d0b-fee1-47c7-afd5-656c69d56f11`. Remote secret-name inspection confirms that neither the DeepSeek key nor the request cap is installed. The two new policy tests and all full suites remain unrun, deferred to consolidated release validation as requested. The production deploy wrapper now requires the cap setting alongside the key.
 
 After approval, retain an owner copy of the existing key in this Mac's login Keychain and install only preview `DEEPSEEK_API_KEY` plus `AI_HINT_DAILY_LIMIT=1`. Deploy the guarded source before installing these settings. Use an existing synthetic preview learner to request exactly one short hint through the app. Verify successful response, D1 hint persistence and reuse without another generation request. Remove only the synthetic progress record created for this check and disable further new generation after the test; retain cached production/user records untouched. Do not retry an uncertain paid request.
 
