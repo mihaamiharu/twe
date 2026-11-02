@@ -2,12 +2,14 @@
 
 This runbook is preparation for #256/#257. It does not authorize a DNS switch, production import, paid plan, data discard or VPS deletion. The owner wants local E2E first. Keep the VPS/Tunnel recoverable until an approved cutover and at least one week of successful observation.
 
+Use [the November 2 execution plan](CLOUDFLARE_RELEASE_PLAN.md) for current evidence, phase order, ownership and acceptance gates. This document owns the cutover and rollback procedure.
+
 ## Candidate checklist
 
 - Complete local lint/typecheck/unit/D1 integration/build checks, then the owner's local Playwright E2E run. Resolve all critical failures.
 - Exercise the full feature/route matrix: en/id content, signed-in navigation/cache isolation, robots/sitemap/canonicals/media/editor WASM, all OG cards and legacy queries, auth/verification/reset/Google/session retention, roles/admin, profile/privacy, progress/submissions/hints/rewards, dashboard/leaderboard, contact/bugs/newsletter and upstream failures.
 - Rehearse empty and incremental D1 migrations, same/different-target concurrent rewards, retries/hint races and deterministic batch rollback under actual D1. Reconcile the full dataset, not a small sample.
-- Record Worker cold/warm CPU/memory/startup/bundle size and D1 calls/rows/storage. Apply the Free go/no-go thresholds from the operations guide. Paid fallback needs owner approval.
+- Record Worker cold/warm CPU/memory/startup/bundle size and D1 calls/rows/storage. Apply the Free go/no-go thresholds from the operations guide. Strict $0 excludes a paid fallback; redesign if the workload cannot fit.
 - Confirm the account is on Free, accept the gateway/object CPU/duration/memory/account-wide quotas, and retain the AppRuntime export/binding. Confirm the selected existing Spacemail TLS SMTP transport, sender and inbox delivery/failure behavior; retain the HTTP alternatives if a later provider change is approved. Configure isolated Google callbacks/origins, secrets, preview access, GitHub environment reviewers, least-privilege tokens and independent backup-key recovery.
 - Rehearse PostgreSQL restore, final export/import/validation, encrypted D1 restore and Time Travel. Measure maintenance/recovery time against the agreed RPO/RTO. Rehearse interrupted import and post-cutover write reconciliation.
 - Review security headers/CSP alongside editor/iframe/external-script behavior. Existing CSP was not silently tightened during the runtime port; a stricter policy needs browser verification. Verify cookies/CSRF/origins/CORS/test-route denial and sensitive-data redaction.

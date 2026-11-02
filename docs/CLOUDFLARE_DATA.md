@@ -4,7 +4,7 @@ Production remains on the VPS until local/preview readiness and a cutover window
 
 ## Export and transform
 
-Use a restricted absolute directory outside the checkout. Never attach snapshots, SQL, auth fixtures or ordinary diagnostic output to GitHub. The existing restricted PostgreSQL dump remains a recovery asset; its actual restore rehearsal is still pending.
+Use a restricted absolute directory outside the checkout. Never attach snapshots, SQL, auth fixtures or ordinary diagnostic output to GitHub. The older restricted PostgreSQL dump passed the local forward/reverse rehearsal described below. Refresh the source archive and candidate-specific compatibility checks under [the release execution plan](CLOUDFLARE_RELEASE_PLAN.md).
 
 ```sh
 # Supply a read-only-capable connection securely; do not put credentials in args.
