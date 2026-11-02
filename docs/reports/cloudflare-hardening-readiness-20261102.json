@@ -121,8 +121,8 @@
     },
     {
       "gate": "Google OAuth",
-      "status": "blocked",
-      "next": "Recover an account with access to historical project 548549555288 or authorize a replacement preview OAuth project/client. MFA is complete but resourcemanager.projects.get is still missing; deletion is not established."
+      "status": "replacement configured; complete sign-in/release validation pending",
+      "next": "See cloudflare-google-oauth-20261102.json. New isolated preview/production clients exist, preview authorization contract passed; complete owner sign-in, migrated-account linkage, publishing and approved production activation."
     },
     {
       "gate": "AI and GitHub provider success flows",
@@ -135,5 +135,6 @@
       "next": "Owner E2E, approved production data/cutover/recovery, observation and resolution of the separate VM workload."
     }
   ],
-  "followupOgAndMemoryReport": "cloudflare-og-readiness-20261102.json"
+  "followupOgAndMemoryReport": "cloudflare-og-readiness-20261102.json",
+  "followupGoogleOAuthReport": "cloudflare-google-oauth-20261102.json"
 }

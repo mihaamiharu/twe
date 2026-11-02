@@ -112,8 +112,8 @@
     },
     {
       "gate": "Google OAuth",
-      "status": "blocked",
-      "next": "Recover historical project access or authorize a replacement OAuth client/project."
+      "status": "replacement configured; complete sign-in/release validation pending",
+      "next": "See cloudflare-google-oauth-20261102.json. New isolated preview/production clients exist, preview authorization contract passed; complete owner sign-in, migrated-account linkage, publishing and approved production activation."
     },
     {
       "gate": "AI and GitHub provider success flows",
@@ -132,5 +132,6 @@
     "No production p99, sustained throughput, guaranteed memory ceiling or final capacity acceptance is claimed.",
     "No billing change, production deployment, extra object namespace, mail/Google/AI/GitHub delivery or VPS modification was performed.",
     "Credentials, request metadata, cookies, raw tails and private account records remain outside the repository."
-  ]
+  ],
+  "followupGoogleOAuthReport": "cloudflare-google-oauth-20261102.json"
 }

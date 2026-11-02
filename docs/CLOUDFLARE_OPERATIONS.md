@@ -31,7 +31,7 @@ The final candidate should run lint, typecheck, unit/D1 integration checks and a
 Local secrets live in ignored `.dev.vars`; environment-specific `.dev.vars.preview`/`.dev.vars.production` must contain their own complete secrets. Runtime secrets belong to Wrangler, never VITE\_ variables, source manifests, GitHub issues or exported logs.
 
 - BETTER_AUTH_SECRET and BETTER_AUTH_URL: retain the production secret/origin for session compatibility; use isolated preview values.
-- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: preserve production Google linkage. Add the isolated preview callback separately rather than replacing the production callback.
+- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: use the separate [replacement Google clients](CLOUDFLARE_GOOGLE_OAUTH.md). Preview is installed; production is retained in owner Keychain until approved release preparation. Preserve Google provider account IDs and user linkage; never copy the preview pair into production.
 - EMAIL_PROVIDER / EMAIL_FROM: selected preview/production-candidate transport is Spacemail SMTP. SMTP_HOST / SMTP_PORT are configuration; SMTP_USER / SMTP_PASSWORD are Worker secrets. HTTP transports retain EMAIL_HTTP_URL / EMAIL_API_KEY.
 - ADMIN_EMAIL: notification destination.
 - DEEPSEEK_API_KEY: existing HTTP AI integration, with bounded timeout and retries disabled.

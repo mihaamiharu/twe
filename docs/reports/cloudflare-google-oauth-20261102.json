@@ -1,0 +1,100 @@
+{
+  "dateJakarta": "2026-11-02",
+  "scope": "Owner-approved replacement Google OAuth project/clients; preview configuration only",
+  "projectId": "twe-auth-20261102",
+  "projectName": "TestingWithEkki Auth",
+  "personalOwnerAccountVerified": true,
+  "appName": "TestingWithEkki",
+  "userDataPolicyApprovedByOwner": true,
+  "publishingStatus": "Testing",
+  "userType": "External",
+  "testUsers": 1,
+  "ownerTestUserConfigured": true,
+  "declaredScopes": [
+    "openid",
+    "https://www.googleapis.com/auth/userinfo.email",
+    "https://www.googleapis.com/auth/userinfo.profile"
+  ],
+  "sensitiveScopes": [],
+  "restrictedScopes": [],
+  "branding": {
+    "homepage": "https://testingwithekki.com",
+    "privacy": "https://testingwithekki.com/en/privacy",
+    "terms": "https://testingwithekki.com/en/terms",
+    "publicPublishingPerformed": false
+  },
+  "clients": [
+    {
+      "target": "preview",
+      "name": "TWE Cloudflare Preview",
+      "type": "Web application",
+      "javascriptOrigins": ["https://twe-preview.ekkisyam2310.workers.dev"],
+      "redirectUris": [
+        "https://twe-preview.ekkisyam2310.workers.dev/api/auth/callback/google"
+      ],
+      "separateCredentialPair": true,
+      "keychainReadbackVerified": true,
+      "installedInRuntime": true
+    },
+    {
+      "target": "production",
+      "name": "TWE Cloudflare Production",
+      "type": "Web application",
+      "javascriptOrigins": ["https://testingwithekki.com"],
+      "redirectUris": ["https://testingwithekki.com/api/auth/callback/google"],
+      "separateCredentialPair": true,
+      "keychainReadbackVerified": true,
+      "installedInRuntime": false
+    }
+  ],
+  "previewAuthorizationRequest": {
+    "capturedAt": "2026-11-02T04:07:29.636Z",
+    "status": 200,
+    "authorizationHost": "accounts.google.com",
+    "expectedClient": true,
+    "redirectUri": "https://twe-preview.ekkisyam2310.workers.dev/api/auth/callback/google",
+    "scopes": ["email", "openid", "profile"],
+    "responseType": "code",
+    "statePresent": true,
+    "cookiesPresent": true,
+    "completedGoogleLogin": false
+  },
+  "previewDeployment": {
+    "capturedAt": "2026-11-02T04:12:51.677Z",
+    "worker": "twe-preview",
+    "deploymentId": "46a2f129-68cc-4817-80ef-22af63b324b7",
+    "createdOn": "2026-11-02T04:05:58.49805Z",
+    "versions": [
+      {
+        "version_id": "e3199b67-cab5-4ea9-affd-de3d5e5697a7",
+        "percentage": 100
+      }
+    ]
+  },
+  "applicationSourceChanged": false,
+  "fullTestSuiteRun": false,
+  "billingChanged": false,
+  "productionRuntimeChanged": false,
+  "historicalProjectChanged": false,
+  "oldClientRevoked": false,
+  "completedGoogleLogin": false,
+  "remainingGates": [
+    "Owner preview consent/callback/session/logout/repeat-sign-in check.",
+    "Migrated existing Google-account ID, provider linkage, progress and role checks.",
+    "Review branding/domain requirements and deliberately publish before general-user release.",
+    "Install production client pair only during approved production preparation/cutover."
+  ],
+  "secretHandling": {
+    "ownerCopies": "Separate Mac login Keychain entries, verified by readback",
+    "previewRuntime": "Cloudflare Worker GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET",
+    "productionRuntime": "Not installed; retained in Keychain only",
+    "githubRuntimeCredentialCopiesAdded": false,
+    "secretsInPublicEvidence": false,
+    "temporaryPlaintextCredentialFilesRemoved": true
+  },
+  "references": [
+    "https://developers.google.com/identity/openid-connect/openid-connect",
+    "https://developers.google.com/identity/protocols/oauth2/web-server",
+    "https://better-auth.com/docs/authentication/google"
+  ]
+}
