@@ -25,17 +25,10 @@ export class LeaderboardPage extends BasePage {
   }
 
   async waitForHydration() {
-    await this.page.waitForFunction(
-      () => {
-        const appWindow = window as Window & {
-          __TSS_START_OPTIONS__?: unknown;
-          $_TSR?: unknown;
-        };
-        return Boolean(appWindow.__TSS_START_OPTIONS__) &&
-          (appWindow.$_TSR?.initialized === true ||
-            appWindow.$_TSR === undefined);
-      },
-      undefined,
+    // Start's globals can exist while the server-rendered tabs are still inert.
+    await expect(this.page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
       { timeout: 20_000 },
     );
   }

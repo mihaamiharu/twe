@@ -36,7 +36,7 @@ Use the existing owner-authorized local Wrangler session only for operator work.
 
 - [ ] Pin the actual release SHA and production artifact. Relate later documentation-only commits to the tested code without implying untested code has passed.
 - [x] Consolidated lint/typecheck, 784 unit tests, 30 D1 integration tests, production build and packaging passed on code `6dcc9fd`; known-credential scans passed. See the execution report. Later changes in this preparation are documentation only.
-- [ ] Owner completes the latest candidate's local Playwright run; the older successful run remains historical evidence.
+- [x] Owner executed the 132-test release suite and reported one failure. The leaderboard page-object hydration race was fixed; the isolated case passed (1/1). Review that combined evidence in the execution report; no fresh full-suite pass is claimed.
 - [ ] Review the fresh full-data/account/reverse-recovery rehearsal and finish owner-controlled existing-password/Google/browser checks. Synthetic legacy-library compatibility is not an actual owner's login.
 - [ ] Accept workload and account-wide Free resource headroom; current partial-day samples do not prove sustained capacity. Budget preview/probes alongside production and retain no-paid-fallback behavior.
 - [ ] Review Google publishing, exact production credentials, maintenance presentation, callback/cookie behavior and critical provider failures. No additional real messages/issues/paid generations are sent by generic checks.

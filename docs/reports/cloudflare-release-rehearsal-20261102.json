@@ -205,10 +205,28 @@
       "build": "production passed",
       "playwrightRunByAgent": false
     },
-    "ownerFinalCandidatePlaywright": "pending; owner retains execution"
+    "ownerFinalCandidatePlaywright": {
+      "ownerExecuted": true,
+      "reportedTotalTests": 132,
+      "reportedFailures": 1,
+      "onlyReportedFailure": "leaderboard monthly switch",
+      "rootCause": "Page object accepted startup globals before the application hydration marker became true.",
+      "fix": "Wait for body[data-app-hydrated=true]; retain URL and active-tab assertions.",
+      "focusedRerun": {
+        "passed": 1,
+        "failed": 0,
+        "elapsedSeconds": 4.1,
+        "disposableEnvironment": true
+      },
+      "targetedLint": "passed with zero warnings",
+      "fullSuiteRerunByAgent": false,
+      "applicationCodeChanged": false,
+      "originalFailureArtifactsRetainedPrivately": true,
+      "releaseReview": "Evaluate the owner full run plus the focused fix; this is not a new full-suite pass."
+    }
   },
   "remaining": [
-    "Owner local E2E and actual existing-account/Google/browser checks.",
+    "Review the owner full E2E run plus the passing focused hydration follow-up; complete actual existing-account/Google/browser activation checks.",
     "Google publishing, production configuration/credential review, final Free workload decision and approved maintenance/cutover window.",
     "Final frozen source export/import, production private backup/recovery and scheduled activation.",
     "At least seven successful observation days and explicit retirement/renewal cancellation sign-off.",
