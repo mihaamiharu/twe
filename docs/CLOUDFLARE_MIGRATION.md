@@ -1,5 +1,7 @@
 # Cloudflare migration plan and initial inventory
 
+Current status (November 2, 2026): production is on Cloudflare Free and the VPS website stack is stopped. The owner approved immediate cutover and VPS reuse. See the [cutover record](reports/cloudflare-production-cutover-20261102.json) and [operations guide](CLOUDFLARE_OPERATIONS.md). The inventory and execution agreement below record the earlier planning baseline.
+
 Tracking issue: [#245](https://github.com/mihaamiharu/twe/issues/245).
 Initial inventory: [#248](https://github.com/mihaamiharu/twe/issues/248).
 Initial inventory October 30, 2026; implementation evidence updated October 31. See [current readiness evidence](CLOUDFLARE_READINESS.md).

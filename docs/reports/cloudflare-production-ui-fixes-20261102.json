@@ -1,0 +1,60 @@
+{
+  "dateJakarta": "2026-11-02",
+  "status": "Both production UI fixes deployed and browser-verified",
+  "fixCommit": "6cb1041",
+  "deployedArtifactSourceCommit": "bec36b4767221e12d0d0adcd16cdc7b24e7e531e",
+  "fixes": {
+    "productionDevtools": "Render the TanStack Devtools shell only when import.meta.env.DEV is true; production launcher string absent from built JavaScript.",
+    "lessonCompletion": "Key detail content by lesson slug, locale and viewer so optimistic completion and pending mutation state belong to that lesson/viewer."
+  },
+  "regressions": {
+    "cases": [
+      "Complete lesson, navigate Next, return Previous and verify persistence after reload",
+      "Hold a completion response, navigate Next and release the original response"
+    ],
+    "before": {
+      "passed": 0,
+      "failed": 2,
+      "failure": "Next lesson incorrectly displayed Completed"
+    },
+    "after": {
+      "passed": 2,
+      "failed": 0,
+      "elapsedSeconds": 24.6
+    },
+    "environment": "Disposable local D1; synthetic accounts; line reporter and diagnostics kept privately outside Git"
+  },
+  "validation": {
+    "targetedEslint": "passed, zero warnings",
+    "typecheck": "passed",
+    "productionBuild": "passed",
+    "builtJavaScriptDevtoolsLauncherMatches": 0,
+    "fullSuitesRepeated": false,
+    "diffCheck": "passed"
+  },
+  "live": {
+    "capturedAt": "2026-11-02T16:26:52.983Z",
+    "worker": "twe-production",
+    "versions": [
+      {
+        "version_id": "2ecd0a99-5e72-444e-9a4c-c4087f8c8131",
+        "percentage": 100
+      }
+    ],
+    "customDomainPresent": true,
+    "workersDevEnabled": false,
+    "previewUrlsEnabled": false,
+    "publicLessonStatus": 200,
+    "browser": {
+      "completedLesson": "dom-tree-hierarchy",
+      "completedLessonStatus": "Completed",
+      "nextLesson": "devtools-mastery",
+      "nextLessonStatusAfterClientNavigation": "Not completed",
+      "nextLessonCompletionButtonEnabled": true,
+      "devtoolsLauncherCount": 0,
+      "refreshNeededAfterNavigation": false
+    }
+  },
+  "data": "One owner-authorized real lesson completion was retained. The next lesson was not completed during verification. No migration/import or progress reset was performed.",
+  "releaseBranchIntegration": "Merged current main backup protections; retained main CODEOWNERS rules and comments. Migration PR targets main and remains unmerged."
+}

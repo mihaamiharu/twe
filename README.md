@@ -17,7 +17,7 @@ A gamified platform for learning QA testing skills through interactive tutorials
 
 ## 🚀 Quick Start
 
-The migration branch runs TanStack Start through a thin Cloudflare Worker and a SQLite-backed Durable Object for dynamic compute, with D1 and Static Assets. The owner requires strict $0 and has deferred cutover pending Free-plan validation. Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git, then:
+Production runs TanStack Start through a thin Cloudflare Worker and a SQLite-backed Durable Object for dynamic compute, with D1 and Static Assets. The November 2, 2026 cutover uses Cloudflare Free; Paid is not an approved fallback. See the [cutover record](./docs/reports/cloudflare-production-cutover-20261102.json). Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git, then:
 
 ```sh
 git clone https://github.com/mihaamiharu/twe.git
@@ -27,7 +27,7 @@ bun run setup
 bun run dev:local
 ```
 
-Open [http://localhost:3000](http://localhost:3000). Setup preserves `.env`/`.dev.vars`, creates local D1 state and syncs editorial content. Docker/Podman and PostgreSQL are not required for this branch. Production remains on the VPS until the migration's readiness/cutover gates are approved.
+Open [http://localhost:3000](http://localhost:3000). Setup preserves `.env`/`.dev.vars`, creates local D1 state and syncs editorial content. Docker/Podman and PostgreSQL are not required for local development. The old VPS website stack is stopped; the VM is retained for remote development.
 
 See [Local development](./docs/LOCAL_DEVELOPMENT.md) and [Cloudflare operations](./docs/CLOUDFLARE_OPERATIONS.md).
 
