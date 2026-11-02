@@ -1,0 +1,61 @@
+{
+  "dateJakarta": "2026-11-02",
+  "scope": "Bug-report privacy source and private intake preparation; no live provider delivery",
+  "sourceCommit": "a8b8ffd1caa5c7412ab85c70f9437c0e1b9b5dbc",
+  "sourceChecks": {
+    "mockedCasesPassed": 30,
+    "assertions": 71,
+    "targetedLint": "passed",
+    "typecheck": "passed",
+    "fullSuiteRun": false,
+    "candidateBuildRun": false,
+    "previewDeployed": false
+  },
+  "privacy": {
+    "reporterEmailExported": false,
+    "userIdExported": false,
+    "rawBrowserInformationExported": false,
+    "opaqueReportReferenceRetained": true,
+    "structuredPageContext": "HTTP(S) origin and pathname only; URL credentials, query and fragment removed",
+    "clientAndServerUrlReduction": true,
+    "formatterReducesHistoricalRowUrls": true,
+    "reportTitlesSentToAnalytics": false,
+    "analyticsCategory": "fixed severity enum",
+    "privateRepositoryCheckedBeforeEveryPost": true,
+    "repositoryVisibilityResultCached": false,
+    "metadataAndPostShareDeadlineMs": 15000,
+    "redirectsFollowed": false,
+    "automaticRetries": false,
+    "savedD1ReportPreservedWhenNotificationBlocked": true,
+    "savedReportPersistenceVerification": "Source ordering preserved; hosted/database failure-path check remains for consolidated release validation."
+  },
+  "repository": {
+    "name": "mihaamiharu/twe-bug-reports",
+    "visibility": "private",
+    "personalOwnerVerified": true,
+    "issuesTabPresent": true,
+    "initialCommit": "dae393c4d966cc996797ac5ae72906552f1762ec",
+    "separateFromRecoveryVault": true,
+    "setupStatus": "created; intake token pending GitHub fresh verification"
+  },
+  "remoteState": {
+    "intakeTokenCreated": false,
+    "intakeRuntimeSecretsInstalled": false,
+    "liveIssuesCreated": 0,
+    "aiCallsSent": 0,
+    "productionChanged": false,
+    "billingChanged": false
+  },
+  "next": [
+    "Complete GitHub Confirm access, then review a token restricted to this one repository with Issues write and Metadata read.",
+    "Store approved credentials privately; prepare matching labels. Build/deploy the privacy candidate before installing preview intake secrets.",
+    "Obtain approval for one clearly labeled synthetic preview submission and inspect its private issue plus admin persistence.",
+    "Confirm AI access and budget before enabling its runtime credential; consolidate full release checks afterward."
+  ],
+  "limitations": [
+    "Report titles, prose and URL paths can contain information typed by reporters; metadata reduction is not a general secret detector.",
+    "A repository owner may later change visibility; the metadata check and issue POST cannot be made atomic.",
+    "Historical stored reports and existing external issues were not modified.",
+    "Focused tests were fully mocked; they do not establish hosted GitHub delivery or complete browser/database behavior."
+  ]
+}
