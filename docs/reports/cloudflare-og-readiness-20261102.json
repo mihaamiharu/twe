@@ -117,8 +117,8 @@
     },
     {
       "gate": "AI and GitHub provider success flows",
-      "status": "GitHub preview passed; DeepSeek read-only access passed; paid hint test pending approval",
-      "next": "See cloudflare-github-intake-20261102.json and cloudflare-ai-hints-20261102.json. Existing DeepSeek credit selected; guarded source prepared, generation remains unactivated pending bounded test approval. Production budget and consolidated release checks remain open."
+      "status": "bounded preview success flows passed; release validation and ongoing AI budget open",
+      "next": "See cloudflare-github-intake-20261102.json and cloudflare-ai-hints-20261102.json. One private issue and one authenticated synthetic AI hint passed with cleanup. New AI generation is disabled after the approved test. Agree ongoing allowances and complete failure/race/browser release checks before production activation."
     },
     {
       "gate": "production release and VPS retirement",

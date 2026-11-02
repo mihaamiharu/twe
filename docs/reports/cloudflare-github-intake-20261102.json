@@ -57,7 +57,7 @@
     "syntheticD1ReportsRemoved": 1
   },
   "next": [
-    "Confirm AI access and budget before enabling its runtime credential or making any upstream call.",
+    "See cloudflare-ai-hints-20261102.json for the subsequently approved single AI success check; agree ongoing allowances before re-enabling generation.",
     "During consolidated release validation, verify hosted notification-failure persistence and owner browser/E2E flows.",
     "Rotate the intake token before December 2 expiry; separately approve production configuration and cutover."
   ],
@@ -112,5 +112,6 @@
     "labelsVerified": true,
     "testIssueClosed": true,
     "syntheticD1ReportRemoved": true
-  }
+  },
+  "followupAiHintsReport": "cloudflare-ai-hints-20261102.json"
 }

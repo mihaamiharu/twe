@@ -1,6 +1,6 @@
 # DeepSeek hint activation
 
-The owner chose existing DeepSeek account credit on November 2, 2026. The existing local credential passed read-only `/user/balance` and `/models` checks: credit is available and `deepseek-flash` is listed. No generation request was sent, no balance amount was retained, and no new credential, billing subscription or production configuration was created.
+The owner chose existing DeepSeek account credit on November 2, 2026. The existing local credential passed read-only `/user/balance` and `/models` checks: credit is available and `deepseek-flash` is listed. Those initial checks sent no generation request. The owner subsequently approved exactly one synthetic preview attempt up to US$0.02, which passed as recorded below. No raw balance amount was retained, and no new API credential, billing subscription or production configuration was created.
 
 ## Request and spending boundaries
 
@@ -12,13 +12,19 @@ Caller inputs are bounded to a 160-character slug, 16,000-character attempt, ten
 
 The client uses fixed HTTPS `api.deepseek.com`, `deepseek-flash`, explicit non-thinking mode (`reasoning_effort: none`), a 1,024-token output cap, 25-second timeout and zero automatic retries. Only a nonempty answer ending with `finish_reason: stop` is accepted and stored; truncated/interrupted answers are failures. Timeout does not prove that upstream processing or billing stopped. Logs omit prompts, code, model answers, keys and provider error bodies.
 
-## Preview preparation and proposed bounded check
+## Approved preview check — November 2, 2026
 
-Guarded source `f898c7c` passed typecheck, targeted lint and the preview build. It is deployed to preview as Worker version `2f487d0b-fee1-47c7-afd5-656c69d56f11`. Remote secret-name inspection confirms that neither the DeepSeek key nor the request cap is installed. The two new policy tests and all full suites remain unrun, deferred to consolidated release validation as requested. The production deploy wrapper now requires the cap setting alongside the key.
+Guarded source `f898c7c` passed typecheck, targeted lint and the preview build. It deployed as Worker version `2f487d0b-fee1-47c7-afd5-656c69d56f11` before activation. The two new policy tests and all full suites remain unrun, deferred to consolidated release validation as requested. The production deploy wrapper requires the cap setting alongside the key.
 
-After approval, retain an owner copy of the existing key in this Mac's login Keychain and install only preview `DEEPSEEK_API_KEY` plus `AI_HINT_DAILY_LIMIT=1`. Deploy the guarded source before installing these settings. Use an existing synthetic preview learner to request exactly one short hint through the app. Verify successful response, D1 hint persistence and reuse without another generation request. Remove only the synthetic progress record created for this check and disable further new generation after the test; retain cached production/user records untouched. Do not retry an uncertain paid request.
+The owner approved an owner Keychain copy, preview-only key installation, a one-request cap and exactly one synthetic generation attempt up to **US$0.02** from existing credit. Keychain service `com.testingwithekki.deepseek.preview.20261102` / account `twe-preview` holds a read-back-verified owner copy. No key was placed in GitHub Actions or production, and no top-up or recurring purchase was made. The current rate card was checked before the request; prompt/output bounds were assessed against peak rates.
 
-The proposed approval ceiling is **one generation attempt and US$0.02**, deducted from existing credit, with synthetic public challenge content only. Confirm the current rate card again before the request. The 32 KB prompt and 1,024 output-token limits leave room below that ceiling at the November 2 peak rates. No top-up, recurring purchase, production key installation or wider test is included.
+An existing synthetic preview learner requested a hint for public `css-attribute-selectors` using `.synthetic-example`. Its challenge progress row was absent before the check. Exactly one generation attempt succeeded in **2,630 ms** through the app's real authenticated HTTP server-function endpoint. D1 stored the returned hint with `used_hint` set. The English answer identified the selector mistake and gave a syntax example using an unrelated attribute; this is a narrow quality observation, not broad hint-quality acceptance.
+
+The operator then set `AI_HINT_DAILY_LIMIT=0`. With new generation disabled, the same request returned the identical stored hint and left the shared allowance count at one. Only the exact newly created synthetic progress row was deleted, with guards for its user/challenge IDs, hint text and untouched completion/attempt fields. An uncached request afterward returned `AI hints are not enabled.` without consuming another allowance. The synthetic session was signed out and its temporary private session file removed. Rate-limit rows were left to expire normally. No other user record was changed.
+
+The resulting active preview Worker version is `f738ca85-aad8-46ea-a73e-916dca90e3d1` at 100%. The key remains in preview and owner Keychain, but **new generation remains disabled** until a separate ongoing allowance is agreed. There was no automatic retry. Two balance samples showed no visible debit; that does not establish a final exact per-call charge or free usage because of rounding, billing delay or unrelated account activity. Raw balances were not retained.
+
+See [sanitized activation and live-check evidence](reports/cloudflare-ai-hints-20261102.json).
 
 Full unit/D1 integration, owner browser/E2E, multilingual hint quality, completed-challenge behavior, billing reconciliation and production budget acceptance remain consolidated release gates. The daily request cap is not a substitute for account-wide credit monitoring.
 

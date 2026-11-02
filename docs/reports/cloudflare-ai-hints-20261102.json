@@ -1,6 +1,6 @@
 {
   "dateJakarta": "2026-11-02",
-  "scope": "Existing DeepSeek account verification and guarded preview preparation; no generation call",
+  "scope": "Existing DeepSeek credit, guarded preview activation, one approved synthetic hint and cleanup; no production change",
   "accountCheck": {
     "existingLocalCredentialAccepted": true,
     "readOnlyBalanceEndpointStatus": 200,
@@ -44,15 +44,30 @@
     "sourceCredentialScan": "existing key absent from source commit"
   },
   "remoteState": {
-    "previewKeyInstalled": false,
-    "previewCapInstalled": false,
-    "generationAttempts": 0,
+    "previewKeyInstalled": true,
+    "previewCapInstalled": true,
+    "generationAttempts": 1,
     "productionChanged": false,
     "billingChanged": false,
-    "previewKeyAndCapAbsenceVerified": true
+    "previewCapValue": "0",
+    "newGenerationDisabled": true,
+    "ownerKeychainCopyVerified": true,
+    "initialPreviewKeyAndCapAbsenceVerified": true
   },
-  "proposedTest": {
-    "approval": "pending",
+  "references": [
+    "https://api-docs.deepseek.com/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-chat-completion/",
+    "https://api-docs.deepseek.com/api/get-user-balance/"
+  ],
+  "remaining": [
+    "Approve an ongoing per-environment AI allowance before re-enabling new generation; preview remains capped at zero.",
+    "Consolidated full tests and owner browser/E2E, including failure/race cases and completed challenges.",
+    "Review multilingual hint quality, user privacy guidance, billing reconciliation and the production/account-wide budget.",
+    "Production data/cutover/recovery and VPS retirement remain separately gated."
+  ],
+  "sourceCommit": "f898c7c",
+  "approvedTest": {
+    "approval": "owner approved setup and exactly one attempt up to US$0.02",
     "environment": "preview",
     "generationAttempts": 1,
     "maximumUsd": 0.02,
@@ -63,18 +78,50 @@
       "persisted D1 hint",
       "cached reuse without generation"
     ],
-    "cleanup": "remove only exact synthetic progress record created by check; disable new generation afterward"
+    "cleanup": "remove only exact synthetic progress record created by check; disable new generation afterward",
+    "status": "passed",
+    "publicChallenge": "css-attribute-selectors",
+    "syntheticUserAttempt": ".synthetic-example"
   },
-  "references": [
-    "https://api-docs.deepseek.com/quick_start/pricing/",
-    "https://api-docs.deepseek.com/api/create-chat-completion/",
-    "https://api-docs.deepseek.com/api/get-user-balance/"
-  ],
-  "remaining": [
-    "Approve Keychain owner copy, preview credential/cap installation and one bounded paid synthetic request.",
-    "Consolidated full tests and owner browser/E2E.",
-    "Review hint quality, completed challenge behavior, user privacy guidance and approved production/account-wide budget."
-  ],
-  "sourceCommit": "f898c7c",
-  "previewWorkerVersion": "2f487d0b-fee1-47c7-afd5-656c69d56f11"
+  "liveVerification": {
+    "capturedAt": "2026-11-02T09:19:52.820Z",
+    "generationAttempts": 1,
+    "success": true,
+    "wallMs": 2630,
+    "d1HintPersisted": true,
+    "cachedHintMatchedAfterGenerationDisabled": true,
+    "uncachedRequestRejectedWhileDisabled": true,
+    "dailyAllowanceCountBeforeAndAfterCache": 1,
+    "syntheticProgressRemoved": true,
+    "syntheticSessionSignedOut": true,
+    "temporarySessionFileRemoved": true,
+    "newGenerationDisabled": true,
+    "otherUserRecordsChanged": false,
+    "productionChanged": false
+  },
+  "previewWorkerVersionBeforeActivation": "2f487d0b-fee1-47c7-afd5-656c69d56f11",
+  "previewWorkerVersionAfterDisabling": "f738ca85-aad8-46ea-a73e-916dca90e3d1",
+  "activePercentage": 100,
+  "credential": {
+    "ownerCopy": "Mac login Keychain",
+    "service": "com.testingwithekki.deepseek.preview.20261102",
+    "account": "twe-preview",
+    "encoding": "base64 JSON",
+    "readbackVerified": true,
+    "source": "existing ignored local environment file; no new API credential created",
+    "runtimeInstallation": "preview only",
+    "githubActionsCopiesCreated": false
+  },
+  "pricingCheck": {
+    "checkedDateJakarta": "2026-11-02",
+    "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "currency": "USD",
+    "peakInputCacheMissPerMillionTokens": 0.3,
+    "peakOutputPerMillionTokens": 1.2,
+    "approvedCeiling": 0.02,
+    "rawBalancesRetained": false,
+    "exactGenerationChargeEstablished": false,
+    "limitation": "Two account-balance samples showed no visible movement; rounding, billing delay and unrelated account activity prevent an exact per-call charge claim. This is not evidence of free API usage."
+  },
+  "qualityObservation": "The English hint identified a class selector used where an attribute selector was needed and gave an unrelated attribute-selector syntax example. One short CSS example does not establish multilingual or other challenge-type quality."
 }
