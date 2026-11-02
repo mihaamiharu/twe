@@ -111,13 +111,13 @@
   "remainingGates": [
     {
       "gate": "OG visual parity",
-      "status": "failed",
-      "next": "Fix font coverage and long-title layout; repeat visual QA with a bounded memory study."
+      "status": "passed for tested scripts/layout in follow-up",
+      "next": "See cloudflare-og-readiness-20261102.json; do not infer all-Unicode or color-emoji parity."
     },
     {
       "gate": "memory and burst capacity",
-      "status": "not accepted",
-      "next": "Reduce/justify object peak memory and measure representative bursts with sufficient headroom."
+      "status": "bounded overload check passed; sustained production capacity open",
+      "next": "Follow-up measured 110846709-byte periodic peak and expected four-of-eight overload rejection. Validate owner release workload and actual account-wide traffic/quota budget; periodic samples can miss transient peaks."
     },
     {
       "gate": "Google OAuth",
@@ -134,5 +134,6 @@
       "status": "deferred",
       "next": "Owner E2E, approved production data/cutover/recovery, observation and resolution of the separate VM workload."
     }
-  ]
+  ],
+  "followupOgAndMemoryReport": "cloudflare-og-readiness-20261102.json"
 }

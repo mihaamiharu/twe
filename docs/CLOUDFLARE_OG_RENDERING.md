@@ -24,7 +24,7 @@ These are bounded-work controls, not production capacity acceptance. Validate ac
 
 ## Verification
 
-Focused tests validate all fourteen callback signatures against the pinned wrapper and cover grapheme bounds, actual title layout, duplicate coalescing, overload, cache hit/eviction, and queue recovery after a rejected title. The owner's full Playwright release run remains separate.
+Focused tests validate all fourteen callback signatures against the pinned wrapper and cover grapheme bounds, actual title layout, duplicate coalescing, overload, cache hit/eviction, and queue recovery after a rejected title. The owner's full Playwright release run remains separate. The [November 2 hosted evidence](reports/cloudflare-og-readiness-20261102.json) records the 96-request pass, inspected glyph/layout cases, bounded overload behavior, scoped resource samples and remaining capacity limits.
 
 Use `cf:measure:preview` for bounded route/role/OG checks. For provider memory samples scoped to a study, `cf:audit:free` accepts an optional positive UTC window of at most one hour after its private report path:
 

@@ -1,0 +1,136 @@
+{
+  "dateJakarta": "2026-11-02",
+  "scope": "Bounded preview OG rendering and memory checks; production cutover and VPS retirement remain deferred",
+  "sourceCommit": "7ac7cc447f95be2b6f41a401787c42be8bef8da9",
+  "workerVersion": "e38a58ef-885c-4e68-ae15-6709555e99c5",
+  "implementation": {
+    "selfHostedFonts": [
+      "Noto Sans",
+      "Noto Sans Arabic",
+      "Noto Sans JP",
+      "Noto Emoji (monochrome)"
+    ],
+    "satoriVersion": "0.63.2",
+    "staticallyCompiledHarfBuzzCallbacks": 14,
+    "distinctRenderLimit": 4,
+    "pngCacheEntries": 8,
+    "pngCacheBytes": 2097152,
+    "fontBinaryCacheBytes": 262144,
+    "perRenderFontCount": 12,
+    "perRenderFontBytes": 524288,
+    "retainedSatoriFontLoaders": 2,
+    "shapedRunsPerLoader": 32,
+    "fixedApplicationObject": true,
+    "externalFontFetch": false
+  },
+  "verification": {
+    "focusedTestsPassed": 4,
+    "focusedAssertions": 43,
+    "targetedLint": "passed",
+    "typecheck": "passed",
+    "previewBuild": "passed",
+    "completeBuiltLocalWorkerdLatinAndMixedPng": "passed",
+    "fullE2ERun": false
+  },
+  "hostedStudy": {
+    "status": "passed",
+    "startedAt": "2026-11-02T03:49:05.672Z",
+    "completedAt": "2026-11-02T03:50:00.247Z",
+    "requests": 96,
+    "genericRequests": 84,
+    "genericStatusCounts": {
+      "200": 74,
+      "401": 2,
+      "307": 4,
+      "403": 4
+    },
+    "uniqueGenericOgImages": 32,
+    "concurrencyCap": 8,
+    "externalProviderDelivery": false,
+    "longUnbrokenTitlePng": "passed",
+    "mixedScriptPng": "passed",
+    "pathologicalCombiningGrapheme": "bounded to ellipsis",
+    "unsupportedCharacterStatus": 422,
+    "eightImageBurst": {
+      "rendered": 4,
+      "retryable503": 4,
+      "retryAfterSeconds": 1
+    },
+    "visualInspection": [
+      "Cyrillic and Latin accents visible.",
+      "Arabic letters connected and right-to-left shaping visible.",
+      "Japanese glyphs visible.",
+      "Joined emoji rendered as complete monochrome icons.",
+      "Long and unbroken titles stay in three lines above the reward footer.",
+      "Mixed scripts render in the same card; escaped markup remains text."
+    ],
+    "visualScope": "These tested cases do not establish all-Unicode or color-emoji parity."
+  },
+  "observedTail": {
+    "records": 116,
+    "outcomes": {
+      "ok": 116
+    },
+    "exceptionCount": 0,
+    "gatewayMaxCpuMs": 3,
+    "objectMaxCpuMs": 724,
+    "runtimeBootEvents": 2,
+    "limitation": "Observed records only, not a complete request meter. Two boot events were observed; no claim of one uninterrupted object lifetime or production cold-start p99."
+  },
+  "providerStudyWindow": {
+    "start": "2026-11-02T03:48:50.000Z",
+    "end": "2026-11-02T03:50:10.000Z",
+    "gatewayRequests": 95,
+    "gatewayErrors": 0,
+    "gatewayMaxCpuMs": 3.735,
+    "objectRequests": 93,
+    "objectInvocationErrors": 0,
+    "objectDurationGbSeconds": 4.0099682560000005,
+    "objectPeriodicGroups": 1,
+    "objectPeriodicPeakMemoryBytes": 110846709,
+    "objectExceededMemoryErrors": 0,
+    "objectExceededCpuErrors": 0,
+    "limitation": "Provider sampling/lag and periodic memory can miss peaks; this window can include other preview activity. Empty periodic groups are not zero memory.",
+    "capturedAt": "2026-11-02T03:52:16.948Z",
+    "conservativeMemoryBudgetBytes": 128000000,
+    "conservativeMemoryHeadroomBytes": 17153291,
+    "memoryHeadroomPercent": 13.4
+  },
+  "earlierFailedCandidate": {
+    "workerVersion": "5e749c24-9eaa-47e2-a479-0cc2f4f64ac1",
+    "status": "not passed; superseded",
+    "completedResponsesBeforeTimeout": 28,
+    "timedOutOgRequests": 1,
+    "followupDiagnosticTimeouts": 2,
+    "cause": "HarfBuzz callback conversion attempted runtime WASM compilation and left startup promise pending. Static callback modules and promise rejection fixed this path."
+  },
+  "remainingGates": [
+    {
+      "gate": "sustained production capacity and quota acceptance",
+      "status": "open",
+      "next": "Bounded work and overload behavior passed. Periodic memory can miss transient peaks; the remaining headroom is limited. Validate owner release workload and budget all active namespaces against actual traffic before cutover."
+    },
+    {
+      "gate": "Google OAuth",
+      "status": "blocked",
+      "next": "Recover historical project access or authorize a replacement OAuth client/project."
+    },
+    {
+      "gate": "AI and GitHub provider success flows",
+      "status": "blocked",
+      "next": "Configure personal preview credentials and obtain bounded upstream-call authorization."
+    },
+    {
+      "gate": "production release and VPS retirement",
+      "status": "deferred",
+      "next": "Owner full E2E, approved production migration/cutover/recovery, observation and resolution of the separate VM workload."
+    }
+  ],
+  "limitations": [
+    "Provider analytics are sampled and delayed; dataset totals need not equal the HTTP probe count. Missing groups are not zero resource use.",
+    "Historical 121434660-byte peak belongs to the previous partial-day audit and is not a measurement of this candidate.",
+    "No production p99, sustained throughput, guaranteed memory ceiling or final capacity acceptance is claimed.",
+    "No billing change, production deployment, extra object namespace, mail/Google/AI/GitHub delivery or VPS modification was performed.",
+    "Credentials, request metadata, cookies, raw tails and private account records remain outside the repository."
+  ]
+}
