@@ -1,6 +1,6 @@
 # Readiness, cutover and retirement
 
-This runbook is preparation for #256/#257. It does not authorize a DNS switch, production import, paid plan, data discard or VPS deletion. The owner wants local E2E first. Keep the VPS/Tunnel recoverable until an approved cutover and at least one week of successful observation.
+This runbook is preparation for #256/#257. It does not authorize a DNS switch, production import, paid plan, data discard or VPS deletion. The owner wants local E2E first. The owner removed the seven-day hold on November 2: follow [the same-day cutover and VPS reuse plan](CLOUDFLARE_SAME_DAY_CUTOVER.md). Retain verified recovery assets off the VPS; reclaim the website stack after immediate checks pass, keeping the VM for remote development.
 
 Use [the November 2 execution plan](CLOUDFLARE_RELEASE_PLAN.md) for current evidence, phase order, ownership and acceptance gates. This document owns the cutover and rollback procedure.
 
@@ -23,8 +23,8 @@ No production DNS change follows simply from a green source check. Link the appr
 3. Take the final PostgreSQL custom-format backup, verify its checksum, export one consistent normalized snapshot, and record final counts/hashes. Keep the frozen PostgreSQL database unchanged as the rollback source.
 4. Apply the reviewed D1 migrations to the explicitly identified empty production target, import once, and require full row/count/hash/FK/integrity equality. Stop on any mismatch; never auto-reset learner data to make reconciliation pass.
 5. Set the reviewed production bindings/secrets/origin/callbacks and deploy the approved production artifact. Keep MAINTENANCE_MODE=true until the target and configuration are confirmed. The checked-in production Worker has no custom-domain route; attach testingwithekki.com only during this approved step, recording the previous Tunnel/DNS routing for rollback.
-6. Route the domain to the Worker, disable maintenance, and smoke-test critical auth/content/write/admin/integration paths. Ensure the old app remains stopped and cannot receive writes through a stale origin or Tunnel hostname. Purge changed stable OG asset URLs if needed; verify static requests bypass the Worker as intended.
-7. Record the exact first-D1-write time and monitor CPU/errors/quotas, auth/email, backups and data invariants closely. Keep restricted audit/recovery evidence and the old deployment recoverable for at least one week.
+6. With the imported dataset reconciled, complete the first private production backup and independent downloaded-artifact recovery, then enable its schedule. Route the domain to the Worker, check maintenance, disable maintenance, and smoke-test critical auth/content/write/admin/integration paths. Ensure the old app remains stopped and cannot receive writes through a stale origin or Tunnel hostname. Purge changed stable OG asset URLs if needed; verify static requests bypass the Worker as intended.
+7. Record the exact first-D1-write time and monitor CPU/errors/quotas, auth/email, backups and data invariants closely. Keep restricted audit/recovery evidence off the VPS. Once immediate acceptance passes, disable the old hosting stack and reuse the VM without a seven-day hold.
 
 ## Rollback and D1-only writes
 
@@ -34,4 +34,4 @@ After D1 accepts writes, block new Worker traffic and drain admitted requests, t
 
 ## Observation and retirement
 
-After at least one successful week, record sign-off for data integrity, feature parity, CPU/budget, auth/email, backups and rollback/recovery results. Then #257 may remove the obsolete Tunnel and VPS credentials/deployment access, archive PostgreSQL recovery assets under the agreed retention, and cancel renewal before May 2027. Target cutover remains April 2027 or earlier. Do not delete the VPS or its backups merely because implementation has been pushed.
+Record immediate acceptance for data integrity, existing-user/critical-flow behavior, CPU/budget and independent production recovery. Under the owner's accelerated direction, #257 can then disable the obsolete TWE stack/Tunnel/deploy access, retain recovery off the machine and release the VPS for remote development the same day. Continue monitoring and check the first scheduled backup without reserving the old stack. Keep the VM; cancellation, reinstallation and deletion are outside this plan. Rollback after D1 writes requires reconciliation into a fresh target.

@@ -40,7 +40,7 @@ Use the existing owner-authorized local Wrangler session only for operator work.
 - [ ] Review the fresh full-data/account/reverse-recovery rehearsal and finish owner-controlled existing-password/Google/browser checks. Synthetic legacy-library compatibility is not an actual owner's login.
 - [ ] Accept workload and account-wide Free resource headroom; current partial-day samples do not prove sustained capacity. Budget preview/probes alongside production and retain no-paid-fallback behavior.
 - [ ] Review Google publishing, exact production credentials, maintenance presentation, callback/cookie behavior and critical provider failures. No additional real messages/issues/paid generations are sent by generic checks.
-- [ ] Record operator, rollback owner, exact maintenance window and measured downtime expectation. Confirm final backup retention and the provider's exact renewal/cancellation deadline.
+- [ ] Record operator, rollback owner, exact maintenance window and downtime allowance (proposed up to 60 minutes; actual remote duration unmeasured). Confirm off-VPS recovery custody/retention. The VM is retained for remote development; cancellation is not part of this cutover.
 
 ## Import, backup and routing order
 
@@ -52,6 +52,6 @@ Only after the owner accepts the concrete go/no-go record, switch the reviewed w
 
 ## Retirement conditions
 
-Keep the old TWE deployment recoverable for at least seven successful observation days. The owner identified the separate landing service as a disposable dummy and approved discontinuing it; its two containers were stopped and restart disabled, with files/volumes retained. It no longer needs a Cloudflare migration or separate account-access task.
+The owner removed the seven-day hold. Follow [the same-day plan](CLOUDFLARE_SAME_DAY_CUTOVER.md): complete immediate critical live checks and independent production recovery, retain recovery assets off the VPS, then stop/disable the old TWE stack so the VM can be reused for remote development. The owner identified the separate landing service as a disposable dummy and approved discontinuing it; its two containers were stopped and restart disabled, with files/volumes retained. It no longer needs a Cloudflare migration or separate account-access task.
 
-After successful observation and explicit retirement sign-off, remove obsolete access/Tunnel/deploy configuration and cancel renewal before the confirmed deadline. VM/backup deletion follows the accepted retention decision. A post-write rollback must preserve and reconcile D1-only writes; a DNS-only rollback is insufficient.
+After immediate acceptance, disable obsolete TWE Tunnel/deploy access only after checking it is not shared, and confirm the site works with old services stopped. Keep the VM and development access. No disk/volume deletion or renewal cancellation is included. A post-write rollback must preserve and reconcile D1-only writes into a fresh target; a DNS-only rollback is insufficient. Monitoring continues on Cloudflare without a time-based hold on VPS reuse.

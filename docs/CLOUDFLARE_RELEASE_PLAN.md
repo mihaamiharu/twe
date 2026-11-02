@@ -6,6 +6,10 @@ Execution has started. [Production standby preparation](reports/cloudflare-produ
 
 The outcome is production on Cloudflare Free with all existing accounts and learning data preserved, independent recovery, and no remaining dependency on the VPS. Existing Spacemail and owner-approved DeepSeek credit remain external integrations. Strict $0 applies to the new hosting architecture; a paid Cloudflare fallback is excluded.
 
+## Updated retirement direction — November 2
+
+The owner removed the seven-day hold and wants to reuse the VPS for remote development. Follow [the same-day cutover plan](CLOUDFLARE_SAME_DAY_CUTOVER.md): retire the TWE hosting stack after immediate production and off-VPS recovery checks pass, keeping the VM itself for development. Continued monitoring does not reserve the VPS. The earlier whole-machine cancellation goal is superseded for this execution; do not cancel or wipe the VM.
+
 ## Starting evidence
 
 The recorded November 2 baseline is release commit `de419ec`, with protected synthetic preview running as Worker version `f738ca85-aad8-46ea-a73e-916dca90e3d1`. Refresh these identifiers before execution; they are not permanent release pins.
@@ -67,7 +71,7 @@ Complete the route/security/feature matrix and relevant failure cases: en/id, pu
 
 Measure bounded representative cold/warm, mixed and burst workloads; record request counts, window, CPU, latency, memory, object-active duration, D1 rows/storage and all other account usage. Gateway target remains p99 below 8 ms with no exceeded-CPU failures; report sample limitations. Object CPU/memory errors, unexplained critical-flow failures or unsupported quota/headroom assumptions block release. A small bounded test is not a sustained-capacity guarantee. If strict Free cannot meet the workload, redesign before cutover.
 
-**Exit:** final readiness record links the exact SHA/artifact, tests, owner E2E, data/auth/recovery results and Free capacity decision, with no unresolved critical failure. Record operator and rollback owner, maintenance window and downtime estimate. Proposed backup objectives remain RPO ≤24 hours / RTO ≤60 minutes until accepted and measured; planned cutover must preserve acknowledged writes.
+**Exit:** final readiness record links the exact SHA/artifact, tests, owner E2E, data/auth/recovery results and Free capacity decision, with no unresolved critical failure. Record operator and rollback owner, maintenance window and downtime planning allowance (the same-day plan proposes up to 60 minutes; actual remote duration is not yet measured). Proposed backup objectives remain RPO ≤24 hours / RTO ≤60 minutes until accepted and measured; planned cutover must preserve acknowledged writes.
 
 ### 5. Execute the approved cutover
 
@@ -75,23 +79,23 @@ Only after phase 4 passes and the owner approves the concrete window and go/no-g
 
 Stop TWE app writers while PostgreSQL remains available; verify auth/session/admin/API writers are unavailable too. Take the final backup and consistent export. Apply reviewed migrations to the identified empty production D1, import and reconcile fully. Configure/deploy the approved production artifact in maintenance, then attach the production route and enable traffic. Preserve mail DNS and unrelated zones/services. Keep the old app stopped so a stale hostname cannot create a second writer.
 
-Record the first D1 production write and check critical login, existing-account identity/roles/progress, content/write/admin paths, cookies, callbacks and resource errors immediately. Run a manual private production backup and independent restore, then enable the reviewed production schedule and verify the first scheduled run.
+Before opening user writes, run a manual private production backup and independent restore, then enable the reviewed production schedule. Record the first D1 production write and check critical login, existing-account identity/roles/progress, content/write/admin paths, cookies, callbacks and resource errors immediately. Verify the first scheduled backup when it runs; this later scheduled event does not hold the VPS for seven days.
 
 **Exit:** one writable production source on Cloudflare, reconciled data, critical live flows passing, backup/recovery proven and cutover evidence recorded.
 
-### 6. Observe for at least seven successful days
+### 6. Complete immediate production acceptance
 
-Review critical auth/write failures, Worker/object errors, CPU/memory/quota headroom, D1 errors/invariants and backups daily. Confirm at least one scheduled artifact is independently recoverable, monitoring ownership is clear, and the old VPS receives no TWE writes. Failed critical checks pause retirement and require investigation; resolve incidents and record a new successful observation window when appropriate.
+Follow the same-day plan's existing-user, progress/admin, public-route, error/quota and independent production-recovery checks. Verify old writers cannot resume. Resolve critical failures before reclaiming the old stack. The owner explicitly removed the seven-day observation hold because the site has low traffic and the VPS is needed for development.
 
-**Exit:** owner accepts at least one week of successful operation, integrity, auth, backups and Free-budget evidence. Keep the old deployment recoverable throughout this phase.
+**Exit:** critical live flows and production recovery pass, the owner completes real-account checks, and retained recovery assets are available off the VPS. Continue monitoring on Cloudflare after VPS reuse; there is no calendar waiting period.
 
-### 7. Retire the VPS under #257
+### 7. Retire TWE hosting and reuse the VPS under #257
 
-First require phase 6 sign-off and resolution of every non-TWE VPS workload. Preserve final PostgreSQL/schema/migration evidence, pinned deploy artifacts and recovery instructions under the accepted retention policy. Disable only obsolete Tunnel/deploy access, rotate/revoke unused credentials, and remove legacy deployment configuration in a separate reviewed change.
+Preserve final PostgreSQL/schema/migration evidence, pinned deploy artifacts, exact routing and recovery instructions outside the VM. Stop and disable restart for the inventoried TWE app/PostgreSQL/Tunnel services, checking dependencies and shared credentials first. Disable only obsolete TWE deployment hooks/access; do not remove remote-development access or unrelated services. Confirm the website works with the old stack stopped and its CPU/memory is available for development.
 
-After a dependency check shows the machine is no longer needed, obtain the explicit retirement/cancellation sign-off, cancel renewal before the actual deadline and retain confirmation. Delete the VM or recovery assets only under the specifically approved retention/deletion step. Verify the live site, auth, mail DNS, backup and monitoring again afterward.
+The VM stays in service for remote development. No VM cancellation, reinstallation, disk wipe or volume/backup deletion is included. Recovery after new D1 writes must use a fresh target with complete reconciliation, rather than assuming the reused VPS is an unchanged rollback server.
 
-**Exit:** Cloudflare serves production independently, no unrelated workload is lost, obsolete access is removed, recovery is retained and renewal cancellation is confirmed.
+**Exit:** Cloudflare serves production independently, off-VPS recovery is proven, old website writers stay disabled and the existing VPS is available for remote development the same day.
 
 ## Stop and rollback rules
 
@@ -101,7 +105,7 @@ After a dependency check shows the machine is no longer needed, obtain the expli
 | Critical auth/security/write failure or Free resource failure before D1 accepts production writes | Keep maintenance or restore the old route/app as the sole writer |
 | Critical failure after any D1 production write | Block new traffic, drain admitted work, verify DB freeze, export and reconcile into a fresh rollback PostgreSQL target before restoring a sole writer |
 | Proposed loss of D1-only writes | Stop; data discard requires a separate explicit owner decision |
-| Separate VPS workload still depends on the VM | TWE may remain on Cloudflare, but whole-VM retirement/cancellation stays blocked |
+| Separate workload or remote development needs the VM | Retire only TWE hosting; preserve the VM and unrelated access/services |
 
 No automatic traffic-only rollback after D1 writes, concurrent old/new writers, production resets, weakened password hashing or paid-plan fallback is part of this plan.
 
@@ -109,4 +113,4 @@ No automatic traffic-only rollback after D1 writes, concurrent old/new writers, 
 
 The agent owns preparation, implementation fixes, isolated rehearsals, non-Playwright checks and sanitized evidence. The owner owns credentials/2FA entry when required, existing-account/browser sign-in, the final local E2E run, cutover go/no-go and retirement sign-off. Routine authorized preparation continues while the owner is away; a required owner action is recorded with independent work continued where possible.
 
-Phases 1–2 and consolidated candidate validation have recorded evidence. Production credential/publishing preparation is complete; finish owner account checks, Free capacity acceptance and the concrete cutover go/no-go record before phase 5. Publish only sanitized results on the release branch; do not mark #256 or #257 complete from source preparation alone. Supporting procedures: [data transfer/recovery](CLOUDFLARE_DATA.md), [operations](CLOUDFLARE_OPERATIONS.md), [backups](CLOUDFLARE_BACKUPS.md), [Google](CLOUDFLARE_GOOGLE_OAUTH.md) and [current evidence](CLOUDFLARE_RELEASE_HARDENING.md).
+Phases 1–2 and consolidated candidate validation have recorded evidence. Production credential/publishing preparation is complete. Refresh final preflight and the concrete cutover window/go-no-go record, then follow the same-day plan, including real migrated-account checks during immediate production acceptance. Publish only sanitized results on the release branch; do not mark #256 or #257 complete from source preparation alone. Supporting procedures: [data transfer/recovery](CLOUDFLARE_DATA.md), [operations](CLOUDFLARE_OPERATIONS.md), [backups](CLOUDFLARE_BACKUPS.md), [Google](CLOUDFLARE_GOOGLE_OAUTH.md) and [current evidence](CLOUDFLARE_RELEASE_HARDENING.md).
