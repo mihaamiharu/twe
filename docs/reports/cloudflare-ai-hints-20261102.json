@@ -1,0 +1,76 @@
+{
+  "dateJakarta": "2026-11-02",
+  "scope": "Existing DeepSeek account verification and guarded preview preparation; no generation call",
+  "accountCheck": {
+    "existingLocalCredentialAccepted": true,
+    "readOnlyBalanceEndpointStatus": 200,
+    "balanceAvailable": true,
+    "readOnlyModelsEndpointStatus": 200,
+    "flashModelAvailable": true,
+    "balanceAmountRetained": false,
+    "generationCalls": 0
+  },
+  "requestPolicy": {
+    "authenticatedOnly": true,
+    "knownDatabaseAndCatalogChallengeRequired": true,
+    "dailyCapSetting": "AI_HINT_DAILY_LIMIT",
+    "missingOrMalformedCap": "new generation disabled",
+    "capRange": [
+      1,
+      9999
+    ],
+    "capStorage": "atomic D1 counter per environment/database",
+    "window": "24 hours anchored at first accepted request",
+    "perUserCooldownMs": 30000,
+    "failedOrUncertainAttemptsRefunded": false,
+    "cachedHintConsumesNewSlot": false,
+    "maxAttemptCharacters": 16000,
+    "maxPromptUtf8Bytes": 32000,
+    "maxOutputTokens": 1024,
+    "model": "deepseek-flash",
+    "reasoningEffort": "none",
+    "timeoutMs": 25000,
+    "automaticRetries": 0,
+    "successfulFinishReason": "stop"
+  },
+  "validation": {
+    "typecheck": "passed",
+    "targetedLint": "passed",
+    "policyTestsAdded": 2,
+    "testsRun": false,
+    "fullSuiteRun": false,
+    "previewBuild": "pending",
+    "previewDeployment": "pending"
+  },
+  "remoteState": {
+    "previewKeyInstalled": false,
+    "previewCapInstalled": false,
+    "generationAttempts": 0,
+    "productionChanged": false,
+    "billingChanged": false
+  },
+  "proposedTest": {
+    "approval": "pending",
+    "environment": "preview",
+    "generationAttempts": 1,
+    "maximumUsd": 0.02,
+    "previewSharedCap": 1,
+    "data": "synthetic public challenge context and code",
+    "verify": [
+      "successful hint",
+      "persisted D1 hint",
+      "cached reuse without generation"
+    ],
+    "cleanup": "remove only exact synthetic progress record created by check; disable new generation afterward"
+  },
+  "references": [
+    "https://api-docs.deepseek.com/quick_start/pricing/",
+    "https://api-docs.deepseek.com/api/create-chat-completion/",
+    "https://api-docs.deepseek.com/api/get-user-balance/"
+  ],
+  "remaining": [
+    "Approve Keychain owner copy, preview credential/cap installation and one bounded paid synthetic request.",
+    "Consolidated full tests and owner browser/E2E.",
+    "Review hint quality, completed challenge behavior, user privacy guidance and approved production/account-wide budget."
+  ]
+}

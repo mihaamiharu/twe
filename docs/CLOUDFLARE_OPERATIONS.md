@@ -34,7 +34,7 @@ Local secrets live in ignored `.dev.vars`; environment-specific `.dev.vars.previ
 - GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: use the separate [replacement Google clients](CLOUDFLARE_GOOGLE_OAUTH.md). Preview is installed; production is retained in owner Keychain until approved release preparation. Preserve Google provider account IDs and user linkage; never copy the preview pair into production.
 - EMAIL_PROVIDER / EMAIL_FROM: selected preview/production-candidate transport is Spacemail SMTP. SMTP_HOST / SMTP_PORT are configuration; SMTP_USER / SMTP_PASSWORD are Worker secrets. HTTP transports retain EMAIL_HTTP_URL / EMAIL_API_KEY.
 - ADMIN_EMAIL: notification destination.
-- DEEPSEEK_API_KEY: existing HTTP AI integration, with bounded timeout and retries disabled.
+- DEEPSEEK_API_KEY / AI_HINT_DAILY_LIMIT: existing DeepSeek credit with bounded prompts/output, no retries and an atomic shared D1 request cap. Missing cap disables new generation; see [activation and preview test limits](CLOUDFLARE_AI_HINTS.md).
 - GH_API_TOKEN / GH_OWNER / GH_REPO: [private bug-report intake](CLOUDFLARE_GITHUB_INTAKE.md). Every delivery verifies private repository metadata before posting; metadata/POST share a 15-second deadline with no redirects or automatic retries. Do not target the public code repository or private backup vault.
 - PREVIEW_ACCESS_TOKEN: at least 32 random characters; Basic username is preview. Preview fails closed if absent, protects static assets too, and sends noindex/private headers.
 - VITE_GA_MEASUREMENT_ID: optional public analytics identifier returned only as configured.

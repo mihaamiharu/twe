@@ -117,8 +117,8 @@
     },
     {
       "gate": "AI and GitHub provider success flows",
-      "status": "GitHub preview passed; AI blocked on access/budget",
-      "next": "See cloudflare-github-intake-20261102.json for the approved single anonymous private issue and cleanup. Confirm AI access/budget and bounded-call authorization before configuring or calling AI; production configuration remains deferred."
+      "status": "GitHub preview passed; DeepSeek read-only access passed; paid hint test pending approval",
+      "next": "See cloudflare-github-intake-20261102.json and cloudflare-ai-hints-20261102.json. Existing DeepSeek credit selected; guarded source prepared, generation remains unactivated pending bounded test approval. Production budget and consolidated release checks remain open."
     },
     {
       "gate": "production release and VPS retirement",
@@ -134,5 +134,6 @@
     "Credentials, request metadata, cookies, raw tails and private account records remain outside the repository."
   ],
   "followupGoogleOAuthReport": "cloudflare-google-oauth-20261102.json",
-  "followupGitHubIntakeReport": "cloudflare-github-intake-20261102.json"
+  "followupGitHubIntakeReport": "cloudflare-github-intake-20261102.json",
+  "followupAiHintsReport": "cloudflare-ai-hints-20261102.json"
 }

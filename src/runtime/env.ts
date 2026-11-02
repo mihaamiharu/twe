@@ -27,6 +27,7 @@ export interface RuntimeEnv {
   EMAIL_FROM?: string;
   ADMIN_EMAIL?: string;
   DEEPSEEK_API_KEY?: string;
+  AI_HINT_DAILY_LIMIT?: string;
   GH_API_TOKEN?: string;
   GH_OWNER?: string;
   GH_REPO?: string;

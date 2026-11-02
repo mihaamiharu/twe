@@ -15,6 +15,7 @@ declare namespace NodeJS {
     CI?: string;
     DATABASE_URL?: string;
     DEEPSEEK_API_KEY?: string;
+    AI_HINT_DAILY_LIMIT?: string;
     DIRECT_URL?: string;
     E2E_ADMIN_EMAIL?: string;
     E2E_ADMIN_PASSWORD?: string;

@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import { getRuntimeEnv } from '#platform';
+import { MAX_HINT_OUTPUT_TOKENS, MAX_HINT_PROMPT_BYTES } from './policy';
 
 // Initialize OpenAI client for DeepSeek
 const getClient = () => {
@@ -71,22 +72,36 @@ export async function generateHint(
     staticHints,
   );
 
+  if (
+    new TextEncoder().encode(systemPrompt + userPrompt).byteLength >
+    MAX_HINT_PROMPT_BYTES
+  ) {
+    return {
+      success: false,
+      error:
+        locale === 'id'
+          ? 'Konteks petunjuk terlalu panjang. Persingkat kode yang dikirim.'
+          : 'Hint context is too long. Shorten the submitted code.',
+    };
+  }
+
   try {
     const completion = await client.chat.completions.create({
       model: 'deepseek-flash',
+      reasoning_effort: 'none',
       messages: [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
       // DeepSeek specific parameters if any needed, usually standard OpenAI params work
       temperature: 0.7,
-      max_tokens: 1024,
+      max_tokens: MAX_HINT_OUTPUT_TOKENS,
     });
 
     const firstChoice = completion.choices[0];
     const hint = firstChoice?.message.content?.trim();
 
-    if (!hint) {
+    if (!hint || firstChoice?.finish_reason !== 'stop') {
       return {
         success: false,
         error: 'Unable to generate hint. Please try again.',
@@ -118,7 +133,7 @@ export async function generateHint(
       return {
         success: false,
         error:
-          'AI service PI balance is exhausted. Hints are temporarily unavailable.',
+          'AI service balance is exhausted. Hints are temporarily unavailable.',
       };
     }
 

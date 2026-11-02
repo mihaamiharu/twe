@@ -13,6 +13,7 @@ BETTER_AUTH_SECRET="replace-with-at-least-32-random-characters"
 # GOOGLE_CLIENT_ID=""
 # GOOGLE_CLIENT_SECRET=""
 # DEEPSEEK_API_KEY=""
+# AI_HINT_DAILY_LIMIT="1" # Required to enable new AI calls; shared 24-hour cap.
 # GH_API_TOKEN=""
 # GH_OWNER="mihaamiharu"
 # GH_REPO="twe"

@@ -1,5 +1,4 @@
 import { createServerFn } from '@tanstack/react-start';
-import { z } from 'zod';
 import { authMiddleware } from './auth.mw';
 import { db } from '@/db';
 import { progress, challenges } from '@/db/schema';
@@ -8,17 +7,13 @@ import { logger } from '@/lib/logger';
 import { generateHint } from '@/lib/ai';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getChallengeContent } from './content.server';
+import { consumeRateLimit } from './rate-limit';
+import { dailyHintLimit, GetHintSchema } from '@/lib/ai/policy';
+import { getRuntimeEnv } from '#platform';
 
 // ----------------------------------------------------------------------------
 // AI HINT GENERATION
 // ----------------------------------------------------------------------------
-
-const GetHintSchema = z.object({
-  challengeSlug: z.string().min(1),
-  userAttempt: z.string().optional(),
-  locale: z.string().default('en'),
-  staticHints: z.array(z.string()).optional(),
-});
 
 export const getAIHint = createServerFn({ method: 'POST' })
   .middleware([authMiddleware])
@@ -38,7 +33,7 @@ export const getAIHint = createServerFn({ method: 'POST' })
       // 3. Get challenge content from filesystem (for instructions/html)
       const challengeContent = await getChallengeContent(challengeSlug, locale);
 
-      if (!challengeContent) {
+      if (!challenge || !challengeContent) {
         return {
           success: false,
           error:
@@ -68,18 +63,41 @@ export const getAIHint = createServerFn({ method: 'POST' })
         };
       }
 
-      if (userProgress?.usedHint) {
-        // Fallback: If marked used but no content (legacy), regenerate but warn it's "recovering"
-        // Or just let it regenerate.
-        // Current logic was preventing re-generation. Let's allow regeneration if content is missing,
-        // but we won't charge them again (already marked used).
-        // Actually, let's just proceed to generation but update the record instead of blocking.
+      const env = getRuntimeEnv();
+      const limit = dailyHintLimit(env.AI_HINT_DAILY_LIMIT);
+      if (!env.DEEPSEEK_API_KEY || limit === 0) {
+        return {
+          success: false,
+          error:
+            locale === 'id'
+              ? 'Petunjuk AI belum diaktifkan.'
+              : 'AI hints are not enabled.',
+        };
+      }
+
+      // Reserve before the provider call. Failed/uncertain calls also consume a
+      // slot; do not refund and accidentally permit repeated billable attempts.
+      // D1 keeps these limits atomic across concurrent object requests.
+      const cooldown = await consumeRateLimit(
+        `ai-hint:user:${userId}`,
+        1,
+        30_000,
+      );
+      const budget = cooldown.allowed
+        ? await consumeRateLimit('ai-hint:daily', limit, 24 * 60 * 60_000)
+        : { allowed: false };
+      if (!budget.allowed) {
+        return {
+          success: false,
+          error:
+            locale === 'id'
+              ? 'Batas petunjuk AI tercapai. Silakan coba lagi nanti.'
+              : 'AI hint limit reached. Please try again later.',
+        };
       }
 
       // 5. Generate hint using Deepseek API
-      logger.info(
-        `[AI Hint] Generating hint for challenge: ${challengeSlug}, user: ${userId}`,
-      );
+      logger.info('[AI Hint] Generating hint.');
 
       const hintResult = await generateHint({
         challengeType: challengeContent.type as
@@ -154,7 +172,7 @@ export const getAIHint = createServerFn({ method: 'POST' })
         }
       }
 
-      logger.info(`[AI Hint] Successfully generated hint for user: ${userId}`);
+      logger.info('[AI Hint] Successfully generated hint.');
 
       return {
         success: true,
