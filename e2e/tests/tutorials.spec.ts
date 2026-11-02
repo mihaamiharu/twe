@@ -278,6 +278,108 @@ test.describe('Tutorials', () => {
     }
   });
 
+  test('should keep completion scoped when navigating to the next lesson', async ({
+    page,
+  }) => {
+    await tutorialsPage.gotoTutorial('dom-tree-hierarchy');
+    await expect(page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
+    );
+    await expect(page.getByTestId('lesson-status-value')).toHaveText(
+      'Not completed',
+    );
+    await tutorialsPage.completeTutorial();
+
+    await page
+      .getByRole('link', {
+        name: 'Next Investigate the UI Before You Automate It',
+      })
+      .click();
+    await expect(page.locator('h1')).toHaveText(
+      'Investigate the UI Before You Automate It',
+    );
+    await expect(page.getByTestId('lesson-status-value')).toHaveText(
+      'Not completed',
+    );
+    await expect(page.getByTestId('complete-tutorial-footer')).toBeEnabled();
+
+    await page
+      .getByRole('link', { name: 'Previous Read the Live DOM and UI State' })
+      .click();
+    await expect(page.locator('h1')).toHaveText(
+      'Read the Live DOM and UI State',
+    );
+    await expect(page.getByTestId('lesson-status-value')).toHaveText(
+      'Completed',
+    );
+    await page.reload();
+    await expect(page.getByTestId('lesson-status-value')).toHaveText(
+      'Completed',
+    );
+  });
+
+  test('should keep a late completion response on its original lesson', async ({
+    page,
+  }) => {
+    let releaseCompletion = () => {};
+    const release = new Promise<void>((resolve) => {
+      releaseCompletion = resolve;
+    });
+    let completionCaptured = false;
+    await page.route('**/_serverFn/**', async (route) => {
+      const request = route.request();
+      if (
+        request.method() !== 'POST' ||
+        !request.postData()?.includes('dom-tree-hierarchy')
+      ) {
+        await route.continue();
+        return;
+      }
+      const response = await route.fetch();
+      completionCaptured = true;
+      await release;
+      await route.fulfill({ response });
+    });
+
+    try {
+      await tutorialsPage.gotoTutorial('dom-tree-hierarchy');
+      await expect(page.locator('body')).toHaveAttribute(
+        'data-app-hydrated',
+        'true',
+      );
+      await tutorialsPage.completeTutorial();
+      await expect.poll(() => completionCaptured).toBe(true);
+      await page
+        .getByRole('link', {
+          name: 'Next Investigate the UI Before You Automate It',
+        })
+        .click();
+      await expect(page.locator('h1')).toHaveText(
+        'Investigate the UI Before You Automate It',
+      );
+      await expect(page.getByTestId('lesson-status-value')).toHaveText(
+        'Not completed',
+      );
+
+      const completedResponse = page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' &&
+          Boolean(
+            response.request().postData()?.includes('dom-tree-hierarchy'),
+          ),
+      );
+      releaseCompletion();
+      await completedResponse;
+      await page.waitForLoadState('networkidle');
+      await expect(page.getByTestId('lesson-status-value')).toHaveText(
+        'Not completed',
+      );
+    } finally {
+      releaseCompletion();
+    }
+  });
+
   test('should mark tutorial as complete and persist it', async ({ page }) => {
     const firstTutorial = tutorialsPage.tutorialCards.first();
     await firstTutorial.click();

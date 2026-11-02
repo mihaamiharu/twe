@@ -103,13 +103,22 @@ function LessonDetailSkeleton() {
 
 function TutorialDetailPage() {
   const response = routeApi.useLoaderData();
+  const { locale } = routeApi.useParams();
+  const { data: auth } = useSuspenseQuery(authQueryOptions);
 
   if (!response.success) {
     if (response.error === 'Tutorial not found') return <NotFound />;
     return <TutorialDetailError />;
   }
 
-  return <TutorialDetailContent tutorial={response.data} />;
+  // A different lesson/viewer owns different optimistic and mutation state,
+  // even when both loader responses start with the same completion boolean.
+  return (
+    <TutorialDetailContent
+      key={JSON.stringify([response.data.slug, locale, auth.user?.id ?? null])}
+      tutorial={response.data}
+    />
+  );
 }
 
 function TutorialDetailError() {
