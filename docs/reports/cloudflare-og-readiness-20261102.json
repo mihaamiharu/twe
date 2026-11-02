@@ -117,8 +117,8 @@
     },
     {
       "gate": "AI and GitHub provider success flows",
-      "status": "blocked",
-      "next": "Configure personal preview credentials and obtain bounded upstream-call authorization."
+      "status": "GitHub preview passed; AI blocked on access/budget",
+      "next": "See cloudflare-github-intake-20261102.json for the approved single anonymous private issue and cleanup. Confirm AI access/budget and bounded-call authorization before configuring or calling AI; production configuration remains deferred."
     },
     {
       "gate": "production release and VPS retirement",
@@ -133,5 +133,6 @@
     "No billing change, production deployment, extra object namespace, mail/Google/AI/GitHub delivery or VPS modification was performed.",
     "Credentials, request metadata, cookies, raw tails and private account records remain outside the repository."
   ],
-  "followupGoogleOAuthReport": "cloudflare-google-oauth-20261102.json"
+  "followupGoogleOAuthReport": "cloudflare-google-oauth-20261102.json",
+  "followupGitHubIntakeReport": "cloudflare-github-intake-20261102.json"
 }
