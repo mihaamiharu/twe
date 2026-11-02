@@ -1,10 +1,49 @@
 import { describe, expect, test } from 'bun:test';
 import satori from 'satori';
+import {
+  adaptSatoriForWorkerd,
+  harfBuzzCallbackModule,
+} from '../../../scripts/satori-workerd.plugin';
 import { normalizeOgParams } from '@/lib/og-params';
 import { renderDynamicOg } from '@/server/og-renderer.server';
 import { OgRenderError } from '@/server/og-errors.server';
 import { getOgElement, getOgRenderOptions } from '@/server/og-template.server';
 import resources from '@/server/generated/og-resources.json';
+
+test('the pinned workerd adapter precompiles every HarfBuzz callback signature', async () => {
+  const source = await Bun.file(
+    'node_modules/satori/dist/standalone.js',
+  ).text();
+  const wrapper = source.slice(0, source.indexOf('var ea='));
+  const signatures = [
+    ...new Set(
+      [...wrapper.matchAll(/"([vipjfd]+)"/g)].map((match) => match[1]!),
+    ),
+  ];
+  expect(signatures).toHaveLength(14);
+  for (const signature of signatures) {
+    const module = new WebAssembly.Module(harfBuzzCallbackModule(signature));
+    let called = false;
+    const instance = new WebAssembly.Instance(module, {
+      e: {
+        f: () => {
+          called = true;
+          return 7;
+        },
+      },
+    });
+    const callback = instance.exports['f'] as (
+      ...args: number[]
+    ) => number | undefined;
+    callback(...Array.from({ length: signature.length - 1 }, () => 1));
+    expect(called).toBe(true);
+  }
+  expect(() => harfBuzzCallbackModule('invalid')).toThrow();
+  const adapted = adaptSatoriForWorkerd(source);
+  expect(adapted).not.toContain('new WebAssembly.Module(kA)');
+  expect(adapted).toContain('catch(error){g(error)}');
+  expect(() => adaptSatoriForWorkerd('different bundle')).toThrow();
+});
 
 describe('OG text and rendering resource boundaries', () => {
   test('limits oversized text without splitting a joined emoji', () => {
