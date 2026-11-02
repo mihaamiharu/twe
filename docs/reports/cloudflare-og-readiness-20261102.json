@@ -112,8 +112,8 @@
     },
     {
       "gate": "Google OAuth",
-      "status": "replacement configured; complete sign-in/release validation pending",
-      "next": "See cloudflare-google-oauth-20261102.json. New isolated preview/production clients exist, preview authorization contract passed; complete owner sign-in, migrated-account linkage, publishing and approved production activation."
+      "status": "owner preview Google sign-in passed; release validation pending",
+      "next": "See cloudflare-google-oauth-20261102.json. Initial owner login passed; complete logout/repeat-login, migrated-account linkage, publishing and approved production activation during release validation."
     },
     {
       "gate": "AI and GitHub provider success flows",

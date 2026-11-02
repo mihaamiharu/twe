@@ -1,6 +1,6 @@
 {
   "dateJakarta": "2026-11-02",
-  "scope": "Owner-approved replacement Google OAuth project/clients; preview configuration only",
+  "scope": "Owner-approved replacement Google OAuth setup and owner-completed preview sign-in; production remains unchanged",
   "projectId": "twe-auth-20261102",
   "projectName": "TestingWithEkki Auth",
   "personalOwnerAccountVerified": true,
@@ -77,9 +77,9 @@
   "productionRuntimeChanged": false,
   "historicalProjectChanged": false,
   "oldClientRevoked": false,
-  "completedGoogleLogin": false,
+  "completedGoogleLogin": true,
   "remainingGates": [
-    "Owner preview consent/callback/session/logout/repeat-sign-in check.",
+    "Logout, repeat sign-in, duplicate-user prevention and role checks during consolidated release validation.",
     "Migrated existing Google-account ID, provider linkage, progress and role checks.",
     "Review branding/domain requirements and deliberately publish before general-user release.",
     "Install production client pair only during approved production preparation/cutover."
@@ -96,5 +96,15 @@
     "https://developers.google.com/identity/openid-connect/openid-connect",
     "https://developers.google.com/identity/protocols/oauth2/web-server",
     "https://better-auth.com/docs/authentication/google"
-  ]
+  ],
+  "ownerPreviewSignIn": {
+    "dateJakarta": "2026-11-02",
+    "status": "owner-confirmed pass",
+    "evidence": "Owner confirmed completion after Google sign-in instructions and supplied a preview /en screenshot showing the signed-in avatar.",
+    "authenticatedHeaderVisible": true,
+    "independentServerSessionInspectionPerformed": false,
+    "logoutAndRepeatSignInVerified": false,
+    "migratedExistingAccountVerified": false,
+    "personalScreenshotPublished": false
+  }
 }

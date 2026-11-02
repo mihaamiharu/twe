@@ -21,11 +21,11 @@ Preview uses only its own `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` Cloudfla
 
 The owner approved Google's API Services User Data Policy and the new credentials. The app remains External / Testing with the owner account as its single test user. Homepage, privacy and terms links are saved; the app has not been published. The Google account selected as support contact is shown to consent-screen users; project notifications use the existing business admin address. Publishing the app and production activation remain separate release steps.
 
-The focused hosted request check passed: preview returns a Google authorization URL using the replacement preview client, the exact callback, authorization-code response type, state protection, cookies and only `email openid profile`. This is configuration evidence, not a completed Google sign-in. See [the setup evidence](reports/cloudflare-google-oauth-20261102.json).
+The focused hosted request check passed: preview returns a Google authorization URL using the replacement preview client, the exact callback, authorization-code response type, state protection, cookies and only `email openid profile`. That request check alone was configuration evidence. The owner subsequently completed Google sign-in and supplied a preview `/en` screenshot with the signed-in avatar; this records an owner-confirmed initial login pass. It does not establish repeat-login, migrated-account or role behavior. See [the setup evidence](reports/cloudflare-google-oauth-20261102.json).
 
 Before closing the OAuth release gate:
 
-1. Complete an owner Google sign-in through preview and confirm callback, session, logout and repeat sign-in. Confirm no duplicate user is created and roles stay server-controlled.
+1. Initial owner Google sign-in passed. During consolidated release validation, confirm logout and repeat sign-in, no duplicate user creation and server-controlled roles.
 2. Verify a migrated existing Google account keeps its user ID, provider linkage and progress. Google identifies an account by stable `sub`; retain the application's stored Google provider account ID. A new OAuth client does not make old client-bound access/refresh tokens valid for that client. Do not unlink accounts or replace user rows to work around token failures.
 3. Finish production branding/domain requirements and deliberately publish the consent app before general-user release. Testing-mode access is not public production readiness.
 4. Install only the production client pair during the approved release preparation, retaining the production auth origin and session secret; then verify the production flow after the approved cutover.
