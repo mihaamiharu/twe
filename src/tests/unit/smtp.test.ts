@@ -1,6 +1,9 @@
 /* eslint-disable @typescript-eslint/await-thenable -- Bun's asynchronous rejects matchers are typed as synchronous matchers. */
 import { describe, expect, test } from 'bun:test';
 import { Buffer } from 'node:buffer';
+// Happy DOM replaces the global WritableStream with Node's classic Writable.
+// Socket fixtures must use the WHATWG stream API exposed by Workers sockets.
+import { WritableStream } from 'node:stream/web';
 import {
   sendSmtpMail,
   type SmtpSocket,
