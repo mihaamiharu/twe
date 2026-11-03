@@ -5,7 +5,10 @@ Welcome to the **TestingWithEkki** project documentation.
 ## Project Basics
 
 - [**README.md**](../README.md): Quick start guide and project overview.
-- [**LOCAL_DEVELOPMENT.md**](./LOCAL_DEVELOPMENT.md): Shared Bun + Docker workflow for macOS and Windows.
+- [**LOCAL_DEVELOPMENT.md**](./LOCAL_DEVELOPMENT.md): Bun + local Workers/D1 workflow for macOS and Windows.
+- [**CLOUDFLARE_D1.md**](./CLOUDFLARE_D1.md): Data representations, authentication and atomic reward writes.
+- [**CLOUDFLARE_OPERATIONS.md**](./CLOUDFLARE_OPERATIONS.md): Runtime bindings, integrations, deployment and rollback.
+- [**CLOUDFLARE_BACKUPS.md**](./CLOUDFLARE_BACKUPS.md): Private backup settings, key custody and recovery commands.
 - [**GLOSSARY.md**](./GLOSSARY.md): Definitions of terms used in the project.
 - [**CHANGELOG.md**](./CHANGELOG.md): History of changes and versions.
 

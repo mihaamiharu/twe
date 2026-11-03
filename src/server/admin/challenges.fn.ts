@@ -25,9 +25,8 @@ export const getAdminChallenges = createServerFn({ method: 'GET' })
         .orderBy(challenges.order, challenges.title);
 
       return { success: true, data: list };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch challenges:', error);
+    } catch {
+      console.error('Failed to fetch challenges:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -77,9 +76,8 @@ export const updateChallengeStatus = createServerFn({ method: 'POST' })
         .where(eq(challenges.id, input.id));
 
       return { success: true, message: 'Challenge updated' };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to update challenge:', error);
+    } catch {
+      console.error('Failed to update challenge:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

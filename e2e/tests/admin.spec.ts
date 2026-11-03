@@ -3,6 +3,9 @@ import { AdminPage } from '../pages/AdminPage';
 import { getE2EAdminCredentials, loginViaApi } from '../utils/auth';
 
 test.describe('Admin Panel', () => {
+  // These are the first authenticated pages in a cold local Vite run and load
+  // the admin chart/table modules as well as the shared application shell.
+  test.setTimeout(60_000);
   let adminPage: AdminPage;
 
   test.beforeEach(async ({ page, context, request }) => {

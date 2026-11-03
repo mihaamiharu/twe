@@ -58,7 +58,7 @@ async function fetchStats() {
 
   // Achievements still from DB (can be migrated to JSON later)
   const [achievementCount] = await db
-    .select({ count: sql<number>`count(*):: int` })
+    .select({ count: sql<number>`count(*)` })
     .from(achievements);
 
   // Calculate tier breakdown from filesystem data

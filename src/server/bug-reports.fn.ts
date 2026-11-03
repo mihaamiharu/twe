@@ -9,6 +9,7 @@ import { optionalAuthMiddleware } from './auth.mw';
 import { createGitHubIssue, formatBugReportBody } from './github.server';
 import { getEarnedAchievementIds, awardAchievements } from '@/lib/stats';
 import { createRateLimitMiddleware } from './rate-limit.mw';
+import { sanitizeBugReportPageUrl } from '@/lib/bug-report-privacy';
 
 const BugReportSchema = z.object({
   title: z.string().min(5, 'Title must be at least 5 characters').max(200),
@@ -78,7 +79,7 @@ export const createBugReport = createServerFn({ method: 'POST' })
           stepsToReproduce,
           expectedBehavior,
           actualBehavior,
-          pageUrl: pageUrl || null,
+          pageUrl: sanitizeBugReportPageUrl(pageUrl),
           browserInfo: browserInfo || null,
         })
         .returning();
@@ -91,7 +92,8 @@ export const createBugReport = createServerFn({ method: 'POST' })
       );
 
       // Award Bug Squasher achievement (only for authenticated users, first report only)
-      let newAchievement: { id: string; name: string; icon: string } | null = null;
+      let newAchievement: { id: string; name: string; icon: string } | null =
+        null;
       if (userId) {
         try {
           const alreadyEarned = await getEarnedAchievementIds(userId);
@@ -102,26 +104,25 @@ export const createBugReport = createServerFn({ method: 'POST' })
               name: 'Bug Squasher',
               icon: '🐞',
             };
-            logger.info(`[Achievements] Bug Squasher awarded to user ${userId}`);
+            logger.info(
+              `[Achievements] Bug Squasher awarded to user ${userId}`,
+            );
           }
         } catch (error) {
           logger.error('Error awarding Bug Squasher achievement:', error);
         }
       }
 
-      // Create GitHub Issue (non-blocking)
+      // Await optional issue notification within the request lifecycle.
       const issueBody = formatBugReportBody({
         reportId: report.id,
         stepsToReproduce: report.stepsToReproduce,
         expectedBehavior: report.expectedBehavior,
         actualBehavior: report.actualBehavior,
         pageUrl: report.pageUrl,
-        browserInfo: report.browserInfo,
-        reporterEmail: report.reporterEmail,
-        userId: report.userId,
       });
 
-      createGitHubIssue({
+      await createGitHubIssue({
         title: `[${report.severity}] ${report.title}`,
         body: issueBody,
         labels: ['bug', report.severity.toLowerCase()],
@@ -142,9 +143,8 @@ export const createBugReport = createServerFn({ method: 'POST' })
         message:
           'Bug report submitted successfully. Thank you for your feedback!',
       };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Error creating bug report:', error);
+    } catch {
+      console.error('Error creating bug report:');
       // Don't expose internal errors
       return {
         success: false,

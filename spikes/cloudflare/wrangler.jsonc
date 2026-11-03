@@ -1,0 +1,52 @@
+{
+	"$schema": "../../node_modules/wrangler/config-schema.json",
+	"name": "twe-migration-spike-local",
+	"account_id": "d5f9db115e5d7b5156bb210e04ecb34e",
+	"main": "src/server.ts",
+	"compatibility_date": "2026-10-30",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"workers_dev": false,
+	"preview_urls": false,
+	"routes": [],
+	"assets": {
+		"binding": "ASSETS"
+	},
+	"observability": {
+		"enabled": true
+	},
+	"vars": {
+		"DEPLOYMENT_ENV": "local",
+		"BETTER_AUTH_URL": "http://localhost:3001"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "twe-migration-local",
+			"database_id": "00000000-0000-0000-0000-000000000000",
+			"migrations_dir": "migrations"
+		}
+	],
+	"env": {
+		"preview": {
+			"name": "twe-migration-preview",
+			"workers_dev": true,
+			"preview_urls": false,
+			"routes": [],
+			"vars": {
+				"DEPLOYMENT_ENV": "preview",
+				"BETTER_AUTH_URL": "https://twe-migration-preview.ekkisyam2310.workers.dev"
+			},
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "twe-migration-preview",
+					// Dedicated synthetic TWE preview database; never bind another project's DB here.
+					"database_id": "c39e8286-5017-4c40-8158-bb264c0e49ff",
+					"migrations_dir": "migrations"
+				}
+			]
+		}
+	}
+}

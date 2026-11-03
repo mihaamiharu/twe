@@ -1,6 +1,12 @@
 import { createServerFn } from '@tanstack/react-start';
 import { db } from '@/db';
-import { users, progress, achievements, userAchievements, submissions } from '@/db/schema';
+import {
+  users,
+  progress,
+  achievements,
+  userAchievements,
+  submissions,
+} from '@/db/schema';
 import { logger } from '@/lib/logger';
 import { desc, eq, and, sql, inArray, like } from 'drizzle-orm';
 import { z } from 'zod';
@@ -24,7 +30,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
 
       // Get total count
       const [countResult] = await db
-        .select({ count: sql<number>`count(*)::int` })
+        .select({ count: sql<number>`count(*)` })
         .from(users)
         .where(and(...conditions));
 
@@ -43,7 +49,7 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         SELECT COALESCE(SUM(${submissions.xpEarned}), 0)
         FROM ${submissions}
         WHERE ${submissions.userId} = users.id
-        AND ${submissions.createdAt} >= ${startOfMonth.toISOString()}
+        AND ${submissions.createdAt} >= ${startOfMonth.getTime()}
       )`;
 
       // Subquery for monthly XP from achievements
@@ -52,13 +58,14 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         FROM ${userAchievements}
         INNER JOIN ${achievements} ON ${userAchievements.achievementId} = ${achievements.id}
         WHERE ${userAchievements.userId} = users.id
-        AND ${userAchievements.unlockedAt} >= ${startOfMonth.toISOString()}
+        AND ${userAchievements.unlockedAt} >= ${startOfMonth.getTime()}
       )`;
 
       // Define the score column based on period
-      const scoreColumn = filters.period === 'monthly'
-        ? sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})`
-        : users.xp;
+      const scoreColumn =
+        filters.period === 'monthly'
+          ? sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})`
+          : users.xp;
 
       const leaderboard = await db
         .select({
@@ -66,11 +73,11 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
           name: users.name,
           image: users.image,
           xp: users.xp, // Global XP
-          monthlyXp: sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})::int`, // Expose monthly XP
+          monthlyXp: sql<number>`(${monthlySubmissionsXp} + ${monthlyAchievementsXp})`, // Expose monthly XP
           level: users.level,
           createdAt: users.createdAt,
           challengesCompleted: sql<number>`(
-            SELECT count(*)::int
+            SELECT count(*)
             FROM ${progress}
             WHERE ${progress.userId} = users.id
             AND ${progress.isCompleted} = true
@@ -84,8 +91,8 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
             // If monthly, ensure they have some monthly XP
             filters.period === 'monthly'
               ? sql`(${monthlySubmissionsXp} + ${monthlyAchievementsXp}) > 0`
-              : undefined
-          )
+              : undefined,
+          ),
         )
         .orderBy(desc(scoreColumn), desc(users.level))
         .limit(filters.limit)
@@ -133,8 +140,6 @@ export const getLeaderboard = createServerFn({ method: 'GET' })
         displayName: user.name || 'Anonymous',
         badges: userBadgesMap.get(user.id) || [],
       }));
-
-
 
       return {
         success: true,

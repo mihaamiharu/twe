@@ -13,7 +13,10 @@ export type AnalyticsEvent =
   | { name: 'tutorial_completed'; params: { slug: string } }
   | { name: 'level_up'; params: { newLevel: number; totalXP: number } }
   | { name: 'achievement_unlocked'; params: { slug: string; name: string } }
-  | { name: 'bug_report_submitted'; params: { title: string } }
+  | {
+      name: 'bug_report_submitted';
+      params: { severity: 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' };
+    }
   | { name: 'user_registered'; params: Record<string, never> }
   | { name: 'user_logged_in'; params: Record<string, never> };
 

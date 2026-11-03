@@ -26,23 +26,32 @@ export async function loginViaApi(
   password?: string,
 ) {
   const usesDisposableUser = email === undefined && password === undefined;
+  if (!usesDisposableUser && (!email || !password)) {
+    throw new Error('Explicit E2E login requires both email and password.');
+  }
+  const seedSecret = process.env.E2E_SECRET;
+  if (usesDisposableUser && !seedSecret) {
+    throw new Error(
+      'E2E_SECRET is missing. Run bun run test:e2e to create an isolated test environment.',
+    );
+  }
   const userSuffix = crypto.randomUUID();
   const resolvedEmail = usesDisposableUser
     ? `kikkawa23+${userSuffix}@example.com`
-    : email || 'kikkawa23@gmail.com';
+    : email;
   const resolvedPassword = usesDisposableUser
     ? `e2e-password-${userSuffix}`
-    : password || 'kikkawa23@gmail.com';
+    : password;
 
   const requester = page ? page.request : request;
 
   // Default authenticated tests mutate progress. Give each test its own
   // disposable account so parallel tests cannot change each other's state.
-  if (usesDisposableUser && process.env.E2E_SECRET) {
+  if (usesDisposableUser && seedSecret) {
     const seedResponse = await requester.post(`${baseURL}/api/test/seed-user`, {
       headers: {
         'content-type': 'application/json',
-        'x-e2e-secret': process.env.E2E_SECRET,
+        'x-e2e-secret': seedSecret,
       },
       data: {
         email: resolvedEmail,

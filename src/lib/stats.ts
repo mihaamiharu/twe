@@ -13,11 +13,11 @@ import {
   achievements,
   bugReports,
 } from '@/db/schema';
-import { eq, and, inArray, sql } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import type { UserStats } from './achievements';
-import { logger } from '@/lib/logger';
+import { getRuntimeEnv } from '#platform';
+import { addAchievementXp, levelUpdate } from '@/server/reward-sql';
 import { getTierFromCategory } from '@/lib/constants';
-import { checkLevelUp } from '@/lib/gamification';
 
 /**
  * The read/write surface shared by the root database and a Drizzle
@@ -25,7 +25,6 @@ import { checkLevelUp } from '@/lib/gamification';
  * same transaction as the progress mutation.
  */
 type StatsDatabase = Pick<typeof db, 'select'>;
-type AchievementDatabase = Pick<typeof db, 'select' | 'insert' | 'update'>;
 
 /**
  * Get user stats for achievement checking
@@ -76,7 +75,7 @@ export async function getUserStats(
 
   // Get completed tutorials count
   const tutorialsResult = await database
-    .select({ count: sql<number>`count(*)::int` })
+    .select({ count: sql<number>`count(*)` })
     .from(progress)
     .where(
       and(
@@ -97,7 +96,7 @@ export async function getUserStats(
 
   // Count perfect scores (all tests passed on first try - we approximate by checking if attempts = 1)
   const perfectScoresResult = await database
-    .select({ count: sql<number>`count(*)::int` })
+    .select({ count: sql<number>`count(*)` })
     .from(progress)
     .where(
       and(
@@ -112,7 +111,7 @@ export async function getUserStats(
 
   // Count bug reports
   const bugReportsResult = await database
-    .select({ count: sql<number>`count(*)::int` })
+    .select({ count: sql<number>`count(*)` })
     .from(bugReports)
     .where(eq(bugReports.userId, userId));
 
@@ -264,108 +263,33 @@ export async function getEarnedAchievementIds(
 export async function awardAchievements(
   userId: string,
   achievementSlugs: string[],
-  database: AchievementDatabase = db,
 ): Promise<string[]> {
   if (achievementSlugs.length === 0) return [];
-
-  if (database === db) {
-    return db.transaction((transaction) =>
-      awardAchievementsInTransaction(userId, achievementSlugs, transaction),
-    );
-  }
-
-  return awardAchievementsInTransaction(userId, achievementSlugs, database);
-}
-
-async function awardAchievementsInTransaction(
-  userId: string,
-  achievementSlugs: string[],
-  database: AchievementDatabase,
-): Promise<string[]> {
-  if (achievementSlugs.length === 0) return [];
-
-  // Resolve reward values from the database rather than from request data.
-  const dbAchievements = await database
-    .select({
-      id: achievements.id,
-      slug: achievements.slug,
-      xpReward: achievements.xpReward,
-    })
-    .from(achievements)
-    .where(inArray(achievements.slug, achievementSlugs));
-
-  if (dbAchievements.length === 0) return [];
-
-  // 2. Insert into user_achievements
-  const values = dbAchievements.map((a) => ({
-    userId,
-    achievementId: a.id,
-    unlockedAt: new Date(),
-    progress: 100,
-  }));
-
-  const insertedAchievements = await database
-    .insert(userAchievements)
-    .values(values)
-    .onConflictDoNothing({
-      target: [userAchievements.userId, userAchievements.achievementId],
-    })
-    .returning({ achievementId: userAchievements.achievementId });
-
-  if (insertedAchievements.length === 0) return [];
-
-  // Only rows inserted by this request may produce XP. A concurrent retry
-  // can therefore never re-award an already unlocked achievement.
-  const insertedIds = new Set(
-    insertedAchievements.map((achievement) => achievement.achievementId),
+  const binding = getRuntimeEnv().DB;
+  const operationId = crypto.randomUUID();
+  const now = Date.now();
+  const statements = [...new Set(achievementSlugs)].map((slug) =>
+    binding
+      .prepare(
+        `
+    INSERT INTO user_achievements (id, user_id, achievement_id, unlocked_at, progress, award_operation_id)
+    SELECT ?, ?, id, ?, 100, ? FROM achievements WHERE slug = ?
+    ON CONFLICT (user_id, achievement_id) DO NOTHING
+  `,
+      )
+      .bind(crypto.randomUUID(), userId, now, operationId, slug),
   );
-  const awardedAchievements = dbAchievements.filter((achievement) =>
-    insertedIds.has(achievement.id),
+  const results = await binding.batch<Record<string, unknown>>([
+    ...statements,
+    addAchievementXp(operationId, userId, now),
+    levelUpdate(userId),
+    binding
+      .prepare(
+        `SELECT a.slug FROM user_achievements ua JOIN achievements a ON a.id = ua.achievement_id WHERE ua.user_id = ? AND ua.award_operation_id = ?`,
+      )
+      .bind(userId, operationId),
+  ]);
+  return (results.at(-1)?.results ?? []).flatMap((row) =>
+    typeof row['slug'] === 'string' ? [row['slug']] : [],
   );
-  const totalXpReward = awardedAchievements.reduce(
-    (sum, achievement) => sum + achievement.xpReward,
-    0,
-  );
-
-  if (totalXpReward > 0) {
-    // Serialize all XP writes for one user so both the total and derived
-    // level are computed from the same authoritative value.
-    const [user] = await database
-      .select({ xp: users.xp, level: users.level })
-      .from(users)
-      .where(eq(users.id, userId))
-      .for('update');
-
-    if (user) {
-      // Calculate new level using the gamification helper
-      const levelUpInfo = checkLevelUp(user.xp, totalXpReward);
-
-      await database
-        .update(users)
-        .set({
-          xp: user.xp + totalXpReward,
-          level: levelUpInfo.newLevel,
-          updatedAt: new Date(),
-        })
-        .where(eq(users.id, userId));
-
-      if (levelUpInfo.leveledUp) {
-        logger.info(
-          `[Achievements] User ${userId} leveled up! ${levelUpInfo.oldLevel} -> ${levelUpInfo.newLevel}`,
-        );
-      }
-
-      logger.info(
-        `[Achievements] Awarded ${totalXpReward} XP to user ${userId}`,
-      );
-    }
-  }
-
-  const slugById = new Map(
-    dbAchievements.map((achievement) => [achievement.id, achievement.slug]),
-  );
-  return insertedAchievements.flatMap((achievement) => {
-    const slug = slugById.get(achievement.achievementId);
-    return slug ? [slug] : [];
-  });
 }

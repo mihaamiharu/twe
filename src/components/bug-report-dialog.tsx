@@ -51,6 +51,7 @@ import { authQueryOptions } from '@/lib/auth.query';
 import { trackEvent } from '@/lib/analytics';
 import { createBugReport } from '@/server/bug-reports.fn';
 import { showAchievementToast } from './achievement-toast';
+import { sanitizeBugReportPageUrl } from '@/lib/bug-report-privacy';
 
 // Helper functions need to be moved or keep them here but typed correctly
 const getBugReportSchema = (t: TFunction) =>
@@ -133,7 +134,7 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
       const response = await createBugReport({
         data: {
           ...data,
-          pageUrl: window.location.href,
+          pageUrl: sanitizeBugReportPageUrl(window.location.href),
           browserInfo: navigator.userAgent,
         },
       });
@@ -154,7 +155,9 @@ export function BugReportDialog({ trigger, className }: BugReportDialogProps) {
       }
 
       // Track analytics
-      trackEvent('bug_report_submitted', { title: form.getValues('title') });
+      trackEvent('bug_report_submitted', {
+        severity: form.getValues('severity'),
+      });
 
       form.reset();
       setOpen(false);

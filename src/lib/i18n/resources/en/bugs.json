@@ -2,7 +2,7 @@
   "dialog": {
     "title": "Report a Bug",
     "trigger": "Report Bug",
-    "description": "Help us improve by reporting issues you find. Please be as detailed as possible."
+    "description": "Describe the issue so we can investigate privately. Do not include passwords, API keys or sensitive personal information."
   },
   "form": {
     "title": {
@@ -42,7 +42,7 @@
     },
     "autocapture": {
       "title": "Auto-captured information:",
-      "url": "Current page URL",
+      "url": "Page address (without query parameters or fragment)",
       "browser": "Browser information",
       "user": "Your user account"
     },

@@ -3,6 +3,7 @@
     "**/*.ts",
     "**/*.tsx"
   ],
+  "exclude": ["node_modules", "bower_components", "jspm_packages", "spikes/cloudflare"],
   "compilerOptions": {
     "target": "ES2022",
     "jsx": "react-jsx",

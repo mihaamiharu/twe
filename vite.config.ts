@@ -1,44 +1,43 @@
 import { defineConfig } from 'vite';
-import { devtools } from '@tanstack/devtools-vite';
+import { cloudflare } from '@cloudflare/vite-plugin';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import viteTsConfigPaths from 'vite-tsconfig-paths';
 import tailwindcss from '@tailwindcss/vite';
+import { contentManifestPlugin } from './scripts/content-manifest.plugin';
+import { ogAssetsPlugin } from './scripts/og-assets.plugin';
+import { bundleAuditPlugin } from './scripts/bundle-audit.plugin';
+import { satoriWorkerdPlugin } from './scripts/satori-workerd.plugin';
+
+// Local Worker bindings come from explicit .dev.vars files. Legacy .env may
+// still contain VPS credentials and must not become Cloudflare preview vars.
+process.env['CLOUDFLARE_LOAD_DEV_VARS_FROM_DOT_ENV'] = 'false';
+process.env['CLOUDFLARE_INCLUDE_PROCESS_ENV'] = 'false';
 
 const config = defineConfig({
   plugins: [
-    devtools(),
+    contentManifestPlugin(),
+    ogAssetsPlugin(),
+    satoriWorkerdPlugin(),
+    cloudflare({
+      configPath: process.env['TWE_WRANGLER_CONFIG'] || 'wrangler.jsonc',
+      persistState: {
+        path: process.env['TWE_D1_PERSIST'] || '.wrangler/state',
+      },
+      viteEnvironment: { name: 'ssr' },
+      remoteBindings: false,
+    }),
     // this is the plugin that enables path aliases
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({ server: { entry: './server.ts' } }),
     viteReact(),
+    bundleAuditPlugin(),
   ],
   optimizeDeps: {
     exclude: ['@resvg/resvg-js'],
-  },
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: (id) => {
-          // React core
-          if (id.includes('node_modules/react/') || id.includes('node_modules/react-dom/')) {
-            return 'react-vendor';
-          }
-          // TanStack libraries
-          if (id.includes('node_modules/@tanstack/')) {
-            return 'tanstack-vendor';
-          }
-          // UI libraries (Radix, Lucide)
-          if (id.includes('node_modules/@radix-ui/') || id.includes('node_modules/lucide-react/')) {
-            return 'ui-vendor';
-          }
-          return undefined;
-        },
-      },
-    },
   },
 });
 

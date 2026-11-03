@@ -1,3 +1,4 @@
+import { optionalAuthMiddleware } from './auth.mw';
 import { createServerFn } from '@tanstack/react-start';
 import { z } from 'zod';
 import { db } from '@/db';
@@ -7,64 +8,67 @@ import { createRateLimitMiddleware } from './rate-limit.mw';
 import { logger } from '@/lib/logger';
 
 const ContactSchema = z.object({
-    name: z.string().min(1, 'Name is required'),
-    email: z.string().email('Please enter a valid email address'),
-    topic: z.enum(['general', 'mentoring', 'partnership', 'opportunity', 'other']).default('general'),
-    message: z.string().min(10, 'Message must be at least 10 characters'),
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Please enter a valid email address'),
+  topic: z
+    .enum(['general', 'mentoring', 'partnership', 'opportunity', 'other'])
+    .default('general'),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
 export const submitContactMessage = createServerFn({ method: 'POST' })
-    .middleware([
-        createRateLimitMiddleware({
-            key: 'contact-submit',
-            limit: 3,
-            windowMinutes: 60,
-        }),
-    ])
-    .inputValidator((data: unknown) => ContactSchema.parse(data))
-    .handler(async ({ data: input }) => {
-        try {
-            const { name, email, topic, message } = input;
+  .middleware([
+    optionalAuthMiddleware,
+    createRateLimitMiddleware({
+      key: 'contact-submit',
+      limit: 3,
+      windowMinutes: 60,
+    }),
+  ])
+  .inputValidator((data: unknown) => ContactSchema.parse(data))
+  .handler(async ({ data: input }) => {
+    try {
+      const { name, email, topic, message } = input;
 
-            // 1. Store in DB
-            const [newMessage] = await db
-                .insert(contactMessages)
-                .values({
-                    name,
-                    email,
-                    topic,
-                    message,
-                    status: 'NEW',
-                })
-                .returning();
-            if (!newMessage) {
-                throw new Error('Failed to create contact message');
-            }
+      // 1. Store in DB
+      const [newMessage] = await db
+        .insert(contactMessages)
+        .values({
+          name,
+          email,
+          topic,
+          message,
+          status: 'NEW',
+        })
+        .returning();
+      if (!newMessage) {
+        throw new Error('Failed to create contact message');
+      }
 
-            logger.info(`[Contact] New message from ${email} (ID: ${newMessage.id})`);
+      logger.info(`[Contact] New message from ${email} (ID: ${newMessage.id})`);
 
-            // 2. Send email notification to admin
-            // Fire and forget - don't block response on email sending
-            sendContactNotificationEmail({
-                id: newMessage.id,
-                name,
-                email,
-                topic,
-                message,
-                createdAt: newMessage.createdAt,
-            }).catch((err) => {
-                logger.error('[Contact] Failed to send notification email:', err);
-            });
+      // 2. Send email notification to admin
+      // Await notification completion so the Worker retains its lifecycle.
+      await sendContactNotificationEmail({
+        id: newMessage.id,
+        name,
+        email,
+        topic,
+        message,
+        createdAt: newMessage.createdAt,
+      }).catch((err) => {
+        logger.error('[Contact] Failed to send notification email:', err);
+      });
 
-            return {
-                success: true,
-                message: 'Message sent successfully! We will get back to you soon.',
-            };
-        } catch (error) {
-            logger.error('Error submitting contact message:', error);
-            return {
-                success: false,
-                error: 'Failed to send message. Please try again later.',
-            };
-        }
-    });
+      return {
+        success: true,
+        message: 'Message sent successfully! We will get back to you soon.',
+      };
+    } catch (error) {
+      logger.error('Error submitting contact message:', error);
+      return {
+        success: false,
+        error: 'Failed to send message. Please try again later.',
+      };
+    }
+  });

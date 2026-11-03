@@ -15,9 +15,8 @@ export const getAdminMessages = createServerFn({ method: 'GET' })
         .orderBy(desc(contactMessages.createdAt));
 
       return { success: true, data: list };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch messages:', error);
+    } catch {
+      console.error('Failed to fetch messages:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -41,9 +40,8 @@ export const updateMessageStatus = createServerFn({ method: 'POST' })
         .where(eq(contactMessages.id, input.id));
 
       return { success: true, message: 'Message updated' };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to update message:', error);
+    } catch {
+      console.error('Failed to update message:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

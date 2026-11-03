@@ -23,9 +23,8 @@ export const getAdminBugs = createServerFn({ method: 'GET' })
       });
 
       return { success: true, data: bugs };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch bug reports:', error);
+    } catch {
+      console.error('Failed to fetch bug reports:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -64,9 +63,8 @@ export const updateBugStatus = createServerFn({ method: 'POST' })
         .where(eq(bugReports.id, input.id));
 
       return { success: true, message: 'Bug report updated' };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to update bug report:', error);
+    } catch {
+      console.error('Failed to update bug report:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

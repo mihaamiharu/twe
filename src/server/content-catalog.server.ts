@@ -1,18 +1,18 @@
-/* eslint-disable security/detect-non-literal-fs-filename -- paths are rooted in validated repository content directories. */
-
 /**
- * Pure filesystem-backed Learn and Practice catalog.
+ * Pure bundled Learn and Practice catalog.
  *
  * This module owns editorial content only. Database persistence IDs, counts,
  * publication overlays, progress, and mutations belong to server functions
  * and are merged there by slug.
  */
 
-import { readFile } from 'fs/promises';
-import { join } from 'path';
+import bundledSources from './generated/content-manifest.json';
+import {
+  ACTIVE_CHALLENGE_TIERS,
+  type ContentSourceManifest,
+} from '@/lib/content-sources';
 import type {
   ChallengeDefinition,
-  ChallengeTier,
   ExpectedStateRule,
   LocalizedArray,
   LocalizedString,
@@ -32,26 +32,17 @@ import { getTierFromCategory } from '@/lib/constants';
 import { omitUndefined } from '@/lib/omit-undefined';
 import i18n from '@/lib/i18n';
 import {
+  parseFrontmatter,
+  type MarkdownDocument,
+} from '@/lib/markdown-document';
+import {
   parseChallengeTierJson,
   parseTutorialRegistryJson,
 } from './content-validation';
 
-const CONTENT_ROOT = process.cwd();
-const TUTORIALS_DIR = join(CONTENT_ROOT, 'tutorials');
-const CHALLENGES_DIR = join(CONTENT_ROOT, 'content', 'challenges');
-
-const TIER_FILES: ChallengeTier[] = [
-  'basic',
-  'beginner',
-  'intermediate',
-  'e2e',
-  'typescript',
-];
-
-type MarkdownDocument = {
-  meta: { title?: string; description?: string };
-  content: string;
-};
+// This module is server-only: the snapshot also contains challenge solutions.
+// Source paths below are diagnostic labels, never runtime filesystem paths.
+const sources: ContentSourceManifest = bundledSources;
 
 function resolveLocale(value: LocalizedString, locale: string): string {
   if (locale === 'id') return value.id ?? value.en;
@@ -67,113 +58,54 @@ function resolveLocaleArray(
   return value.en;
 }
 
-function parseFrontmatter(content: string): MarkdownDocument {
-  const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-
-  if (!frontmatterMatch) {
-    const titleMatch = content.match(/^#\s+(.+)$/m);
-    const descriptionMatch = content.match(/^#[^\n]+\n+([^\n#]+)/);
-    return {
-      meta: omitUndefined({
-        title: titleMatch?.[1]?.trim(),
-        description: descriptionMatch?.[1]?.trim(),
-      }),
-      content,
-    };
-  }
-
-  const frontmatter = frontmatterMatch[1];
-  const body = frontmatterMatch[2];
-  if (frontmatter === undefined || body === undefined) {
-    return { meta: {}, content };
-  }
-
-  const meta: MarkdownDocument['meta'] = {};
-  for (const line of frontmatter.split('\n')) {
-    const [key, ...valueParts] = line.split(':');
-    if (!key || valueParts.length === 0) continue;
-
-    let value = valueParts.join(':').trim();
-    if (
-      (value.startsWith("'") && value.endsWith("'")) ||
-      (value.startsWith('"') && value.endsWith('"'))
-    ) {
-      value = value.slice(1, -1);
-    }
-
-    if (key.trim() === 'title') meta.title = value;
-    if (key.trim() === 'description') meta.description = value;
-  }
-
-  return { meta, content: body.trim() };
-}
-
-function isFileNotFoundError(error: unknown): boolean {
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    error.code === 'ENOENT'
-  );
-}
-
-async function readTutorialDocument(
+function readTutorialDocument(
   slug: string,
   locale: string,
 ): Promise<MarkdownDocument> {
-  try {
-    return parseFrontmatter(
-      await readFile(join(TUTORIALS_DIR, locale, `${slug}.md`), 'utf-8'),
-    );
-  } catch (error) {
-    if (!isFileNotFoundError(error)) throw error;
-    return parseFrontmatter(
-      await readFile(join(TUTORIALS_DIR, 'en', `${slug}.md`), 'utf-8'),
-    );
+  const localized = sources.tutorials[`${locale}/${slug}.md`];
+  const fallback = sources.tutorials[`en/${slug}.md`];
+  const content = localized ?? fallback;
+  if (content === undefined) {
+    throw new Error(`Missing bundled tutorial: tutorials/en/${slug}.md`);
   }
+  return Promise.resolve(parseFrontmatter(content));
 }
 
 let registryCache: TutorialRegistry | null = null;
 let challengeCache: Map<string, ChallengeDefinition> | null = null;
 let relationshipsValidated = false;
 
-async function loadRegistry(): Promise<TutorialRegistry> {
-  if (registryCache) return registryCache;
-
-  const registryPath = join(TUTORIALS_DIR, 'registry.json');
-  registryCache = parseTutorialRegistryJson(
-    await readFile(registryPath, 'utf-8'),
-    registryPath,
+function loadRegistry(): Promise<TutorialRegistry> {
+  registryCache ??= parseTutorialRegistryJson(
+    sources.registry,
+    'tutorials/registry.json',
   );
-  return registryCache;
+  return Promise.resolve(registryCache);
 }
 
-async function loadAllChallenges(): Promise<Map<string, ChallengeDefinition>> {
-  if (challengeCache) return challengeCache;
+function loadAllChallenges(): Promise<Map<string, ChallengeDefinition>> {
+  if (challengeCache) return Promise.resolve(challengeCache);
 
   const loaded = new Map<string, ChallengeDefinition>();
-  for (const tier of TIER_FILES) {
-    try {
-      const filePath = join(CHALLENGES_DIR, `${tier}.json`);
-      const tierData = parseChallengeTierJson(
-        await readFile(filePath, 'utf-8'),
-        filePath,
-      );
+  for (const tier of ACTIVE_CHALLENGE_TIERS) {
+    // eslint-disable-next-line security/detect-object-injection -- tier comes from the explicit active-tier allowlist.
+    const content = sources.tiers[tier];
+    if (content === undefined) continue;
+    const tierData = parseChallengeTierJson(
+      content,
+      `content/challenges/${tier}.json`,
+    );
 
-      for (const challenge of tierData.challenges) {
-        if (loaded.has(challenge.slug)) {
-          throw new Error(`Duplicate challenge slug: ${challenge.slug}`);
-        }
-        loaded.set(challenge.slug, challenge);
+    for (const challenge of tierData.challenges) {
+      if (loaded.has(challenge.slug)) {
+        throw new Error(`Duplicate challenge slug: ${challenge.slug}`);
       }
-    } catch (error) {
-      if (isFileNotFoundError(error)) continue;
-      throw error;
+      loaded.set(challenge.slug, challenge);
     }
   }
 
   challengeCache = loaded;
-  return loaded;
+  return Promise.resolve(loaded);
 }
 
 function assertUniqueTutorialSlugs(registry: TutorialRegistry): void {
@@ -381,7 +313,7 @@ function serializeExpectedStateRule(
   };
 }
 
-/** Load the complete localized Learn catalog from filesystem content. */
+/** Load the complete localized Learn catalog from bundled content. */
 export async function getTutorialCatalogList(
   locale: string,
 ): Promise<TutorialCatalogList> {
@@ -415,7 +347,7 @@ export async function getTutorialCatalogDetail(
   }
 }
 
-/** Load the complete localized Practice catalog from filesystem content. */
+/** Load the complete localized Practice catalog from bundled content. */
 export async function getChallengeCatalogList(
   locale: string,
 ): Promise<ChallengeCatalogList> {
@@ -507,7 +439,7 @@ export async function getPreviousTutorialCatalogItem(
   return getAdjacentTutorialCatalogItem(currentSlug, locale, 'previous');
 }
 
-/** Validate all declared Learn↔Practice relationships against filesystem IDs. */
+/** Validate all declared Learn↔Practice relationships against bundled IDs. */
 export async function validateCatalogRelationships(): Promise<void> {
   await loadCatalogSources();
 }

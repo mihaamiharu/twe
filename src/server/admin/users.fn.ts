@@ -26,23 +26,23 @@ export const getAdminUsers = createServerFn({ method: 'GET' })
         .orderBy(desc(users.createdAt));
 
       return { success: true, data: usersList };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch users:', error);
+    } catch {
+      console.error('Failed to fetch users:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
 
 export const deleteUser = createServerFn({ method: 'POST' })
   .middleware([adminMiddleware])
-  .inputValidator((data: unknown) => z.object({ userId: z.string() }).parse(data))
+  .inputValidator((data: unknown) =>
+    z.object({ userId: z.string() }).parse(data),
+  )
   .handler(async ({ data: { userId } }) => {
     try {
       await db.delete(users).where(eq(users.id, userId));
       return { success: true, message: 'User deleted successfully' };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to delete user:', error);
+    } catch {
+      console.error('Failed to delete user:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -66,9 +66,8 @@ export const updateUserStatus = createServerFn({ method: 'POST' })
         .where(eq(users.id, input.id));
 
       return { success: true, message: 'User updated' };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to update user:', error);
+    } catch {
+      console.error('Failed to update user:');
       return { success: false, error: 'Internal Server Error' };
     }
   });
@@ -107,7 +106,9 @@ export const getAdminUserDetail = createServerFn({ method: 'GET' })
         .from(progress)
         .where(eq(progress.userId, input.userId));
 
-      const completedChallengeCount = userProgress.filter(p => p.isCompleted).length;
+      const completedChallengeCount = userProgress.filter(
+        (p) => p.isCompleted,
+      ).length;
 
       return {
         success: true,
@@ -117,9 +118,8 @@ export const getAdminUserDetail = createServerFn({ method: 'GET' })
           completedChallengeCount,
         },
       };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch user detail:', error);
+    } catch {
+      console.error('Failed to fetch user detail:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

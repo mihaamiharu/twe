@@ -1,196 +1,213 @@
-import { and, eq } from 'drizzle-orm';
-import { db } from '@/db';
-import { progress, users } from '@/db/schema';
-import type { Achievement } from '@/lib/achievements';
-import { checkAchievements } from '@/lib/achievements';
+import { getRuntimeEnv } from '#platform';
+import { z } from 'zod';
+import { ACHIEVEMENTS } from '@/lib/achievements';
 import { checkLevelUp } from '@/lib/gamification';
 import {
-  awardAchievements,
-  getEarnedAchievementIds,
-  getUserStats,
-} from '@/lib/stats';
-
-/** The transaction type accepted by callbacks that add domain-specific writes. */
-export type ProgressTransaction = Parameters<
-  Parameters<typeof db.transaction>[0]
->[0];
+  addAchievementXp,
+  insertEligibleAchievements,
+  levelUpdate,
+  snapshotEligibleAchievements,
+} from './reward-sql';
 
 export type ProgressRewardTarget =
-  | {
-      kind: 'tutorial';
-      tutorialId: string;
-      xpReward: number;
-    }
-  | {
-      kind: 'challenge';
-      challengeId: string;
-      xpReward: number;
-    };
+  | { kind: 'tutorial'; tutorialId: string; xpReward: number }
+  | { kind: 'challenge'; challengeId: string; xpReward: number };
 
-export type ProgressRewardCompletion = {
-  progressId: string;
-  wasAlreadyCompleted: boolean;
-  isFirstCompletion: boolean;
-  usedHint: boolean;
-  xpAwarded: number;
-  levelUp: {
-    oldLevel: number;
-    newLevel: number;
-    levelsGained: number;
-  } | null;
-  earnedAchievements: Achievement[];
-  awardedAchievementSlugs: string[];
-};
+export interface SubmissionWrite {
+  code: string;
+  isPassed: boolean;
+  executionTime?: number | undefined;
+  testsPassed: number;
+  testsTotal: number;
+  errorMessage?: string | undefined;
+}
 
-type ProgressRewardCallback<T> = (
-  transaction: ProgressTransaction,
-  completion: ProgressRewardCompletion,
-) => Promise<T>;
-
-type RunProgressRewardInput<T> = {
-  userId: string;
-  target: ProgressRewardTarget;
-  shouldComplete: boolean;
-  onPersist: ProgressRewardCallback<T>;
-};
+const resultSchema = z.object({
+  progressId: z.string(),
+  wasCompleted: z.number(),
+  firstCompletion: z.number(),
+  usedHint: z.number(),
+  xpAwarded: z.number(),
+  oldXp: z.number(),
+  newXp: z.number(),
+});
+const achievementSchema = z.object({
+  id: z.string(),
+  slug: z.string(),
+  name: z.string(),
+  icon: z.string(),
+});
 
 /**
- * Runs the shared progress transition and reward ledger in one transaction.
- * Tutorial view counts and challenge submissions/counters remain callbacks so
- * their domain-specific persistence stays explicit at the call site.
+ * D1 executes the entire prepared batch serially in one transaction. Every
+ * read-dependent decision remains inside SQL; no interactive transaction,
+ * JS read/modify/write XP update, or SELECT FOR UPDATE is used.
  */
-export async function runProgressRewardTransaction<T>({
+export async function runProgressRewardTransaction({
   userId,
   target,
   shouldComplete,
-  onPersist,
-}: RunProgressRewardInput<T>): Promise<
-  ProgressRewardCompletion & { persisted: T }
-> {
-  return db.transaction(async (transaction) => {
-    const entityValues =
-      target.kind === 'tutorial'
-        ? {
-            tutorialId: target.tutorialId,
-            isCompleted: false,
-          }
-        : {
-            challengeId: target.challengeId,
-            isCompleted: false,
-            attempts: 0,
-          };
-
-    await transaction
-      .insert(progress)
-      .values({ userId, ...entityValues })
-      .onConflictDoNothing();
-
-    const entityCondition =
-      target.kind === 'tutorial'
-        ? eq(progress.tutorialId, target.tutorialId)
-        : eq(progress.challengeId, target.challengeId);
-    const [progressRecord] = await transaction
-      .select()
-      .from(progress)
-      .where(and(eq(progress.userId, userId), entityCondition))
-      .for('update');
-
-    if (!progressRecord) {
-      throw new Error('Failed to initialize progress');
-    }
-
-    const wasAlreadyCompleted = progressRecord.isCompleted;
-    const isFirstCompletion = shouldComplete && !wasAlreadyCompleted;
-    const usedHint = progressRecord.usedHint;
-    const xpAwarded = isFirstCompletion
-      ? Math.floor(
-          target.xpReward * (target.kind === 'challenge' && usedHint ? 0.5 : 1),
+  submission,
+  locale = 'en',
+}: {
+  userId: string;
+  target: ProgressRewardTarget;
+  shouldComplete: boolean;
+  submission?: SubmissionWrite;
+  locale?: string;
+}) {
+  if ((target.kind === 'challenge') !== Boolean(submission))
+    throw new Error('Challenge rewards require a submission.');
+  const binding = getRuntimeEnv().DB;
+  const now = Date.now();
+  const operationId = crypto.randomUUID();
+  const submissionId = submission ? crypto.randomUUID() : null;
+  const targetColumn =
+    target.kind === 'tutorial' ? 'tutorial_id' : 'challenge_id';
+  const targetId =
+    target.kind === 'tutorial' ? target.tutorialId : target.challengeId;
+  const statements = [
+    binding
+      .prepare(
+        `INSERT INTO progress (id, user_id, ${targetColumn}, is_completed, attempts, used_hint, created_at, updated_at, last_accessed_at) VALUES (?, ?, ?, 0, 0, 0, ?, ?, ?) ON CONFLICT DO NOTHING`,
+      )
+      .bind(crypto.randomUUID(), userId, targetId, now, now, now),
+    binding
+      .prepare(
+        `
+      INSERT INTO reward_operations (id, user_id, kind, target_id, progress_id, was_completed, first_completion, used_hint, xp_awarded, old_xp, created_at)
+      SELECT ?, ?, ?, ?, p.id, p.is_completed, (? AND p.is_completed = 0), p.used_hint,
+        CASE WHEN ? AND p.is_completed = 0 THEN CAST(? * CASE WHEN ? = 'challenge' AND p.used_hint = 1 THEN 0.5 ELSE 1 END AS INTEGER) ELSE 0 END,
+        u.xp, ? FROM progress p JOIN users u ON u.id = p.user_id WHERE p.user_id = ? AND p.${targetColumn} = ?
+    `,
+      )
+      .bind(
+        operationId,
+        userId,
+        target.kind,
+        targetId,
+        Number(shouldComplete),
+        Number(shouldComplete),
+        target.xpReward,
+        target.kind,
+        now,
+        userId,
+        targetId,
+      ),
+  ];
+  if (submission)
+    statements.push(
+      binding
+        .prepare(
+          `
+    INSERT INTO submissions (id, user_id, challenge_id, code, is_passed, xp_earned, execution_time, tests_passed, tests_total, error_message, created_at)
+    SELECT ?, ?, ?, ?, ?, o.xp_awarded, ?, ?, ?, ?, ? FROM reward_operations o WHERE o.id = ?
+  `,
         )
-      : 0;
-    const now = new Date();
-    let initialXp: number | null = null;
-
-    if (target.kind === 'tutorial' ? !wasAlreadyCompleted : true) {
-      await transaction
-        .update(progress)
-        .set({
-          isCompleted: progressRecord.isCompleted || shouldComplete,
-          completedAt: isFirstCompletion ? now : progressRecord.completedAt,
-          lastAccessedAt: now,
-          updatedAt: now,
-          ...(target.kind === 'tutorial'
-            ? {}
-            : {
-                attempts: (progressRecord.attempts ?? 0) + 1,
-              }),
-        })
-        .where(eq(progress.id, progressRecord.id));
-    }
-
-    if (isFirstCompletion) {
-      const [user] = await transaction
-        .select({ xp: users.xp, level: users.level })
-        .from(users)
-        .where(eq(users.id, userId))
-        .for('update');
-      if (!user) throw new Error('User not found');
-
-      initialXp = user.xp;
-      const levelUpInfo = checkLevelUp(user.xp, xpAwarded);
-      await transaction
-        .update(users)
-        .set({
-          xp: user.xp + xpAwarded,
-          level: levelUpInfo.newLevel,
-          updatedAt: now,
-        })
-        .where(eq(users.id, userId));
-    }
-
-    const earnedAchievements = isFirstCompletion
-      ? checkAchievements(
-          await getUserStats(userId, transaction),
-          await getEarnedAchievementIds(userId, transaction),
-        )
-      : [];
-    const awardedAchievementSlugs = await awardAchievements(
-      userId,
-      earnedAchievements.map((achievement) => achievement.id),
-      transaction,
+        .bind(
+          submissionId,
+          userId,
+          targetId,
+          submission.code,
+          Number(submission.isPassed),
+          submission.executionTime ?? null,
+          submission.testsPassed,
+          submission.testsTotal,
+          submission.errorMessage ?? null,
+          now,
+          operationId,
+        ),
     );
-
-    let levelUp: ProgressRewardCompletion['levelUp'] = null;
-    if (initialXp !== null) {
-      const [updatedUser] = await transaction
-        .select({ xp: users.xp })
-        .from(users)
-        .where(eq(users.id, userId));
-      if (updatedUser) {
-        const levelUpInfo = checkLevelUp(initialXp, updatedUser.xp - initialXp);
-        if (levelUpInfo.leveledUp) {
-          levelUp = {
-            oldLevel: levelUpInfo.oldLevel,
-            newLevel: levelUpInfo.newLevel,
-            levelsGained: levelUpInfo.levelsGained,
-          };
+  statements.push(
+    binding
+      .prepare(
+        `
+      UPDATE progress SET is_completed = (is_completed OR ?),
+        completed_at = CASE WHEN (SELECT first_completion FROM reward_operations WHERE id = ?) THEN ? ELSE completed_at END,
+        last_accessed_at = ?, updated_at = ?, attempts = COALESCE(attempts, 0) + ?,
+        best_submission_id = CASE WHEN ? THEN ? ELSE best_submission_id END
+      WHERE id = (SELECT progress_id FROM reward_operations WHERE id = ?)
+        AND (? = 'challenge' OR is_completed = 0)
+    `,
+      )
+      .bind(
+        Number(shouldComplete),
+        operationId,
+        now,
+        now,
+        now,
+        target.kind === 'challenge' ? 1 : 0,
+        Number(Boolean(submission?.isPassed)),
+        submissionId,
+        operationId,
+        target.kind,
+      ),
+    binding
+      .prepare(
+        'UPDATE users SET xp = xp + (SELECT xp_awarded FROM reward_operations WHERE id = ?), updated_at = ? WHERE id = ?',
+      )
+      .bind(operationId, now, userId),
+    binding
+      .prepare(
+        target.kind === 'tutorial'
+          ? 'UPDATE tutorials SET view_count = view_count + 1 WHERE id = ? AND (SELECT first_completion FROM reward_operations WHERE id = ?) = 1'
+          : 'UPDATE challenges SET completion_count = completion_count + 1 WHERE id = ? AND (SELECT first_completion FROM reward_operations WHERE id = ?) = 1',
+      )
+      .bind(targetId, operationId),
+    levelUpdate(userId),
+    snapshotEligibleAchievements(operationId, userId),
+    ...insertEligibleAchievements(operationId, userId, now),
+    addAchievementXp(operationId, userId, now),
+    levelUpdate(userId),
+    binding
+      .prepare(
+        `SELECT o.progress_id progressId, o.was_completed wasCompleted, o.first_completion firstCompletion, o.used_hint usedHint, o.xp_awarded xpAwarded, o.old_xp oldXp, u.xp newXp FROM reward_operations o JOIN users u ON u.id = o.user_id WHERE o.id = ?`,
+      )
+      .bind(operationId),
+    binding
+      .prepare(
+        `SELECT a.id, a.slug, COALESCE(a.name ->> ?, a.name ->> 'en', '') name, a.icon FROM user_achievements ua JOIN achievements a ON a.id = ua.achievement_id WHERE ua.award_operation_id = ? AND ua.user_id = ?`,
+      )
+      .bind(locale, operationId, userId),
+  );
+  const results = await binding.batch(statements);
+  const result = resultSchema.parse(results.at(-2)?.results[0]);
+  const newAchievements = achievementSchema
+    .array()
+    .parse(results.at(-1)?.results);
+  const level = checkLevelUp(result.oldXp, result.newXp - result.oldXp);
+  const awardedAchievementSlugs = newAchievements.map((item) => item.slug);
+  return {
+    progressId: result.progressId,
+    wasAlreadyCompleted: Boolean(result.wasCompleted),
+    isFirstCompletion: Boolean(result.firstCompletion),
+    usedHint: Boolean(result.usedHint),
+    xpAwarded: result.xpAwarded,
+    levelUp: level.leveledUp
+      ? {
+          oldLevel: level.oldLevel,
+          newLevel: level.newLevel,
+          levelsGained: level.levelsGained,
         }
-      }
-    }
-
-    const completion: ProgressRewardCompletion = {
-      progressId: progressRecord.id,
-      wasAlreadyCompleted,
-      isFirstCompletion,
-      usedHint,
-      xpAwarded,
-      levelUp,
-      earnedAchievements,
-      awardedAchievementSlugs,
-    };
-
-    return {
-      ...completion,
-      persisted: await onPersist(transaction, completion),
-    };
-  });
+      : null,
+    earnedAchievements: ACHIEVEMENTS.filter((item) =>
+      awardedAchievementSlugs.includes(item.id),
+    ),
+    awardedAchievementSlugs,
+    persisted: {
+      submission: {
+        id: submissionId ?? '',
+        isPassed: submission?.isPassed ?? false,
+        testsPassed: submission?.testsPassed ?? 0,
+        testsTotal: submission?.testsTotal ?? 0,
+        xpEarned: result.xpAwarded,
+        executionTime: submission?.executionTime,
+      },
+      newAchievements: newAchievements.map(({ id, name, icon }) => ({
+        id,
+        name,
+        icon,
+      })),
+    },
+  };
 }

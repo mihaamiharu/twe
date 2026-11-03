@@ -15,8 +15,8 @@ export const getConsent = createServerFn({ method: 'GET' }).handler(
       if (cookieValue === 'granted' || cookieValue === 'denied') {
         return cookieValue;
       }
-    } catch (error) {
-      console.error('[Consent] Failed to get consent from cookie:', error);
+    } catch {
+      console.error('[Consent] Failed to get consent from cookie:');
     }
 
     return null;

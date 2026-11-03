@@ -27,9 +27,8 @@ export const getAdminSubmissions = createServerFn({ method: 'GET' })
       });
 
       return { success: true, data: submissionsList };
-    } catch (ignored) {
-      const error = ignored as Error;
-      console.error('Failed to fetch submissions:', error);
+    } catch {
+      console.error('Failed to fetch submissions:');
       return { success: false, error: 'Internal Server Error' };
     }
   });

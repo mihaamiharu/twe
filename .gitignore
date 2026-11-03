@@ -2,12 +2,21 @@ node_modules
 .DS_Store
 dist
 dist-ssr
+public/og/
+public/og-fonts/
 *.local
 count.txt
 .env
+.env.*
+!.env.example
+!.env.*.example
 .nitro
 .tanstack
 .wrangler
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+spikes/cloudflare/src/worker-bindings.generated.d.ts
 .output
 .vinxi
 todos.json
@@ -34,6 +43,15 @@ lint_*.txt
 
 # Sensitive credentials
 rclone-backup.conf
+.vscode/mcp.json
+.mcp.json
+
+# Database backups contain credentials and user records; keep outside the repo.
+*.dump
+*.pgdump
+*.backup
+/*_backup*.sql
+/*-backup*.sql
 
 # VPS Access Guide
 vps_access_guide.md
@@ -41,3 +59,7 @@ vps_access_guide.md
 # Agent and Conductor local data
 .agent/mihaamiharu/
 conductor/
+
+src/worker-bindings.generated.d.ts
+# Private, short-lived data-only Wrangler configs; removed after proxy startup.
+.*.data-proxy-*.json

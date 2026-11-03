@@ -1,5 +1,6 @@
 import type { ChallengeCatalogDetail } from '@/lib/catalog.types';
 import i18n from '@/lib/i18n';
+import { getOgImagePath } from '@/lib/og-image';
 import {
   BASE_URL,
   ORGANIZATION_ID,
@@ -69,7 +70,7 @@ export function createPracticeDetailSeoHead({
   );
   const title = `${challenge.title} · ${difficulty} | TestingWithEkki`;
   const url = `${BASE_URL}/${locale}${path}`;
-  const ogImage = `${BASE_URL}/api/og?title=${encodeURIComponent(challenge.title)}&type=Challenge&difficulty=${encodeURIComponent(challenge.difficulty)}&xp=${challenge.xpReward}`;
+  const ogImage = `${BASE_URL}${getOgImagePath({ title: challenge.title, type: 'Challenge', difficulty: challenge.difficulty, xp: challenge.xpReward })}`;
   const homeLabel = translate('common:navigation.home', locale, 'Home');
   const practiceLabel = translate(
     'common:navigation.practice',

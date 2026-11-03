@@ -1,12 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
-import dotenv from 'dotenv';
-import path from 'path';
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+if (process.env.E2E_EXTERNAL_SERVER && !process.env.E2E_SECRET) {
+  throw new Error(
+    'The disposable E2E runner must pass E2E_SECRET to Playwright.',
+  );
+}
 
 const baseURL = process.env.BASE_URL || 'http://localhost:3000';
 const baseURLHostname = new URL(baseURL).hostname;

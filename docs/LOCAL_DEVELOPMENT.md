@@ -1,93 +1,62 @@
-# Local development on macOS and Windows
+# Local development on Workers and D1
 
-Use Bun for the application and Docker Desktop for PostgreSQL 15. Both platforms
-use the same commands and Compose configuration. On Apple Silicon, Docker selects
-the image architecture automatically.
+The migration branch uses Bun, Vite, local workerd, a SQLite-backed AppRuntime Durable Object and a persisted local D1 database. The object supplies compute; application data remains in D1. It does not require a PostgreSQL container. The former PostgreSQL helpers remain under `src/db/legacy/` for recovery; normal local development uses D1.
 
-## Prerequisites
+## Setup
 
-- Install [Bun](https://bun.sh/) and Git; ensure `bun` is on your PATH.
-- Install [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-  On Windows, enable its WSL 2 backend. On macOS, choose the download for your chip.
-- Start Docker Desktop and wait until `docker info` succeeds.
-
-## First-time setup
-
-From a cloned repository, run these commands in Terminal or PowerShell:
+Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git on macOS or Windows, then run:
 
 ```sh
-bun install
+bun install --frozen-lockfile
 bun run setup
 bun run dev:local
 ```
 
-`setup` creates `.env` from `.env.example` only if it is missing, generates an auth
-secret for that new file, starts PostgreSQL, waits for readiness, applies checked-in
-migrations, and syncs tutorials, challenges, and achievements. Existing `.env`
-files are preserved; replace the placeholder auth secret yourself if you copied
-the example previously. Run setup again after pulling migrations or content changes.
+Open http://localhost:3000. Setup preserves existing `.env` and `.dev.vars` files. If `.dev.vars` is absent it copies the example and generates a random auth secret, applies checked-in D1 migrations, and syncs the editorial catalog/achievements into local D1. It never copies production data or configures remote bindings. Optional integrations can be added to the ignored local file using `.dev.vars.example`.
 
-`dev:local` starts the database if needed, then runs Vite at
-[http://localhost:3000](http://localhost:3000). It does not rerun migrations or sync.
-Stop the app with Ctrl+C. The database stays running for the next session.
+The local app uses http://localhost:3000 as its auth origin. Keep that origin consistent when signing in. Mail delivery is disabled only for local/test mode; local verification is off. Use isolated testing credentials when enabling email or Google OAuth locally. Production secrets belong in Wrangler, not a local test configuration.
 
-## Database control
+## Daily commands
 
 ```sh
-bun run db:up
-bun run db:stop
+bun run dev:local       # app + local workerd/D1; Ctrl-C stops the process
+bun run db:migrate      # apply local D1 migrations
+bun run db:sync         # update local editorial metadata and fixtures
+bun run db:generate     # generate reviewed D1 schema changes
+bun run build          # build Worker/client/static assets
+bun run preview        # preview the existing build
 ```
 
-Stopping preserves the named volume and your local accounts/progress. Each machine
-has its own data. The helpers explicitly use `docker-compose.yml`, start only
-`postgres`, and use the Compose connection:
+The normal local database lives under ignored `.wrangler/state/v3`. Stopping dev preserves it. Do not delete that directory to fix an unrelated test: test runners own separate uniquely named state directories. `db:up` applies local migrations and `db:stop` explains how to stop the dev process; there is no persistent database daemon.
 
-```env
-DATABASE_URL="postgresql://twe_user:twe_password@localhost:5432/twe_db"
-```
-
-The database ports bind to loopback only. Local PostgreSQL uses the image defaults;
-production tuning belongs in the production configuration.
-
-These commands require that connection and an unset `DIRECT_URL`, so setup cannot
-accidentally migrate another database. They set `NODE_ENV=development`, clear
-`TEST_DATABASE_URL`, and use `BETTER_AUTH_URL=http://localhost:3000` for child
-processes. For a custom/native/remote database, configure `.env` and use the manual
-commands (`bun run db:migrate`, `bun run db:sync`, `bun run dev`).
-
-Email verification is disabled in the example. Google OAuth, email, analytics, and
-AI provider credentials are optional for basic development; configure them when
-testing those features. Never copy production database settings into local setup.
-
-## Testing
+## Tests for the final candidate
 
 ```sh
+bun run lint
+bun run typecheck
 bun run test:unit
-bun run test:ci
+bun run test:integration
+bunx playwright install chromium
 bun run test:e2e
 ```
 
-Unit tests need no database. `test:ci` manages the integration database on port 5433
-and runs the CI checks. E2E uses its own disposable container and requires an active
-container engine; it does not use or delete your development volume.
+Integration and E2E runners each create a disposable D1 config/state under `.wrangler/test-runs`, apply migrations, and delete only their own directory afterward. The E2E runner chooses a free application port (override E2E_APP_PORT if needed), syncs content, starts a test-mode Worker, seeds synthetic users/progress, and passes a per-run secret to support APIs. No Docker/Podman service or database port is needed. Use the runner rather than invoking support endpoints against the normal local app.
 
-## Podman alternative
+The runner passes that same per-run secret to Playwright for isolated account creation and verifies user/admin login before starting the browser suite. Do not set `E2E_SECRET` in the legacy `.env`; the generated sandbox value takes precedence. To rerun the affected auth/navigation checks first, use `bun run test:e2e -- e2e/tests/admin.spec.ts e2e/tests/tutorials.spec.ts e2e/tests/rebrand-shell.spec.ts`.
 
-Docker Desktop is the documented default. Existing Podman users can use these
-helpers if `podman compose` supports `up --wait`. Start the Podman machine first,
-then set `LOCAL_CONTAINER_RUNTIME=podman` in `.env`. For E2E/CI, use the separate
-`E2E_CONTAINER_RUNTIME=podman` setting. The helpers do not install a Compose provider
-or start the container engine for you.
+`bun run test:ci` combines lint/typecheck/unit/D1 integration/build; E2E remains an explicit separate run. Run the affected browser checks before release. See [operations](CLOUDFLARE_OPERATIONS.md) and [backup tooling](CLOUDFLARE_BACKUPS.md) for deployment and recovery.
 
 ## Troubleshooting
 
-- **`bun` not found:** restart your terminal after installation and check PATH.
-- **Engine unavailable:** open Docker Desktop and check `docker info`.
-- **Port 5432 occupied:** stop the other local PostgreSQL instance or use a custom
-  database with the manual workflow.
-- **Password authentication failed:** an existing volume may have been initialized
-  with different credentials. Restore the original settings or migrate your data;
-  changing Compose environment values does not change an existing DB password.
-- **Custom database rejected:** restore the example local URL and unset `DIRECT_URL`,
-  or use the manual workflow intentionally.
-- **Missing tables/content:** run `bun run setup` again after pulling updates.
+- Missing auth secret: run setup or add a sufficiently long random BETTER_AUTH_SECRET to `.dev.vars`.
+- Missing table: apply local migrations before syncing or starting features that read D1.
+- Test support API returns 403: normal local mode intentionally denies it; use the disposable E2E runner.
+- Email is unavailable: configure the selected Spacemail TLS SMTP credentials for preview/production, or an explicitly selected HTTP transport. Disabled email is allowed only locally/in tests.
+- Wrong deploy environment: rebuild with cf:build:preview or cf:build:production; the deploy wrapper rejects mismatched artifacts.
+- Preserve local configuration and recovery files. Do not restart retired production writers to diagnose a local test failure.
+
+## Compute and CLI data bindings
+
+Vite and the disposable HTTP/E2E app use the same AppRuntime forwarding boundary as preview. The Worker handles security/maintenance/assets; dynamic Start requests run in the object. Local-only data scripts use a D1/vars proxy without object declarations, because Wrangler’s platform proxy does not execute the application class. Its exclusive mode-0600 temporary config stays beside the original to preserve relative paths and `.dev.vars`, then is removed after startup. The original config and secrets are never rewritten. The ignored filename pattern covers interrupted cleanup.
+
+Cloudflare dev/build bindings use explicit `.dev.vars` files and ignore the legacy `.env` fallback and inherited process variables. Run setup to create an isolated local auth secret if needed. Remote preview/production build output strips resolved local credential files; local-only preview files are mode 0600. Keep private source files and all database backups outside shared build artifacts.

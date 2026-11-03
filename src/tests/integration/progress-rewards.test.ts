@@ -17,6 +17,7 @@ import {
 } from '../../server/submissions.fn';
 import { completeTutorialHandler } from '../../server/tutorials.fn';
 import { getEarnedAchievementIds, getUserStats } from '../../lib/stats';
+import { runProgressRewardTransaction } from '../../server/progress-rewards';
 import { setupTestDb, truncateTables } from './setup';
 import type { z } from 'zod';
 
@@ -332,6 +333,86 @@ describe('Learn and Practice progress/reward invariants', () => {
     });
     expect(unlocked).toHaveLength(1);
     expect(user?.xp).toBe(150);
+  });
+
+  test('concurrent different challenges retain both increments, one shared award and the final level', async () => {
+    await seedAchievement('first-challenge');
+    const secondId = '00000000-0000-0000-0000-000000000102';
+    await db
+      .insert(challenges)
+      .values({
+        id: secondId,
+        slug: 'second-fixture',
+        title: { en: 'Second fixture' },
+        type: 'JAVASCRIPT',
+        difficulty: 'HARD',
+        xpReward: 400,
+        order: 2,
+      });
+    const submission = {
+      code: 'synthetic',
+      isPassed: true,
+      testsPassed: 1,
+      testsTotal: 1,
+    };
+    const results = await Promise.all([
+      runProgressRewardTransaction({
+        userId: testUserId,
+        target: { kind: 'challenge', challengeId, xpReward: 100 },
+        shouldComplete: true,
+        submission,
+      }),
+      runProgressRewardTransaction({
+        userId: testUserId,
+        target: { kind: 'challenge', challengeId: secondId, xpReward: 400 },
+        shouldComplete: true,
+        submission,
+      }),
+    ]);
+    expect(results.filter((result) => result.isFirstCompletion)).toHaveLength(
+      2,
+    );
+    expect(results.flatMap((result) => result.awardedAchievementSlugs)).toEqual(
+      ['first-challenge'],
+    );
+    const user = await db.query.users.findFirst({
+      where: eq(users.id, testUserId),
+    });
+    expect(user?.xp).toBe(550);
+    expect(user?.level).toBe(2);
+    expect(
+      await db.query.progress.findMany({
+        where: eq(progress.userId, testUserId),
+      }),
+    ).toHaveLength(2);
+  });
+
+  test('a persisted hint halves first-completion XP and retries retain the original credit', async () => {
+    await db
+      .insert(progress)
+      .values({
+        userId: testUserId,
+        challengeId,
+        usedHint: true,
+        hintContent: 'Synthetic persisted hint',
+      });
+    const first = requireData(
+      await challengeSubmissionHandler({
+        data: passingSubmission(),
+        context: { user: { id: testUserId } },
+      }),
+    );
+    const retry = requireData(
+      await challengeSubmissionHandler({
+        data: passingSubmission(),
+        context: { user: { id: testUserId } },
+      }),
+    );
+    expect(first.submission.xpEarned).toBe(50);
+    expect(retry.submission.xpEarned).toBe(0);
+    expect(
+      (await db.query.users.findFirst({ where: eq(users.id, testUserId) }))?.xp,
+    ).toBe(50);
   });
 
   test('practice mode is non-persistent and non-rewarding', async () => {
