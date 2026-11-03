@@ -1,119 +1,59 @@
-# Workers/D1 development and operations
+# Cloudflare runtime and deployment
 
-This is the release-branch operating model. Source preparation is distinct from verified release readiness. Production now runs on Cloudflare: the root custom domain targets `twe-production`, maintenance is disabled, and D1 is the sole writable production database. The old TWE app/PostgreSQL/Docker Tunnel are stopped with restart disabled. The VM remains available for remote development. See [the cutover and retirement record](reports/cloudflare-production-cutover-20261102.json).
+The app uses Static Assets, a thin Worker gateway, one SQLite-backed `AppRuntime` Durable Object for dynamic TanStack Start requests, and D1 for application data. The object supplies compute; D1 remains authoritative. Keep the fixed `application` object name and account for gateway and object quotas separately. Adding object storage, timers or per-user objects requires a new capacity and recovery design.
 
-Current execution and activation gates: [release plan](CLOUDFLARE_RELEASE_PLAN.md), [production checklist](CLOUDFLARE_PRODUCTION_CHECKLIST.md), and [fresh rehearsal/candidate evidence](reports/cloudflare-release-rehearsal-20261102.json).
+## Environments
 
-## Resources
-
-| Environment          | Worker         | D1 database                          | Current state                                                                        |
-| -------------------- | -------------- | ------------------------------------ | ------------------------------------------------------------------------------------ |
-| Local                | twe-local      | local Wrangler state                 | Created by local setup                                                               |
-| Preview              | twe-preview    | a57397b4-3f7f-432e-a161-04330b3a5b4b | All three migrations applied in APAC; protected Worker deployed; synthetic data only |
-| Production candidate | twe-production | 6f6630be-ed32-4d07-ba24-24d45bb160c9 | Live Worker/custom domain; all three migrations and final source import reconciled; old VPS writers disabled             |
-
-Do not use the event-booking-platform `ebp-r1` resources or the separate synthetic migration spike as the full application's database. Read replication remains disabled. The production custom domain is now attached; the `www` redirect and mail DNS were preserved. Root `cf:*` commands now target the full app; `cf:spike:*` retains the original isolated fixture.
-
-## Local workflow
+`wrangler.jsonc` defines isolated local, preview and production bindings. Build the target before deployment: a later `--env` flag cannot change the database embedded in an artifact. Preview requires Basic authentication, uses synthetic data and sends private/noindex responses. Production custom domains may be managed in the Cloudflare dashboard separately from the checked-in configuration.
 
 ```sh
-bun install --frozen-lockfile
-bun run setup       # preserves .env/.dev.vars; creates local D1 and editorial data
-bun run dev:local   # Vite + local workerd/D1 on port 3000
-```
-
-No PostgreSQL, Docker or Podman service is required for the migrated app. The old PostgreSQL helpers remain recovery tooling. Never point test tooling at the normal local or remote dataset.
-
-`bun run test:integration` provisions a private, disposable local D1 configuration/state, applies migrations, runs the integration suite, then removes only that sandbox. `bun run test:e2e` uses its own independent D1 sandbox, synthetic users, secret-gated support APIs and Playwright. The owner will run E2E locally before release. Test endpoints require APP_ENV=test and the run-specific secret; NODE_ENV alone does not open them.
-
-The final candidate should run lint, typecheck, unit/D1 integration checks and a production build together after implementation, followed by the owner's local E2E and preview resource/feature checks. No implementation issue is closed merely because its source files exist.
-
-## Configuration and credentials
-
-Local secrets live in ignored `.dev.vars`; environment-specific `.dev.vars.preview`/`.dev.vars.production` must contain their own complete secrets. Runtime secrets belong to Wrangler, never VITE\_ variables, source manifests, GitHub issues or exported logs.
-
-- BETTER_AUTH_SECRET and BETTER_AUTH_URL: retain the production secret/origin for session compatibility; use isolated preview values.
-- GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET: use the separate [replacement Google clients](CLOUDFLARE_GOOGLE_OAUTH.md). Separate preview and production pairs are installed in their corresponding Workers and retained in owner Keychain; production is live with maintenance disabled. The Google audience is now External / In production, with identity scopes only. Preserve Google provider account IDs and user linkage; never copy the preview pair into production.
-- EMAIL_PROVIDER / EMAIL_FROM: selected preview/production-candidate transport is Spacemail SMTP. SMTP_HOST / SMTP_PORT are configuration; SMTP_USER / SMTP_PASSWORD are Worker secrets. HTTP transports retain EMAIL_HTTP_URL / EMAIL_API_KEY.
-- ADMIN_EMAIL: notification destination.
-- DEEPSEEK_API_KEY / AI_HINT_DAILY_LIMIT: existing DeepSeek credit with bounded prompts/output, no retries and an atomic shared D1 request cap. Missing cap disables new generation; see [activation and preview test limits](CLOUDFLARE_AI_HINTS.md).
-- GH_API_TOKEN / GH_OWNER / GH_REPO: [private bug-report intake](CLOUDFLARE_GITHUB_INTAKE.md). Every delivery verifies private repository metadata before posting; metadata/POST share a 15-second deadline with no redirects or automatic retries. Do not target the public code repository or private backup vault.
-- PREVIEW_ACCESS_TOKEN: at least 32 random characters; Basic username is preview. Preview fails closed if absent, protects static assets too, and sends noindex/private headers.
-- VITE_GA_MEASUREMENT_ID: optional public analytics identifier returned only as configured.
-- MAINTENANCE_MODE=true: every application request returns 503, including session reads that might refresh auth data. Static production assets may still bypass the Worker.
-
-The Worker supports nodejs_compat only for supported libraries/APIs. Runtime OG layout/PNG use workerd-selected WASM implementations; native Bun/build and legacy PostgreSQL modules must be absent from the final Worker graph.
-
-## Existing Spacemail delivery
-
-On November 1 the owner selected the existing provider and admin@testingwithekki.com. The inventoried VPS already uses Spacemail at mail.spacemail.com:465 with implicit TLS. EMAIL_PROVIDER=smtp uses Workers outbound TLS sockets directly; it adds no VPS relay, external gateway or new mail-provider subscription. Local/test delivery remains disabled by default. The live production Worker uses this transport and the preserved mailbox credentials. The owner completed a real forgot-password reset and successful existing-account login after cutover. Standby/cutover automation did not send extra synthetic mail.
-
-The adapter accepts only port 465 with TLS from connection start, requires the sender to match the authenticated mailbox, bounds message/reply size and the entire exchange to 20 seconds, and closes its request-owned socket in finally. It encodes UTF-8 MIME, rejects header/envelope injection, redacts provider errors and performs no automatic retry after an uncertain DATA outcome. No connection pooling, timers or persistent sockets remain in AppRuntime; open sockets would otherwise extend object-active duration. SMTP_HOST/SMTP_PORT are trusted operator configuration, never request inputs.
-
-One explicitly authorized, clearly labeled email from/to the owner's admin mailbox was accepted by Spacemail from an isolated hosted Cloudflare object in 2,174 ms. Durable state recorded the single send attempt; no second message occurred. The owner subsequently confirmed inbox arrival on November 1. See [the sanitized report](reports/cloudflare-spacemail-20261101.json); real verification/reset flows and representative delivery/failure behavior remain release checks.
-
-The retained `EMAIL_PROVIDER=http` contract POSTs JSON `{from,to,subject,html,text?,replyTo?}` to the configured HTTPS EMAIL_HTTP_URL with Bearer EMAIL_API_KEY. It follows no redirects, waits up to 20 seconds and accepts only a successful HTTP status. A vendor with a different contract needs an adapter or a gateway exposing this contract. An optional `resend` adapter remains available. `disabled` delivery is accepted only in local/test environments and does not print mail contents or tokens.
-
-Verification/reset/newsletter delivery is awaited and reports failure. Pending newsletter rows permit a later retry/resend. Optional contact/bug notifications are awaited within the request lifecycle but their failure does not undo the saved submission. There are no untracked mail/GitHub promises. Delivery acceptance is not proof that mail arrived; perform inbox/spam/failure checks before release.
-
-## Abuse controls and diagnostics
-
-Contact and bug reports retain 3 requests/hour, newsletter 5/hour, anchored at the first accepted request. D1's conditional UPSERT enforces a strict shared window rather than an eventually consistent approximate counter. Verification resend keeps one request/minute per normalized-email HMAC key. Public Better Auth endpoints retain its default 10-second inactivity window (3 sensitive requests, 100 otherwise) through an atomic D1 wrapper rather than isolate memory.
-
-Authenticated keys use user IDs; anonymous deployed requests use only Cloudflare's CF-Connecting-IP, HMACed with the app secret. Arbitrary X-Forwarded-For/X-Real-IP values are ignored. Missing deployed client identity fails closed; local/test requests use their own isolated local bucket. A scheduled Worker cleans expired buckets daily; the schema indexes expiry.
-
-Workers Logs replaces @sentry/bun. Server logger output contains level/scope rather than objects, private user strings or upstream error payloads; request failures have random correlation IDs. Client Sentry remains consent-controlled. Do not enable automatic request-header/body logging or upload snapshots as diagnostics. Inspect CPU exceeded errors, Worker 5xx, D1 errors/row usage/storage, auth failures, email failures and backup failures daily during rollout, then weekly. Treat any integrity discrepancy, repeated CPU exhaustion or sustained auth failure as a release/rollback incident.
-
-Free remains conditional: the gateway must fit its 10 ms CPU ceiling, with a target p99 below 8 ms and no exceeded-CPU failures. Dynamic SSR/auth/OG now execute in a SQLite-backed AppRuntime object and require separate CPU, duration, memory and account-wide quota acceptance. Measure password hashing and arbitrary OG generation explicitly. Record D1 query/row usage against the current plan limits and retain headroom. The owner has now required strict $0 and deferred cutover; Workers Paid and external paid overages are not an available fallback. See CLOUDFLARE_FREE_ARCHITECTURE.md for the compute redesign and its evidence gates.
-
-## Build/deploy ordering
-
-CI, deployment and backup workflows explicitly install Node 22 and Bun 1.4.2 rather than depending on the runner’s default Node. The build wrapper supplies a 4 GiB Node build heap unless NODE_OPTIONS already specifies a heap size; this does not change Worker runtime budgets. Select the environment at build time with CLOUDFLARE_ENV. The Vite plugin emits a resolved deploy configuration; passing --env to a later deploy does not choose another artifact.
-
-```sh
+bun run setup
+bun run dev:local
 bun run cf:build:preview
 bun run cf:deploy
-# Empty preview only; saves synthetic learner/admin credentials privately.
-bun run cf:preview:seed /absolute/private/new-accounts.json
-# Uses private JSON files containing PREVIEW_ACCESS_TOKEN and synthetic accounts.
-bun run cf:smoke:preview /absolute/private/secrets.json /absolute/private/new-accounts.json /absolute/private/new-smoke-report.json
 ```
 
-The deploy wrapper checks the built Worker name/environment/database and required secret names. Both targets require the selected transport’s secret names; SMTP requires SMTP_USER/SMTP_PASSWORD/EMAIL_FROM, while HTTP requires EMAIL_API_KEY/EMAIL_FROM. Production validates its TLS/HTTPS transport configuration before deployment. Production additionally requires TWE_RELEASE_APPROVED_SHA equal to HEAD and TWE_ALLOW_PRODUCTION_DEPLOY=yes. The manual GitHub workflow validates the pinned candidate, uses isolated GitHub environments, builds the selected target, applies additive migrations, and deploys that artifact. Configure required reviewers on cloudflare-production before enabling production credentials. Use a scoped deploy token; the workflow's GITHUB_TOKEN has only contents:read.
+See [local development](LOCAL_DEVELOPMENT.md) for persistent local state and disposable test runners. The PostgreSQL helpers under `src/db/legacy/` and `scripts/migration/` are recovery tools, not runtime dependencies. The former VPS deployment workflows are archived under `.github/legacy-vps/`.
 
-For a first deployment, use `bun scripts/deploy-cloudflare.ts production /absolute/private/settings.json`. Wrangler uploads these settings as secrets alongside the code, so include `MAINTENANCE_MODE=true` in the initial production payload. The JSON must be a nonempty object of uppercase setting names and nonempty string values, in a private regular file (mode `0600`) outside the checkout; symlinks and relative paths are rejected. A complete payload avoids querying a nonexistent Worker's secrets. Partial updates may inherit required names from the existing Worker. Create the file only immediately before deployment, keep its parent directory private, and remove it in a `finally` cleanup after the command finishes. Keep the independent owner copy in Keychain. Never put secret values in command arguments or printed output. This path preserves the artifact and production approval guards; it does not authorize a data import or traffic switch. See [Wrangler's atomic secret upload](https://developers.cloudflare.com/workers/configuration/secrets/#upload-secrets-alongside-code).
+## Configuration
 
-The legacy VPS workflows are archived under `.github/legacy-vps/`; merging the migration no longer automatically deploys a Worker build into a VPS container. CI still validates main/PRs. Release-branch pushes do not execute those suites. Incompatible future schema changes need an expand/contract release plan; a Worker version rollback cannot undo D1 schema or data changes. A migration failure must stop deployment; a deployment failure leaves the prior Worker against a backward-compatible schema.
+Keep runtime secrets in Wrangler and local secrets in ignored `.dev.vars`. Never use a `VITE_` variable for a secret. Build/dev bindings disable the legacy `.env` fallback and inherited process-variable fallback.
 
-## Backup and recovery
+| Settings                                               | Purpose                                                                                                               |
+| ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`                | Auth signing secret and canonical origin; preserve existing production values when updating the app                   |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`             | Separate Web OAuth clients per environment, with exact `/api/auth/callback/google` redirects and identity scopes only |
+| `EMAIL_PROVIDER`, `EMAIL_FROM`                         | Select `smtp`, `http` or `resend`; `disabled` is local/test-only                                                      |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` | SMTP uses implicit TLS on port 465; sender must match the authenticated mailbox                                       |
+| `EMAIL_HTTP_URL`, `EMAIL_API_KEY`                      | HTTP delivery uses HTTPS, Bearer auth and JSON `{from,to,subject,html,text?,replyTo?}`; no redirects/retries          |
+| `ADMIN_EMAIL`                                          | Notification destination                                                                                              |
+| `GH_API_TOKEN`, `GH_OWNER`, `GH_REPO`                  | Restricted private bug-intake repository; delivery verifies private visibility before posting                         |
+| `DEEPSEEK_API_KEY`, `AI_HINT_DAILY_LIMIT`              | Bounded hint generation with a shared atomic D1 cap; missing cap disables new generation                              |
+| `PREVIEW_ACCESS_TOKEN`                                 | Preview Basic password, at least 32 random characters; username `preview`                                             |
+| `MAINTENANCE_MODE`                                     | `true` rejects application requests with 503, including session reads that can write                                  |
+| `VITE_GA_MEASUREMENT_ID`                               | Optional public analytics identifier                                                                                  |
 
-Owner: mihaamiharu. Proposed operational targets: RPO <=24 hours and RTO <=60 minutes, subject to measured rehearsal and explicit release sign-off. Cloudflare Free currently provides seven days of D1 Time Travel; this is a recovery window, not an independent long-term backup.
+Email, GitHub and AI work is bounded and awaited. Provider errors must not expose request content or credentials. Workers Logs uses sanitized scopes/correlation IDs; client Sentry remains consent-controlled. Avoid recording request bodies, cookies, auth headers or database exports in diagnostics.
 
-Future recovery exports run only in the owner-controlled private [twe-backups vault](https://github.com/mihaamiharu/twe-backups), using its `.github/workflows/backup.yml`. The public `backup-cloudflare.yml` is now a credential-free manual handoff on main; its old environment secret copies have already been removed and its old dedicated token revoked. The owner approved workflow-only PR #260, squash-merged as `0d6086e`; its post-merge policy check passed without starting application CI/VPS deployment. The vault uses repository secrets (GitHub Free private environments are unavailable), separate preview/production keys, an immutable tooling pin, exact encrypted-only uploads, a 4 MiB archive cap and 30-day retention. Only the owner has write access. See [backup automation and owner-key custody](CLOUDFLARE_BACKUPS.md).
+## Release and rollback
 
-Private [preview run 41357633519](https://github.com/mihaamiharu/twe-backups/actions/runs/41357633519) passed in 23 seconds. The downloaded ZIP matched GitHub's digest; independent owner-Keychain decryption and disposable local D1 restore reconciled all 214 rows across 18 tables, integrity/FK checks and all 48 enforced freeze triggers. Recovery plaintext/state were removed. Production readiness and scheduling flags remain absent. The nominal future schedule is 02:15 and 14:15 Asia/Jakarta; do not enable it until the production import, manual production backup and independent recovery pass. The older public synthetic preview run remains historical evidence, not production backup storage.
+PRs to `main` run quality/build, unit, disposable D1 integration and E2E checks. Deployments are manual; merging does not deploy. The candidate workflow requires the reviewed full SHA, isolated environment credentials and explicit production approval. Its production branch guard currently requires `release/cloudflare-migration`.
 
 ```sh
-# Keep the recovery key in a password manager/secret store, not command history.
-bun scripts/backup-d1.ts backup preview /absolute/private/preview.enc
-bun scripts/backup-d1.ts decrypt /absolute/private/preview.enc /absolute/private/decrypted.sql
-bun run cf:backup:prepare-restore /absolute/private/decrypted.sql /absolute/private/restore.sql
+bun run cf:build:production
+# After review, set TWE_RELEASE_APPROVED_SHA to HEAD and
+# TWE_ALLOW_PRODUCTION_DEPLOY=yes, then:
+bun --no-env-file scripts/deploy-cloudflare.ts production
 ```
 
-TWE_BACKUP_KEY must be available securely in the process environment. Plain SQL is created only in a mode-0700 temporary directory and removed after encryption. Decryption writes exclusively outside the checkout. Raw D1 exports interleave table definitions and data; deferred foreign-key checks still fail if an account insert references a users table that has not been created. Run the recovery preparation command before importing. It uses a restricted offline SQLite parser, validates foreign keys/integrity, preserves text/binary values and auto-increment state, and emits all tables before data, with indexes/views/freeze triggers last. It never disables foreign keys on the target. Restore the prepared SQL into a newly identified empty isolated D1 database, without applying migrations first; the dump already contains its migration history. Use a dedicated config/state and perform complete row/integrity, freeze-enforcement and application checks. The schema-only preview export/decrypt/local restore and preview Time Travel marker rehearsal passed on October 30; see CLOUDFLARE_READINESS.md. Repeat with representative approved data/timing and independently held recovery keys before release. Never restore the live database without a write freeze and an approved data reconciliation plan.
+The wrapper verifies Worker name, environment, D1 binding, AppRuntime migration, email transport and required secret names. Existing deployments inherit stored secrets. First deployments may pass an absolute private JSON settings file as the third argument; it must be mode 0600 outside the checkout. Include `MAINTENANCE_MODE=true` while preparing a new production target, retain an independent secret-store copy and remove the temporary file after use. Do not put secret values in command arguments.
 
-References: [Cloudflare Vite environments](https://developers.cloudflare.com/workers/vite-plugin/reference/cloudflare-environments/), [D1 limits](https://developers.cloudflare.com/d1/platform/limits/), [Time Travel](https://developers.cloudflare.com/d1/reference/time-travel/).
+Apply reviewed additive D1 migrations before the matching application. Keep AppRuntime exported and bound after class creation. A Worker rollback changes code only; it cannot undo schema changes or reconcile new D1 writes. Restoring an older PostgreSQL snapshot or changing DNS requires a separate write-freeze and reconciliation plan.
 
-## Preview access handoff
+HTTP maintenance and the database write freeze are separate controls. `scripts/migration/freeze-d1.ts` blocks core/support writes at the database boundary, including admitted requests; it must be verified before an export/recovery operation. Restore into an empty isolated target first and verify complete rows, integrity, roles, provider links and progress before considering live replacement.
 
-The full-app preview is https://twe-preview.ekkisyam2310.workers.dev. Basic username is `preview`; the generated token and synthetic account credentials are retained outside git in the operator’s restricted private-artifacts directory. Retrieve them locally rather than pasting credentials into issues, logs or source. Synthetic learner/admin credentials are preverified; the HTTP smoke does not trigger real email. The SMTP test has separate explicit owner authorization. The seed command refuses a populated preview, reconciles all application tables and cannot select production. The HTTP smoke checks access/noindex/private caching, assets/OG, support-API denial, credential login/session/cookie flags, roles/admin access and logout; it does not replace the owner’s Playwright/browser release run.
+## Monitoring and recovery
 
-## AppRuntime compute boundary
+Inspect gateway CPU failures/5xx, object CPU/memory/duration, D1 errors/row usage/storage, auth failures, integration failures and private backup freshness. Budget all production, preview and probe workloads together. Keep hosting on Free and treat exhausted quotas as availability incidents; no Paid fallback is configured by this operating model.
 
-The source exports AppRuntime; the namespace binding has the same name in local/preview/production. The `app-runtime-v1` SQLite class migration is applied by Worker deployment, separately from D1 schema migrations. One fixed `application` object is APAC-hinted. Do not derive object IDs from users or requests, add timers/alarms, or start storing business data in its SQLite storage without a reviewed quota/recovery design. D1 remains authoritative.
-
-Preview, local HTTP and the owner’s later local E2E exercise the boundary. CLI data scripts omit unused compute declarations from their platform proxy, preserving the same D1 state and private vars. Keep AppRuntime exported/bound when rolling code back after class creation; removing a class or deleting a namespace is a separate reviewed migration. A version rollback does not reconcile D1 writes. Gateway and object errors are caught independently before platform logging.
-
-Before release, confirm the account is actually on Free and budget all active production/preview/probe objects together. Do not keep probe/preview workloads active indefinitely. Duration is object-active time; tail request wall time is insufficient billed-duration evidence. Review quotas/availability and failure behavior, rather than inferring $0 from a short CPU sample. No Paid fallback or account downgrade is automatic. The dashboard lookup required login, and the limited CLI token could not read subscription state.
-
-On November 1 a full remote synthetic-preview export passed encryption, decryption, schema-first preparation and fresh local workerd restore. All 214 rows across 18 tables matched by count/hash; all 48 freeze triggers survived and enforced a blocked write. Wrong-key and modified-ciphertext decryption produced no plaintext. The four recovery phases took 6.821 seconds in this environment. See [the report](reports/cloudflare-backup-restore-20261101.json); this is not production cutover timing or owner key-custody acceptance.
+Independent encrypted recovery runs in a private repository. The public backup workflow only hands off to that vault and has no export credentials. See [backup tooling](CLOUDFLARE_BACKUPS.md) and [D1 data invariants](CLOUDFLARE_D1.md). Owner account inventories, credential locations, migration plans, cutover records and validation reports are kept in the owner's local operations reference rather than this public repository.

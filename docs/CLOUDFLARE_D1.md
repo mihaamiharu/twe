@@ -19,7 +19,7 @@ Production's timestamp interpretation follows the old application's JavaScript D
 
 The schema retains cascades, set-null relationships, unique email/token/slug values, progress's exactly-one-target CHECK, partial user/tutorial and user/challenge uniqueness, and user/achievement uniqueness. Additional FK, leaderboard and time-based indexes are checked in. New `reward_operations`, `rate_limit_buckets` and operator-only `app_control` tables support reward accounting, abuse control and a database-enforced write freeze.
 
-`drizzle/d1/0000_*.sql` creates the complete schema; `0001_*.sql` adds query indexes, and `0002_*.sql` adds the operator write-freeze control and triggers. Neither file has been applied to production. Use `bun run db:generate` for later changes and review generated SQLite rebuilds carefully: D1's foreign-key enforcement cannot be bypassed by assuming PostgreSQL or ordinary SQLite migration behavior.
+`drizzle/d1/0000_*.sql` creates the complete schema; `0001_*.sql` adds query indexes, and `0002_*.sql` adds the operator write-freeze control and triggers. Use `bun run db:generate` for later changes and review generated SQLite rebuilds carefully: D1's foreign-key enforcement cannot be bypassed by assuming PostgreSQL or ordinary SQLite migration behavior.
 
 ## Binding and auth lifecycle
 
@@ -44,13 +44,13 @@ Verification/reset sends are awaited and fail explicitly. Verification resend no
 
 Every operation gets a fresh UUID. Retried attempts may create another submission and increment attempts, as before; progress uniqueness prevents repeat completion credit. Concurrent different targets use SQL increments and cannot overwrite another completion's XP. Achievement uniqueness and operation ownership prevent duplicate award credit. The eligibility snapshot prevents achievement XP from cascading into extra eligibility in the middle of the same completion.
 
-Standalone bug-report achievement awards also insert/unlock/add XP/derive level in one batch. Their notification is awaited, while optional notification failure does not undo the stored report. SQL CHECK/FK failures abort a reward batch, including its progress/submission/counter writes. This design still needs actual D1 concurrency, retry and injected-failure evidence.
+Standalone bug-report achievement awards also insert/unlock/add XP/derive level in one batch. Their notification is awaited, while optional notification failure does not undo the stored report. SQL CHECK/FK failures abort a reward batch, including its progress/submission/counter writes. Disposable D1 integration fixtures exercise concurrency, retries and failure rollback.
 
 The scheduled Worker removes expired limiter entries and operation diagnostics older than 30 days. Learner progress, submissions and achievement unlocks are retained; their unique constraints remain the reward invariants after diagnostic cleanup.
 
-## Validation still required
+## Validation
 
-Run empty creation and incremental migration, all integration fixtures and concurrent same/different-target completions, failed attempts/retries, hint races, level boundaries, achievement eligibility, and failure rollback. Check admin/leaderboard/profile sorting and JSON/date projections. Measure D1 calls/rows and Worker CPU before selecting Free. No runtime compatibility claim follows from source generation alone.
+Run empty creation and incremental migration, all integration fixtures and concurrent same/different-target completions, failed attempts/retries, hint races, level boundaries, achievement eligibility, and failure rollback. Check admin/leaderboard/profile sorting and JSON/date projections. Measure D1 calls/rows and gateway/object usage separately for each release.
 
 References: [D1 batch semantics](https://developers.cloudflare.com/d1/worker-api/d1-database/#batch), [D1 limits](https://developers.cloudflare.com/d1/platform/limits/).
 

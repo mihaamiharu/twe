@@ -1,6 +1,6 @@
 # Local development on Workers and D1
 
-The migration branch uses Bun, Vite, local workerd, a SQLite-backed AppRuntime Durable Object and a persisted local D1 database. The object supplies compute; application data remains in D1. It does not require a PostgreSQL container. The former VPS/PostgreSQL workflow is retained in [the recovery reference](LOCAL_DEVELOPMENT_POSTGRESQL.md); its old package commands are historical.
+The migration branch uses Bun, Vite, local workerd, a SQLite-backed AppRuntime Durable Object and a persisted local D1 database. The object supplies compute; application data remains in D1. It does not require a PostgreSQL container. The former PostgreSQL helpers remain under `src/db/legacy/` for recovery; normal local development uses D1.
 
 ## Setup
 
@@ -44,7 +44,7 @@ Integration and E2E runners each create a disposable D1 config/state under `.wra
 
 The runner passes that same per-run secret to Playwright for isolated account creation and verifies user/admin login before starting the browser suite. Do not set `E2E_SECRET` in the legacy `.env`; the generated sandbox value takes precedence. To rerun the affected auth/navigation checks first, use `bun run test:e2e -- e2e/tests/admin.spec.ts e2e/tests/tutorials.spec.ts e2e/tests/rebrand-shell.spec.ts`.
 
-`bun run test:ci` combines lint/typecheck/unit/D1 integration/build; E2E remains an explicit separate run. The migration owner will run E2E locally before release. See [operations](CLOUDFLARE_OPERATIONS.md), [data transfer](CLOUDFLARE_DATA.md), and [cutover](CLOUDFLARE_CUTOVER.md) for the remaining release gates.
+`bun run test:ci` combines lint/typecheck/unit/D1 integration/build; E2E remains an explicit separate run. Run the affected browser checks before release. See [operations](CLOUDFLARE_OPERATIONS.md) and [backup tooling](CLOUDFLARE_BACKUPS.md) for deployment and recovery.
 
 ## Troubleshooting
 
@@ -53,7 +53,7 @@ The runner passes that same per-run secret to Playwright for isolated account cr
 - Test support API returns 403: normal local mode intentionally denies it; use the disposable E2E runner.
 - Email is unavailable: configure the selected Spacemail TLS SMTP credentials for preview/production, or an explicitly selected HTTP transport. Disabled email is allowed only locally/in tests.
 - Wrong deploy environment: rebuild with cf:build:preview or cf:build:production; the deploy wrapper rejects mismatched artifacts.
-- Preserve `.env`, PostgreSQL volumes and recovery files while migrating; do not remove the old infrastructure until post-cutover sign-off.
+- Preserve local configuration and recovery files. Do not restart retired production writers to diagnose a local test failure.
 
 ## Compute and CLI data bindings
 

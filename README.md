@@ -17,7 +17,7 @@ A gamified platform for learning QA testing skills through interactive tutorials
 
 ## 🚀 Quick Start
 
-Production runs TanStack Start through a thin Cloudflare Worker and a SQLite-backed Durable Object for dynamic compute, with D1 and Static Assets. The November 2, 2026 cutover uses Cloudflare Free; Paid is not an approved fallback. See the [cutover record](./docs/reports/cloudflare-production-cutover-20261102.json). Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git, then:
+Production runs TanStack Start through a thin Cloudflare Worker and a SQLite-backed Durable Object for dynamic compute, with D1 and Static Assets. Hosting uses Cloudflare Free; Paid is not an approved fallback. Install Node.js 22.12+ (for the Cloudflare/Vite toolchain), Bun and Git, then:
 
 ```sh
 git clone https://github.com/mihaamiharu/twe.git
@@ -103,7 +103,7 @@ bun run test:ci    # lint/typecheck/unit/D1 integration/build
 bun run test:e2e   # separate local browser run before release
 ```
 
-See [data transfer](./docs/CLOUDFLARE_DATA.md), [schema/rewards](./docs/CLOUDFLARE_D1.md), and [cutover/rollback](./docs/CLOUDFLARE_CUTOVER.md). Existing PostgreSQL migrations and tools remain available for recovery until retirement.
+See [schema/rewards](./docs/CLOUDFLARE_D1.md), [deployment/rollback](./docs/CLOUDFLARE_OPERATIONS.md), and [backup tooling](./docs/CLOUDFLARE_BACKUPS.md). Existing PostgreSQL migrations and tools remain available for recovery. Dated migration plans, owner configuration inventories and verification reports are retained in the owner's local operations reference.
 
 ## 🎮 Challenge Types
 

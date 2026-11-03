@@ -1,9 +1,10 @@
-import { describe, expect, test } from 'bun:test';
+import { beforeAll, describe, expect, test } from 'bun:test';
 import satori from 'satori';
 import {
   adaptSatoriForWorkerd,
   harfBuzzCallbackModule,
 } from '../../../scripts/satori-workerd.plugin';
+import { generateOgFonts } from '../../../scripts/generate-og-fonts';
 import { normalizeOgParams } from '@/lib/og-params';
 import { renderDynamicOg } from '@/server/og-renderer.server';
 import { OgRenderError } from '@/server/og-errors.server';
@@ -46,6 +47,11 @@ test('the pinned workerd adapter precompiles every HarfBuzz callback signature',
 });
 
 describe('OG text and rendering resource boundaries', () => {
+  beforeAll(async () => {
+    // A clean unit-test checkout has not run Vite's font preparation hook.
+    await generateOgFonts();
+  });
+
   test('limits oversized text without splitting a joined emoji', () => {
     const emoji = '👩🏽‍💻';
     const params = normalizeOgParams({

@@ -1,8 +1,7 @@
+// Legacy VPS entrypoint. Normal development and deployment use workerd.
 const PORT = process.env.PORT || 3000;
 
 import { brotliCompressSync, constants, gzipSync } from 'node:zlib';
-import * as Sentry from "@sentry/bun";
-import { getSentryConfig } from "../src/lib/sentry.config";
 
 type StartServer = { fetch(request: Request): Promise<Response> };
 type CompressionEncoding = 'br' | 'gzip';
@@ -180,8 +179,6 @@ if (
 }
 const server = serverModule.default;
 
-Sentry.init(getSentryConfig());
-
 const env = process.env.NODE_ENV || 'development';
 console.log(`🚀 ${env.charAt(0).toUpperCase() + env.slice(1)} server starting on port ${PORT}...`);
 
@@ -241,7 +238,6 @@ Bun.serve({
 
             return maybeCompressResponse(finalResponse, req);
         } catch (error) {
-            Sentry.captureException(error);
             console.error('SSR Error:', error);
             return new Response('Internal Server Error', { status: 500 });
         }
