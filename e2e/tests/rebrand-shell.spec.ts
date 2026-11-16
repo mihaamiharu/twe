@@ -80,7 +80,7 @@ test.describe('Rebrand V1 global shell', () => {
       }),
     ).toBeVisible();
     await expect(
-      page.locator('header').getByRole('link', { name: 'Labs, Soon' }),
+      page.locator('header').getByRole('link', { name: 'Labs Soon' }),
     ).toHaveAttribute('href', '/en/labs');
     await expect(
       page.getByRole('link', { name: 'Explore Practice' }).first(),
@@ -303,5 +303,70 @@ test.describe('Rebrand V1 global shell', () => {
         '[data-empty-state][data-empty-state-illustration="thinking"]',
       ),
     ).toBeVisible();
+  });
+});
+
+test.describe('Home page motion', () => {
+  test('shows all content immediately with reduced motion', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/en');
+
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByTestId('current-lessons')).toBeVisible();
+
+    const hidden = await page
+      .locator('.reveal, .reveal-solid, .reveal-fade, .reveal-scroll')
+      .evaluateAll(
+        (elements) =>
+          elements.filter((element) => {
+            const style = getComputedStyle(element);
+            return style.opacity !== '1' || style.translate !== 'none';
+          }).length,
+      );
+    expect(hidden).toBe(0);
+  });
+
+  test('keeps below-the-fold sections readable once scrolled into view', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/en');
+    await expect(page.locator('body')).toHaveAttribute(
+      'data-app-hydrated',
+      'true',
+    );
+
+    const cta = page.locator('.reveal-scroll').last();
+    await cta.scrollIntoViewIfNeeded();
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveCSS('opacity', '1');
+  });
+
+  test('finishes the hero entrance with every step visible', async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 1280, height: 720 });
+    await page.goto('/en');
+
+    const hero = page.locator('[data-home-hero-visual]');
+    for (const step of ['inspect', 'run', 'verify']) {
+      await expect(
+        hero.locator(`[data-hero-step="${step}"]`).locator('visible=true'),
+      ).not.toHaveCount(0);
+    }
+    await expect
+      .poll(() =>
+        hero
+          .locator('.reveal')
+          .evaluateAll((elements) =>
+            elements
+              .filter((element) => element.getClientRects().length > 0)
+              .every((element) => getComputedStyle(element).opacity === '1'),
+          ),
+      )
+      .toBe(true);
   });
 });

@@ -49,8 +49,11 @@ export function LanguageSwitcher() {
           variant="ghost"
           size="default"
           className="min-w-[5rem] gap-1 rounded-md px-2 font-mono text-xs tracking-wide text-[var(--graphite)] shadow-none hover:bg-[var(--orange-tint)] hover:text-[var(--graphite)]"
-          aria-label={`Switch language, currently ${languageNames[currentLocale]}`}
         >
+          {/* Visible text stays part of the accessible name. */}
+          <span className="sr-only">
+            {`Switch language, currently ${languageNames[currentLocale]}:`}
+          </span>
           <span
             className={
               currentLocale === 'en'

@@ -25,7 +25,7 @@ export function SelectorPanel({
     <div className="workspace-panel space-y-4">
       <div className="space-y-2">
         <h3 className="text-sm font-bold flex items-center gap-2 text-workspace-text">
-          <div className="h-6 w-6 rounded-md bg-brand-orange/15 flex items-center justify-center text-xs font-bold text-brand-orange border border-brand-orange/30">
+          <div className="h-6 w-6 rounded-md bg-brand-orange/15 flex items-center justify-center text-xs font-bold text-[var(--brand-orange-text)] border border-brand-orange/30">
             1
           </div>
           {t('challenges:playground.step1')}

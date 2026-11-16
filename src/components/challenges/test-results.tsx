@@ -10,6 +10,7 @@
 
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { stagger } from '@/lib/motion';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -177,13 +178,18 @@ export function TestResults({
       {/* Header with Summary */}
       <div
         className={cn(
-          'px-4 py-3 border-b border-workspace-border flex items-center justify-between',
+          'reveal-fade px-4 py-3 border-b border-workspace-border flex items-center justify-between',
           allPassed ? 'bg-brand-success/10' : 'bg-brand-error/10',
         )}
       >
-        <div className="flex items-center gap-3">
+        <div
+          className={cn('flex items-center gap-3', !allPassed && 'motion-shake')}
+        >
           {allPassed ? (
-            <CheckCircle2 className="h-5 w-5 text-brand-success" />
+            <CheckCircle2
+              className="reveal-pop h-5 w-5 text-brand-success"
+              style={stagger(results.length + 2)}
+            />
           ) : (
             <XCircle className="h-5 w-5 text-brand-error" />
           )}
@@ -229,7 +235,11 @@ export function TestResults({
       {/* Test Results List */}
       <div className="divide-y divide-workspace-border">
         {results.map((result, index) => (
-          <div key={result.id} className="group">
+          <div
+            key={result.id}
+            className="reveal group"
+            style={stagger(Math.min(index, 8) + 1)}
+          >
             {/* Test Header Row */}
             <button
               onClick={() => result.error && toggleExpand(result.id)}

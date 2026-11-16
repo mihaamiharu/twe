@@ -36,7 +36,7 @@ export function ResultsPanel({
             className={cn(
               'px-3 py-1.5 text-xs font-medium rounded-sm transition-colors',
               resultsTab === 'results'
-                ? 'bg-brand-orange/10 text-brand-orange'
+                ? 'bg-brand-orange/10 text-[var(--brand-orange-text)]'
                 : 'text-workspace-muted hover:text-workspace-text hover:bg-workspace-elevated',
             )}
           >
@@ -47,7 +47,7 @@ export function ResultsPanel({
             className={cn(
               'px-3 py-1.5 text-xs font-medium rounded-sm transition-colors',
               resultsTab === 'console'
-                ? 'bg-brand-orange/10 text-brand-orange'
+                ? 'bg-brand-orange/10 text-[var(--brand-orange-text)]'
                 : 'text-workspace-muted hover:text-workspace-text hover:bg-workspace-elevated',
             )}
           >

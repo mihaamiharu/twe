@@ -16,6 +16,7 @@ import { BASE_URL, createSeoHead, createWebsiteSchema } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { getOgImagePath } from '@/lib/og-image';
 import { LocaleRoutes, localeParams } from '@/lib/navigation';
+import { stagger } from '@/lib/motion';
 
 export const Route = createFileRoute('/$locale/')({
   loader: async ({ context, params }) => {
@@ -68,21 +69,21 @@ function HomePage() {
     <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-4 lg:px-12 lg:pb-28 lg:pt-20">
         <div className="relative z-10 max-w-2xl">
-          <p className="mb-6 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+          <p className="reveal mb-6 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">
             {t('hero.eyebrow')}
           </p>
-          <h1 className="max-w-[680px] text-[clamp(3rem,6vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
+          <h1 className="reveal-solid max-w-[680px] text-[clamp(3rem,6vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
             {t('hero.title')}
             <span className="text-[var(--brand-orange)]">.</span>
           </h1>
-          <p className="mt-7 max-w-xl text-lg leading-8 text-[var(--muted-graphite)] sm:text-[1.125rem]">
+          <p className="reveal mt-7 max-w-xl text-lg leading-8 text-[var(--muted-graphite)] sm:text-[1.125rem]" style={stagger(2)}>
             {t('hero.description')}
           </p>
-          <div className="mt-8 flex flex-col items-start gap-3 sm:flex-row">
+          <div className="reveal mt-8 flex flex-col items-start gap-3 sm:flex-row" style={stagger(3)}>
             <Link
               to={LocaleRoutes.learn}
               params={params}
-              className="motion-hover-lift inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+              className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange-deep)] px-5 text-[15px] font-medium text-white hover:bg-[#9c3618] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
               {t('hero.startWebAutomation')}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -90,12 +91,12 @@ function HomePage() {
             <Link
               to={LocaleRoutes.practice}
               params={params}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+              className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
               {t('hero.explorePractice')}
             </Link>
           </div>
-          <div className="mt-9 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
+          <div className="reveal mt-9 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]" style={stagger(4)}>
             <span className="flex -space-x-2" aria-hidden="true">
               <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#d8b5a7]" />
               <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#b9c4c8]" />
@@ -108,18 +109,18 @@ function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="grid gap-10 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:p-9 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:p-12">
+        <div className="reveal-scroll grid gap-10 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:p-9 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:p-12">
           <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('learningPath.eyebrow')}</p>
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">{t('learningPath.eyebrow')}</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learningPath.title')}</h2>
             <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learningPath.description')}</p>
             <Link
               to={LocaleRoutes.learn}
               params={params}
-              className="mt-7 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
+              className="motion-hover-arrow-group mt-7 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange-text)] transition-colors hover:text-[var(--graphite)]"
             >
               {t('learningPath.cta')}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <ArrowRight className="motion-hover-arrow h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
             <div
@@ -131,19 +132,23 @@ function HomePage() {
                   key={lesson.slug}
                   to={LocaleRoutes.learnDetail}
                   params={{ ...params, slug: lesson.slug }}
-                  className="motion-hover-arrow-group group relative flex min-h-44 flex-col rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-4 transition-colors hover:border-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                  style={stagger(index + 1)}
+                  className="reveal-scroll motion-hover-lift motion-hover-arrow-group group relative flex min-h-44 flex-col rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-4 transition-colors hover:border-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
                 >
-                  <span className="font-mono text-[11px] text-[var(--brand-orange)]">
+                  <span className="font-mono text-[11px] text-[var(--brand-orange-text)]">
                     {t('learningPath.lessonNumber', { number: index + 1 })}
                   </span>
-                  <h3 className="mt-4 font-semibold leading-6 group-hover:text-[var(--brand-orange)]">
+                  <h3
+                    className="mt-4 font-semibold leading-6 group-hover:text-[var(--brand-orange-text)]"
+                    style={{ viewTransitionName: `lesson-${lesson.slug}` }}
+                  >
                     {lesson.title}
                   </h3>
                   <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--muted-graphite)]">
                     {lesson.description}
                   </p>
                   <ArrowRight
-                    className="motion-hover-arrow mt-auto h-4 w-4 self-end text-[var(--brand-orange)]"
+                    className="motion-hover-arrow mt-auto h-4 w-4 self-end text-[var(--brand-orange-text)]"
                     aria-hidden="true"
                   />
                 </Link>
@@ -159,21 +164,21 @@ function HomePage() {
 
       <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
         <div className="grid items-start gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('learnPractice.eyebrow')}</p>
+          <div className="reveal-scroll">
+            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">{t('learnPractice.eyebrow')}</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learnPractice.title')}</h2>
             <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learnPractice.description')}</p>
           </div>
           <div className="grid gap-7 lg:grid-cols-[0.85fr_1.15fr]">
             <ol className="space-y-5">
-              {methodSteps.map((step) => {
+              {methodSteps.map((step, index) => {
                 const Icon = step.icon;
                 return (
-                  <li key={step.number} className="flex gap-4 border-b border-[var(--soft-border)] pb-5 last:border-b-0">
-                    <span className="font-mono text-xs text-[var(--brand-orange)]">{step.number}</span>
+                  <li key={step.number} style={stagger(index)} className="reveal-scroll flex gap-4 border-b border-[var(--soft-border)] pb-5 last:border-b-0">
+                    <span className="font-mono text-xs text-[var(--brand-orange-text)]">{step.number}</span>
                     <div>
                       <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
-                        <Icon className="h-3.5 w-3.5 text-[var(--brand-orange)]" aria-hidden="true" />
+                        <Icon className="h-3.5 w-3.5 text-[var(--brand-orange-text)]" aria-hidden="true" />
                         {step.label}
                       </div>
                       <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
@@ -183,11 +188,11 @@ function HomePage() {
                 );
               })}
             </ol>
-            <div className="lg:pt-4">
+            <div className="reveal-scroll lg:pt-4" style={stagger(2)}>
               <PracticePreview />
-              <Link to={LocaleRoutes.practice} params={params} className="mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange)] hover:text-[var(--graphite)]">
+              <Link to={LocaleRoutes.practice} params={params} className="motion-hover-arrow-group mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange-text)] hover:text-[var(--graphite)]">
                 {t('learnPractice.cta')}
-                <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+                <ArrowRight className="motion-hover-arrow h-3.5 w-3.5" aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -195,21 +200,21 @@ function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14">
+        <div className="reveal-scroll grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14">
           <div className="relative mx-auto w-full max-w-[300px]">
-            <div className="absolute inset-4 rounded-[42%] border border-[var(--brand-orange)]/35" />
-            <img src="/testing-workflow-illustration.jpg" alt="Illustration of a software testing workflow" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-center" width={600} height={600} loading="lazy" />
-            <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] shadow-sm">TEST FLOW / TWE</div>
+            <div className="absolute inset-4 rounded-[42%] border border-[var(--brand-orange)]/35" aria-hidden="true" />
+            <img src="/testing-workflow-illustration-480.webp" srcSet="/testing-workflow-illustration-240.webp 240w, /testing-workflow-illustration-480.webp 480w" sizes="216px" alt="Illustration of a software testing workflow" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-center" width={480} height={480} loading="lazy" decoding="async" />
+            <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange-text)] shadow-sm">TEST FLOW / TWE</div>
           </div>
           <div>
             <h2 className="max-w-2xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t('philosophy.title')}</h2>
             <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">{t('philosophy.description')}</p>
             <div className="mt-8 border-t border-[var(--brand-orange)]/25 pt-6">
-              <p className="font-mono text-xs uppercase tracking-[0.15em] text-[var(--brand-orange)]">{t('creator.eyebrow')}</p>
+              <p className="font-mono text-xs uppercase tracking-[0.15em] text-[var(--brand-orange-text)]">{t('creator.eyebrow')}</p>
               <h3 className="mt-2 text-2xl font-semibold">{t('creator.title')}</h3>
               <p className="mt-3 max-w-xl text-base leading-7 text-[var(--muted-graphite)]">{t('creator.description')}</p>
-              <Link to={LocaleRoutes.about} params={params} className="mt-5 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] hover:text-[var(--graphite)]">
-                {t('creator.cta')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              <Link to={LocaleRoutes.about} params={params} className="motion-hover-arrow-group mt-5 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange-text)] hover:text-[var(--graphite)]">
+                {t('creator.cta')} <ArrowRight className="motion-hover-arrow h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -223,41 +228,41 @@ function HomePage() {
             data-empty-state-illustration="thinking"
             className="grid items-center gap-10 py-10 sm:py-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16 lg:py-14"
           >
-            <div className="max-w-xl">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('labs.eyebrow')}</p>
+            <div className="reveal-scroll max-w-xl">
+              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">{t('labs.eyebrow')}</p>
               <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('labs.title')}</h2>
               <p className="mt-5 text-base leading-7 text-[var(--muted-graphite)]">{t('labs.description')}</p>
               <Link
                 to={LocaleRoutes.labs}
                 params={params}
-                className="mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange)] transition-colors hover:text-[var(--graphite)]"
+                className="motion-hover-arrow-group mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange-text)] transition-colors hover:text-[var(--graphite)]"
               >
                 {t('labs.cta')}
-                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                <ArrowRight className="motion-hover-arrow h-4 w-4" aria-hidden="true" />
               </Link>
             </div>
 
-            <div className="relative overflow-hidden rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:p-7">
+            <div className="reveal-scroll relative overflow-hidden rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:p-7" style={stagger(1)}>
               <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full border border-[var(--brand-orange)]/20" aria-hidden="true" />
               <div className="absolute -bottom-20 -left-12 h-44 w-44 rounded-full border border-[var(--brand-orange)]/15" aria-hidden="true" />
               <div className="relative">
                 <div className="flex items-start justify-between gap-4 border-b border-[var(--soft-border)] pb-5">
                   <div className="flex items-center gap-3">
                     <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--orange-tint)]">
-                      <FlaskConical className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+                      <FlaskConical className="h-5 w-5 text-[var(--brand-orange-text)]" aria-hidden="true" />
                     </span>
                     <div>
-                      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--brand-orange)]">{t('labs.preview.label')}</p>
+                      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">{t('labs.preview.label')}</p>
                       <p className="mt-1 text-sm font-semibold">{t('labs.preview.title')}</p>
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-full border border-[var(--brand-orange)]/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--brand-orange)]">{t('labs.preview.status')}</span>
+                  <span className="shrink-0 rounded-full border border-[var(--brand-orange)]/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--brand-orange-text)]">{t('labs.preview.status')}</span>
                 </div>
                 <div className="mt-6 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2 sm:gap-3">
                   {[t('labs.preview.steps.observe'), t('labs.preview.steps.try'), t('labs.preview.steps.review')].map((step, index) => (
                     <div key={step} className="contents">
                       <div className="rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-3 text-center">
-                        <span className="font-mono text-[10px] text-[var(--brand-orange)]">0{index + 1}</span>
+                        <span className="font-mono text-[10px] text-[var(--brand-orange-text)]">0{index + 1}</span>
                         <p className="mt-2 text-xs font-semibold sm:text-sm">{step}</p>
                       </div>
                       {index < 2 && <QaDoodle kind="trace" className="h-5 w-5 sm:h-6 sm:w-6" />}
@@ -272,18 +277,18 @@ function HomePage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-6 pb-24 sm:px-8 lg:px-12 lg:pb-32">
-        <div className="rounded-xl bg-[var(--graphite)] px-7 py-12 text-[var(--paper-surface)] sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
+        <div className="reveal-scroll surface-dark rounded-xl bg-[var(--graphite)] px-7 py-12 text-[var(--paper-surface)] sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
           <div>
             <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--orange-tint)]">{t('cta.eyebrow')}</p>
             <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('cta.title')}</h2>
             <p className="mt-4 max-w-xl text-base leading-7 text-[#d2d0c9]">{t('cta.description')}</p>
           </div>
           <div className="mt-8 flex shrink-0 flex-col items-start gap-4 sm:flex-row lg:mt-0 lg:flex-col lg:items-start">
-            <Link to={LocaleRoutes.learn} params={params} className="inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#f06f4b] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
+            <Link to={LocaleRoutes.learn} params={params} className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange-deep)] px-5 text-[15px] font-medium text-white hover:bg-[#9c3618] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
               {t('cta.primary')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
-            <Link to={LocaleRoutes.practice} params={params} className="inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
-              {t('cta.secondary')} <Play className="h-3.5 w-3.5" aria-hidden="true" />
+            <Link to={LocaleRoutes.practice} params={params} className="motion-hover-arrow-group inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
+              {t('cta.secondary')} <Play className="motion-hover-arrow h-3.5 w-3.5" aria-hidden="true" />
             </Link>
           </div>
         </div>

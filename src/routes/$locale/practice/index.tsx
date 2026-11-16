@@ -37,6 +37,7 @@ import { cn } from '@/lib/utils';
 import { TRACK_CONFIG, TRACK_IDS, type TrackId } from '@/config/tracks';
 import i18n from '@/lib/i18n';
 import { createSeoHead } from '@/lib/seo';
+import { stagger } from '@/lib/motion';
 import { type PracticeChallengeLabels } from '@/components/challenges/practice-challenge-item';
 import {
   filterPracticeChallenges,
@@ -298,29 +299,33 @@ export function ChallengesPage() {
           className="max-w-3xl pb-8 lg:pb-10"
           aria-labelledby="practice-title"
         >
-          <p className="font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
+          <p className="reveal font-mono text-[11px] font-medium uppercase tracking-[0.18em] text-primary">
             {t('library.eyebrow')}
           </p>
           <h1
             id="practice-title"
-            className="mt-3 text-4xl font-semibold tracking-[-0.045em] text-foreground sm:text-5xl"
+            className="reveal-solid mt-3 text-4xl font-semibold tracking-[-0.045em] text-foreground sm:text-5xl"
           >
             {t('library.headline')}
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg">
+          <p
+            className="reveal mt-4 max-w-2xl text-base leading-7 text-muted-foreground sm:text-lg"
+            style={stagger(2)}
+          >
             {t('library.description')}
           </p>
         </section>
 
         <section
           aria-labelledby="how-practice-works"
-          className="mb-8 border border-brand-orange/20 bg-brand-orange/8 px-4 py-4 sm:px-5 lg:mb-10 lg:py-3.5"
+          style={stagger(3)}
+          className="reveal mb-8 border border-brand-orange/20 bg-brand-orange/8 px-4 py-4 sm:px-5 lg:mb-10 lg:py-3.5"
         >
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:gap-6">
             <div className="shrink-0 lg:w-44">
               <h2
                 id="how-practice-works"
-                className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-brand-orange"
+                className="font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-[var(--brand-orange-text)]"
               >
                 {t('howPractice.title')}
               </h2>
@@ -333,12 +338,12 @@ export function ChallengesPage() {
                   className="relative min-w-0 lg:flex lg:flex-1 lg:items-center lg:pr-7"
                 >
                   <div className="flex min-w-0 items-center gap-2.5">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-orange/25 bg-background text-brand-orange">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full border border-brand-orange/25 bg-background text-[var(--brand-orange-text)]">
                       <Icon className="h-3.5 w-3.5" aria-hidden="true" />
                     </div>
                     <div className="min-w-0">
                       <p className="text-sm font-semibold text-foreground">
-                        <span className="mr-1 font-mono text-[10px] text-brand-orange">
+                        <span className="mr-1 font-mono text-[10px] text-[var(--brand-orange-text)]">
                           0{index + 1}
                         </span>
                         {t(`howPractice.steps.${key}.title`)}
@@ -350,7 +355,7 @@ export function ChallengesPage() {
                   </div>
                   {index < PRACTICE_STEPS.length - 1 && (
                     <ArrowRight
-                      className="absolute -right-1 top-1/2 hidden h-3.5 w-3.5 -translate-y-1/2 text-brand-orange/50 lg:block"
+                      className="absolute -right-1 top-1/2 hidden h-3.5 w-3.5 -translate-y-1/2 text-[var(--brand-orange-text)]/50 lg:block"
                       aria-hidden="true"
                     />
                   )}
@@ -604,11 +609,12 @@ export function ChallengesPage() {
                   category,
                   tier: categoryTier,
                   challenges: categoryChallenges,
-                }) => (
+                }, index) => (
                   <section
                     key={category}
                     aria-labelledby={`category-${category}`}
-                    className="overflow-hidden rounded-xl border border-border bg-card"
+                    style={stagger(Math.min(index, 6))}
+                    className="reveal overflow-hidden rounded-xl border border-border bg-card"
                   >
                     <div className="border-b border-border">
                       <button

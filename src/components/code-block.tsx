@@ -50,7 +50,7 @@ export function CodeBlock({ children, className, ...props }: CodeBlockProps) {
           title="Copy code"
         >
           {isCopied ? (
-            <Check className="w-3.5 h-3.5 text-green-500" />
+            <Check className="reveal-pop w-3.5 h-3.5 text-green-500" />
           ) : (
             <Copy className="w-3.5 h-3.5" />
           )}

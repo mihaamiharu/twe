@@ -54,7 +54,7 @@ export function EditorPanel({
             <div className="flex items-center gap-2 mt-1">
               <Badge
                 variant="outline"
-                className="text-[10px] h-5 px-1.5 py-0 font-mono bg-brand-orange/10 text-brand-orange border-brand-orange/30 truncate max-w-[200px]"
+                className="text-[10px] h-5 px-1.5 py-0 font-mono bg-brand-orange/10 text-[var(--brand-orange-text)] border-brand-orange/30 truncate max-w-[200px]"
               >
                 <Search className="h-2.5 w-2.5 mr-1" />
                 {challenge.targetSelector}

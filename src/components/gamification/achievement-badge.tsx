@@ -128,7 +128,7 @@ export function AchievementBadge({
           className={cn(
             'absolute top-2 right-2',
             earned
-              ? 'border-brand-orange/30 bg-brand-orange/10 text-brand-orange'
+              ? 'border-brand-orange/30 bg-brand-orange/10 text-[var(--brand-orange-text)]'
               : 'bg-muted',
           )}
         >
