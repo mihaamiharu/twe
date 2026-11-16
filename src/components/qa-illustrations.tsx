@@ -181,7 +181,7 @@ export function QaAnnotation({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-2 font-mono text-[11px] text-[var(--brand-orange)]',
+        'inline-flex items-center gap-2 font-mono text-[11px] text-[var(--brand-orange-text)]',
         className,
       )}
       aria-label={`${copy.number} ${copy.label}`}

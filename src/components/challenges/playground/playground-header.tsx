@@ -103,7 +103,7 @@ export function PlaygroundHeader({
                 `challenges:types.${challenge.type?.toLowerCase() || 'unknown'}`,
               )}
             </Badge>
-            <span className="text-brand-orange flex items-center gap-1 font-bold">
+            <span className="text-[var(--brand-orange-text)] flex items-center gap-1 font-bold">
               <Zap className="h-3 w-3 fill-current" />
               {challenge.xp} XP
             </span>
@@ -211,7 +211,7 @@ export function PlaygroundHeader({
                 ? t('common:messages.loading')
                 : t('common:actions.runCode')
             }
-            className="font-bold border-brand-orange text-brand-orange hover:bg-brand-orange/10"
+            className="font-bold border-brand-orange text-[var(--brand-orange-text)] hover:bg-brand-orange/10"
           >
             {isRunning ? (
               <Loader2 className="h-4 w-4 animate-spin motion-reduce:animate-none" />

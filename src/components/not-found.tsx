@@ -24,7 +24,7 @@ function MissingPageCard() {
       </div>
 
       <div className="flex items-center gap-3 py-6 sm:py-7">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--orange-tint)] text-[var(--brand-orange)]">
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--orange-tint)] text-[var(--brand-orange-text)]">
           <FileQuestion className="h-6 w-6" aria-hidden="true" />
         </div>
         <div>
@@ -50,11 +50,11 @@ function AssertionResultCard() {
 
   return (
     <div
-      className="w-full rounded-[18px] border border-[#393c38] bg-[#202321] p-4 text-left text-[#f2f1ec] shadow-[0_18px_45px_rgba(29,29,27,0.14)] sm:p-5"
+      className="surface-dark w-full rounded-[18px] border border-[#393c38] bg-[#202321] p-4 text-left text-[#f2f1ec] shadow-[0_18px_45px_rgba(29,29,27,0.14)] sm:p-5"
       data-not-found-card="assertion-result"
     >
       <div className="mb-4 flex items-center justify-between gap-3 border-b border-[#393c38] pb-3 font-mono text-[10px] uppercase tracking-[0.12em]">
-        <span className="text-[var(--brand-orange)]">
+        <span className="text-[var(--brand-orange-text)]">
           {t('notFound.assertionLabel')}
         </span>
         <Search className="h-3.5 w-3.5 text-[#a5a69f]" aria-hidden="true" />
@@ -100,7 +100,7 @@ export function NotFound() {
 
       <div className="relative z-10 mx-auto max-w-7xl">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+          <div className="inline-flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">
             <span>{t('notFound.eyebrow')}</span>
             <span className="h-px w-8 bg-[var(--brand-orange)]" />
             <span className="text-[var(--muted-graphite)]">
@@ -108,7 +108,7 @@ export function NotFound() {
             </span>
           </div>
 
-          <div className="mt-5 text-[clamp(5.5rem,18vw,10rem)] font-semibold leading-[0.78] tracking-[-0.1em] text-[var(--brand-orange)]">
+          <div className="mt-5 text-[clamp(5.5rem,18vw,10rem)] font-semibold leading-[0.78] tracking-[-0.1em] text-[var(--brand-orange-text)]">
             404
           </div>
 
@@ -123,7 +123,7 @@ export function NotFound() {
             <Button
               asChild
               size="lg"
-              className="rounded-md bg-[var(--brand-orange)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange)]/90"
+              className="rounded-md bg-[var(--brand-orange-deep)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange-deep)]/90"
             >
               <Link
                 to={LocaleRoutes.home}
@@ -167,7 +167,7 @@ export function NotFound() {
               <img
                 src="/illustrations/twe-inspector-female-404.png"
                 alt={t('notFound.characterAlt')}
-                className="relative z-10 h-full w-full object-contain object-bottom"
+                className="motion-float relative z-10 h-full w-full object-contain object-bottom"
                 width={1122}
                 height={1402}
                 loading="eager"
@@ -181,7 +181,7 @@ export function NotFound() {
 
         <p className="mt-8 flex items-center justify-center gap-2 text-center font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted-graphite)] sm:mt-10">
           <Search
-            className="h-3.5 w-3.5 text-[var(--brand-orange)]"
+            className="h-3.5 w-3.5 text-[var(--brand-orange-text)]"
             aria-hidden="true"
           />
           {t('notFound.inspectorNote')}

@@ -19,10 +19,10 @@ import { Link, useLocation, useParams } from '@tanstack/react-router';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 
 const externalLinkClass =
-  'group inline-flex min-h-11 items-center gap-3 text-[0.95rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)]';
+  'group inline-flex min-h-11 items-center gap-3 text-[0.95rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]';
 
 const iconClass =
-  'h-[1.1rem] w-[1.1rem] shrink-0 text-[var(--muted-graphite)] transition-colors group-hover:text-[var(--brand-orange)]';
+  'h-[1.1rem] w-[1.1rem] shrink-0 text-[var(--muted-graphite)] transition-colors group-hover:text-[var(--brand-orange-text)]';
 
 export function Footer() {
   const { t } = useTranslation(['common', 'legal']);
@@ -45,29 +45,29 @@ export function Footer() {
             </p>
 
             <nav aria-label="Footer navigation" className="flex flex-wrap items-center gap-x-6 gap-y-2 text-[var(--graphite)]">
-              <Link to={LocaleRoutes.learn} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.learn')}</Link>
-              <Link to={LocaleRoutes.practice} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.practice')}</Link>
-              <Link to={LocaleRoutes.labs} params={localizedParams} className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]">
+              <Link to={LocaleRoutes.learn} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange-text)]">{t('common:navigation.learn')}</Link>
+              <Link to={LocaleRoutes.practice} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange-text)]">{t('common:navigation.practice')}</Link>
+              <Link to={LocaleRoutes.labs} params={localizedParams} className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]">
                 {t('common:navigation.labs')}
-                <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
+                <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange-text)]">
                   {t('common:navigation.labsSoon')}
                 </span>
               </Link>
-              <Link to={LocaleRoutes.about} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('common:navigation.about')}</Link>
-              <Link to={LocaleRoutes.contact} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('legal:contact.title')}</Link>
+              <Link to={LocaleRoutes.about} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange-text)]">{t('common:navigation.about')}</Link>
+              <Link to={LocaleRoutes.contact} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange-text)]">{t('legal:contact.title')}</Link>
             </nav>
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-[var(--muted-graphite)]">
-              <a href="https://www.linkedin.com/in/ekkisyamsugiardi/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange)]">
+              <a href="https://www.linkedin.com/in/ekkisyamsugiardi/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange-text)]">
                 <Linkedin className="h-4 w-4" aria-hidden="true" />
                 LinkedIn
               </a>
-              <a href="https://github.com/mihaamiharu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange)]">
+              <a href="https://github.com/mihaamiharu" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition-colors hover:text-[var(--brand-orange-text)]">
                 <Github className="h-4 w-4" aria-hidden="true" />
                 GitHub
               </a>
-              <Link to={LocaleRoutes.privacy} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('legal:privacy.title')}</Link>
-              <Link to={LocaleRoutes.terms} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange)]">{t('legal:terms.title')}</Link>
+              <Link to={LocaleRoutes.privacy} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange-text)]">{t('legal:privacy.title')}</Link>
+              <Link to={LocaleRoutes.terms} params={localizedParams} className="transition-colors hover:text-[var(--brand-orange-text)]">{t('legal:terms.title')}</Link>
             </div>
           </div>
         </div>
@@ -88,9 +88,9 @@ export function Footer() {
               params={localizedParams}
               className="group inline-flex min-h-11 items-center"
             >
-              <span className="text-[1.7rem] font-semibold tracking-[-0.05em] text-[var(--graphite)] group-hover:text-[var(--brand-orange)]">
+              <span className="text-[1.7rem] font-semibold tracking-[-0.05em] text-[var(--graphite)] group-hover:text-[var(--brand-orange-text)]">
                 TestingWith
-                <span className="twe-wordmark-ekki text-[var(--brand-orange)]">
+                <span className="twe-wordmark-ekki text-[var(--brand-orange-text)]">
                   Ekki
                 </span>
               </span>
@@ -101,7 +101,7 @@ export function Footer() {
           </div>
 
           <nav aria-label={t('common:footer.explore')}>
-            <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+            <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">
               {t('common:footer.explore')}
             </h2>
             <div className="mt-4 h-px w-14 bg-[var(--brand-orange)]" />
@@ -134,7 +134,7 @@ export function Footer() {
                 >
                   <FlaskConical className={iconClass} aria-hidden="true" />
                   {t('common:navigation.labs')}
-                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange)]">
+                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange-text)]">
                     {t('common:navigation.labsSoon')}
                   </span>
                 </Link>
@@ -153,7 +153,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label={t('common:footer.connect')}>
-            <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+            <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">
               {t('common:footer.connect')}
             </h2>
             <div className="mt-4 h-px w-14 bg-[var(--brand-orange)]" />
@@ -205,7 +205,7 @@ export function Footer() {
           </nav>
 
           <nav aria-label={t('common:footer.legal')}>
-            <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+            <h2 className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">
               {t('common:footer.legal')}
             </h2>
             <div className="mt-4 h-px w-14 bg-[var(--brand-orange)]" />
@@ -242,7 +242,7 @@ export function Footer() {
           </p>
           <BugReportDialog
             trigger={
-              <button className="inline-flex min-h-11 items-center gap-2 self-start text-sm text-[var(--muted-graphite)] transition-colors hover:text-[var(--brand-orange)] focus-visible:text-[var(--brand-orange)] sm:self-auto">
+              <button className="inline-flex min-h-11 items-center gap-2 self-start text-sm text-[var(--muted-graphite)] transition-colors hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)] sm:self-auto">
                 <Bug className="h-4 w-4" aria-hidden="true" />
                 {t('common:footer.reportBug')}
               </button>

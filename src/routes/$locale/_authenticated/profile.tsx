@@ -236,7 +236,7 @@ function ProfilePage() {
           </CardContent>
         </Card>
 
-        <div className="mb-8 grid gap-4 sm:grid-cols-3">
+        <div className="reveal mb-8 grid gap-4 sm:grid-cols-3 [--i:2]">
           <Card className="rounded-xl border-[var(--soft-border)] bg-[var(--paper-surface)] shadow-none transition-colors hover:border-[var(--brand-orange)]/45">
             <CardContent className="p-5">
               <BookOpen className="mb-3 h-5 w-5 text-primary" />

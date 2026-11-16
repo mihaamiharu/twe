@@ -1,0 +1,18 @@
+# TestingWithEkki
+
+> Grow beyond test execution through Web Automation lessons and hands-on challenges in Practice. Available in English (/en) and Indonesian (/id).
+
+## Learn
+
+- [Web Automation lessons](https://testingwithekki.com/en/learn): Lessons that build the foundations for Web Automation and Playwright.
+
+## Practice
+
+- [Practice challenges](https://testingwithekki.com/en/practice): Hands-on selector, JavaScript, TypeScript and Playwright challenges that run in the browser.
+- [Leaderboard](https://testingwithekki.com/en/leaderboard): Community progress ranking.
+
+## About
+
+- [About](https://testingwithekki.com/en/about): Who is behind TestingWithEkki and how the site teaches.
+- [Contact](https://testingwithekki.com/en/contact): Ways to get in touch.
+- [Sitemap](https://testingwithekki.com/sitemap.xml): Full list of public pages.

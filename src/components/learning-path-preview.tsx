@@ -34,7 +34,7 @@ export function LearningPathPreview({
           <div className="h-2.5 w-28 rounded border border-[var(--soft-border)]" />
           <div className="flex items-center justify-between gap-2">
             <div className="h-2.5 w-20 rounded border border-[var(--soft-border)]" />
-            <span className="flex items-center gap-1 rounded border border-[var(--brand-orange)]/50 px-1.5 py-1 font-mono text-[8px] text-[var(--brand-orange)]">
+            <span className="flex items-center gap-1 rounded border border-[var(--brand-orange)]/50 px-1.5 py-1 font-mono text-[8px] text-[var(--brand-orange-text)]">
               <MousePointer2 className="h-2.5 w-2.5" />
               &lt;button&gt;
             </span>
@@ -54,17 +54,17 @@ export function LearningPathPreview({
         aria-hidden="true"
       >
         <div className="flex items-center gap-2 text-[var(--muted-graphite)]">
-          <Code2 className="h-3 w-3 text-[var(--brand-orange)]" />
+          <Code2 className="h-3 w-3 text-[var(--brand-orange-text)]" />
           <span>user.js</span>
         </div>
         <div className="mt-2 text-[var(--muted-graphite)]">
-          <span className="text-[var(--brand-orange)]">const</span> user = &#123;
+          <span className="text-[var(--brand-orange-text)]">const</span> user = &#123;
         </div>
         <div className="pl-3 text-[var(--graphite)]">
-          name: <span className="text-[var(--brand-orange)]">&apos;Ekki&apos;</span>,
+          name: <span className="text-[var(--brand-orange-text)]">&apos;Ekki&apos;</span>,
         </div>
         <div className="pl-3 text-[var(--graphite)]">
-          role: <span className="text-[var(--brand-orange)]">&apos;QA&apos;</span>,
+          role: <span className="text-[var(--brand-orange-text)]">&apos;QA&apos;</span>,
         </div>
         <div className="text-[var(--muted-graphite)]">&#125;;</div>
       </div>
@@ -81,16 +81,16 @@ export function LearningPathPreview({
         aria-hidden="true"
       >
         <div className="flex items-center gap-2 text-[var(--muted-graphite)]">
-          <Code2 className="h-3 w-3 text-[var(--brand-orange)]" />
+          <Code2 className="h-3 w-3 text-[var(--brand-orange-text)]" />
           <span>login.spec.ts</span>
         </div>
         <div className="mt-2 text-[var(--muted-graphite)]">
-          <span className="text-[var(--brand-orange)]">test</span>(
+          <span className="text-[var(--brand-orange-text)]">test</span>(
           <span className="text-[var(--graphite)]">&apos;has title&apos;</span>,
         </div>
         <div className="pl-3 text-[var(--graphite)]">async (&#123; page &#125;) =&gt;</div>
         <div className="pl-3 text-[var(--muted-graphite)]">
-          <span className="text-[var(--brand-orange)]">await</span> page.goto(...)
+          <span className="text-[var(--brand-orange-text)]">await</span> page.goto(...)
         </div>
       </div>
     );
@@ -105,13 +105,13 @@ export function LearningPathPreview({
       aria-hidden="true"
     >
       <div className="flex items-center gap-2 font-mono text-[9px] text-[var(--muted-graphite)]">
-        <ListChecks className="h-3.5 w-3.5 text-[var(--brand-orange)]" />
+        <ListChecks className="h-3.5 w-3.5 text-[var(--brand-orange-text)]" />
         E2E / Checkout flow
       </div>
       <div className="mt-3 space-y-2">
         {[0, 1, 2].map((item) => (
           <div key={item} className="flex items-center gap-2">
-            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[var(--brand-orange)] text-[8px] text-[var(--brand-orange)]">
+            <span className="flex h-3.5 w-3.5 items-center justify-center rounded-full border border-[var(--brand-orange)] text-[8px] text-[var(--brand-orange-text)]">
               ✓
             </span>
             <span

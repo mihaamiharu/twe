@@ -67,7 +67,7 @@ function ChangelogPage() {
   const getTypeColor = (type: EntryType) => {
     switch (type) {
       case 'feature':
-        return 'text-brand-orange bg-brand-orange-tint border-brand-orange/20';
+        return 'text-[var(--brand-orange-text)] bg-brand-orange-tint border-brand-orange/20';
       case 'improvement':
         return 'text-foreground bg-muted border-border';
       case 'fix':

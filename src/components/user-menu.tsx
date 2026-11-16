@@ -63,7 +63,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
               alt={user.name || 'User'}
               className="object-cover"
             />
-            <AvatarFallback className="bg-[var(--orange-tint)] text-[var(--brand-orange)] font-medium">
+            <AvatarFallback className="bg-[var(--orange-tint)] text-[var(--brand-orange-text)] font-medium">
               {(user.name || user.email || 'U').charAt(0).toUpperCase()}
             </AvatarFallback>
           </Avatar>
@@ -82,7 +82,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
               <div className="flex items-center gap-1 mt-1.5">
                 <Badge
                   variant="outline"
-                  className="h-5 w-fit border-brand-orange/25 bg-brand-orange-tint px-1.5 text-[10px] uppercase tracking-wider text-brand-orange"
+                  className="h-5 w-fit border-brand-orange/25 bg-brand-orange-tint px-1.5 text-[10px] uppercase tracking-wider text-[var(--brand-orange-text)]"
                 >
                   Admin
                 </Badge>
@@ -115,7 +115,7 @@ const UserMenuComponent = ({ user, locale }: UserMenuProps) => {
           <DropdownMenuItem asChild>
             <Link
               to="/admin"
-              className="cursor-pointer font-medium text-brand-orange focus:bg-brand-orange-tint focus:text-brand-orange"
+              className="cursor-pointer font-medium text-[var(--brand-orange-text)] focus:bg-brand-orange-tint focus:text-[var(--brand-orange-text)]"
             >
               <LayoutDashboard className="mr-2 h-4 w-4" />
               {t('common:navigation.admin')}

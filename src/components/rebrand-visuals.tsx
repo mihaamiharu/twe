@@ -14,6 +14,7 @@ import {
   QaDoodle,
   QaEngineerIllustration,
 } from '@/components/qa-illustrations';
+import { stagger } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 
 export {
@@ -47,7 +48,7 @@ export function PracticePreview({
   return (
     <div
       className={cn(
-        'overflow-hidden rounded-[10px] border border-[#393c38] bg-[#171918] text-[#f2f1ec] shadow-[0_18px_45px_rgba(29,29,27,0.18)]',
+        'surface-dark overflow-hidden rounded-[10px] border border-[#393c38] bg-[#171918] text-[#f2f1ec] shadow-[0_18px_45px_rgba(29,29,27,0.18)]',
         className,
       )}
       aria-label="Practice workspace preview"
@@ -74,7 +75,7 @@ export function PracticePreview({
         >
           {showWorkflowStep && (
             <span
-              className="whitespace-nowrap font-mono text-[9px] tracking-[0.08em] text-[var(--brand-orange)]"
+              className="whitespace-nowrap font-mono text-[9px] tracking-[0.08em] text-[var(--brand-orange-text)]"
               data-workflow-label="run"
             >
               02 /
@@ -89,7 +90,7 @@ export function PracticePreview({
           <span
             className={cn(
               'font-mono text-[10px] text-[#a5a69f]',
-              showWorkflowStep && 'text-[var(--brand-orange)]',
+              showWorkflowStep && 'text-[var(--brand-orange-text)]',
             )}
           >
             RUN
@@ -102,26 +103,26 @@ export function PracticePreview({
           <div className="rounded-md border border-[#393c38] bg-[#202321] p-3">
             <div className="mb-2 flex items-center gap-2 font-mono text-[9px] text-[#a5a69f]">
               <Code2
-                className="h-3 w-3 text-[var(--brand-orange)]"
+                className="h-3 w-3 text-[var(--brand-orange-text)]"
                 aria-hidden="true"
               />
               tests/login.spec.ts
             </div>
             <div className="overflow-hidden whitespace-nowrap font-mono text-[9px] leading-4 text-[#f2f1ec]">
-              <span className="text-[var(--brand-orange)]">await</span>{' '}
+              <span className="text-[var(--brand-orange-text)]">await</span>{' '}
               page.getByRole(&apos;button&apos;, &#123; name: &apos;Sign
               in&apos; &#125;).click()
             </div>
             <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#393c38] pt-2 font-mono text-[9px]">
               <span
-                className="text-[var(--brand-orange)]"
+                className="text-[var(--brand-orange-text)]"
                 data-hero-step="verify"
                 data-workflow-label="verify"
               >
                 03 / VERIFY
               </span>
               <span
-                className="flex items-center gap-1 text-[var(--brand-success)]"
+                className="flex items-center gap-1 text-[#5cc4a8]"
                 data-result-state="passed"
               >
                 <CheckCircle2 className="h-3 w-3" aria-hidden="true" />
@@ -141,14 +142,14 @@ export function PracticePreview({
               <div className="space-y-2">
                 <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
                 <div className="h-7 rounded border border-[#d9d3c8] bg-white" />
-                <div className="practice-target-button flex h-7 items-center justify-center rounded bg-[var(--brand-orange)] font-mono text-[10px] text-white">
+                <div className="practice-target-button flex h-7 items-center justify-center rounded bg-[var(--brand-orange-deep)] font-mono text-[10px] text-white">
                   Sign in
                 </div>
               </div>
             </div>
             <div className="mt-3 flex items-center gap-2 font-mono text-[10px] text-[#a5a69f]">
               <Eye
-                className="h-3 w-3 text-[var(--brand-orange)]"
+                className="h-3 w-3 text-[var(--brand-orange-text)]"
                 aria-hidden="true"
               />
               inspected
@@ -163,7 +164,7 @@ export function PracticePreview({
             <pre className="overflow-hidden font-mono text-[10px] leading-5 text-[#f2f1ec]">
               <code>
                 <span className="text-[#a5a69f]">1 </span>
-                <span className="text-[var(--brand-orange)]">await</span>{' '}
+                <span className="text-[var(--brand-orange-text)]">await</span>{' '}
                 page.getByRole(
                 {'\n'}
                 <span className="text-[#a5a69f]">2 </span>
@@ -172,7 +173,7 @@ export function PracticePreview({
                 ).click()
                 {'\n'}
                 <span className="text-[#a5a69f]">3 </span>
-                <span className="text-[var(--brand-orange)]">await</span>{' '}
+                <span className="text-[var(--brand-orange-text)]">await</span>{' '}
                 expect(page.getByText(
                 {'\n'}
                 <span className="text-[#a5a69f]">4 </span>
@@ -184,7 +185,7 @@ export function PracticePreview({
             <div className="mt-3 border-t border-[#393c38] pt-3">
               <div className="flex items-center justify-between font-mono text-[10px]">
                 <span
-                  className="practice-result-indicator flex items-center gap-1.5 text-[var(--brand-success)]"
+                  className="practice-result-indicator flex items-center gap-1.5 text-[#5cc4a8]"
                   data-practice-motion="verify"
                 >
                   <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
@@ -223,7 +224,7 @@ function InspectTargetBrowser({ className }: { className?: string }) {
         <div className="space-y-2 sm:order-1">
           <div className="flex justify-end font-mono text-[9px] uppercase tracking-[0.08em]">
             <span
-              className="text-[var(--brand-orange)]"
+              className="text-[var(--brand-orange-text)]"
               data-workflow-label="inspect"
             >
               01 / INSPECT
@@ -232,10 +233,15 @@ function InspectTargetBrowser({ className }: { className?: string }) {
           <div className="h-7 rounded-md border border-[var(--soft-border)] bg-white" />
           <div className="h-7 rounded-md border border-[var(--soft-border)] bg-white" />
           <div
-            className="relative flex h-8 items-center justify-center rounded-md bg-[var(--brand-orange)] font-mono text-[10px] font-medium text-white"
+            className="relative flex h-8 items-center justify-center rounded-md bg-[var(--brand-orange-deep)] font-mono text-[10px] font-medium text-white"
             data-inspector-target="sign-in"
           >
             <span className="absolute -inset-1.5 rounded-[8px] border border-[var(--brand-orange)]" />
+            <span
+              className="motion-ring-pulse absolute -inset-1.5 rounded-[8px] border border-[var(--brand-orange)]"
+              style={stagger(12)}
+              aria-hidden="true"
+            />
             <span className="absolute -left-2 -top-2 h-2.5 w-2.5 border-l border-t border-[var(--brand-orange)]" />
             Sign in
           </div>
@@ -255,7 +261,9 @@ function HomeInspectorCharacter({ className }: { className?: string }) {
       data-hero-character
     >
       <img
-        src="/illustrations/twe-inspector-male-hero-768.png"
+        src="/illustrations/twe-inspector-male-hero-768.webp"
+        srcSet="/illustrations/twe-inspector-male-hero-400.webp 400w, /illustrations/twe-inspector-male-hero-768.webp 640w"
+        sizes="(min-width: 640px) 460px, 80vw"
         alt="TWE Inspector pointing toward the highlighted Sign in button"
         className="absolute left-1/2 top-1/2 h-full w-auto max-w-none -translate-x-1/2 -translate-y-1/2 object-contain"
         width={640}
@@ -278,7 +286,7 @@ function VerificationResult({ className }: { className?: string }) {
       data-hero-step="verify"
     >
       <div
-        className="mb-2 font-mono text-[9px] tracking-[0.08em] text-[var(--brand-orange)]"
+        className="mb-2 font-mono text-[9px] tracking-[0.08em] text-[var(--brand-orange-text)]"
         data-workflow-label="verify"
       >
         03 / VERIFY
@@ -298,10 +306,14 @@ function VerificationResult({ className }: { className?: string }) {
         </div>
       </div>
       <div
-        className="mt-2 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2 font-mono text-[9px] text-[var(--brand-success)]"
+        className="mt-2 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2 font-mono text-[9px] text-[var(--color-brand-teal-dark)]"
         data-result-state="passed"
       >
-        <CheckCircle2 className="h-3.5 w-3.5" aria-hidden="true" />
+        <CheckCircle2
+          className="reveal-pop h-3.5 w-3.5"
+          style={stagger(15)}
+          aria-hidden="true"
+        />
         PASSED
       </div>
     </div>
@@ -324,6 +336,8 @@ function HeroWorkflowTrace() {
         strokeLinecap="round"
         strokeOpacity="0.68"
         strokeWidth="1.2"
+        className="reveal-trace"
+        style={stagger(7)}
       />
     </svg>
   );
@@ -332,7 +346,7 @@ function HeroWorkflowTrace() {
 export function HomeHeroVisual() {
   return (
     <div
-      className="relative isolate mx-auto h-[500px] w-full max-w-[680px] overflow-hidden sm:h-[610px] sm:overflow-visible lg:h-[590px]"
+      className="relative isolate mx-auto h-[500px] w-full max-w-[680px] overflow-hidden [--reveal-base:120ms] sm:h-[610px] sm:overflow-visible lg:h-[590px]"
       role="group"
       aria-label="Inspect, run, and verify testing workflow"
       data-home-hero-visual
@@ -341,12 +355,18 @@ export function HomeHeroVisual() {
         <div className="absolute bottom-[1%] left-[14%] z-0 h-20 w-[76%] rounded-[48%] bg-[var(--orange-tint)]/45" />
         <div className="absolute -left-[4%] top-[18%] z-[5] h-[76%] w-[74%] rounded-[38%] bg-[var(--paper-surface)]/65" />
 
-        <InspectTargetBrowser className="absolute left-[2%] top-5 z-10 w-[96%]" />
+        <div
+          className="reveal absolute left-[2%] top-5 z-10 w-[96%]"
+          style={stagger(1)}
+        >
+          <InspectTargetBrowser />
+        </div>
 
-        <HomeInspectorCharacter className="absolute -left-[2%] top-[23%] z-20 w-[66%]" />
+        <HomeInspectorCharacter className="reveal-solid absolute -left-[2%] top-[23%] z-20 w-[66%]" />
 
         <div
-          className="absolute bottom-4 right-[1%] z-40 w-[57%]"
+          className="reveal absolute bottom-4 right-[1%] z-40 w-[57%]"
+          style={stagger(6)}
           data-hero-step="run"
         >
           <PracticePreview compact showWorkflowStep />
@@ -357,16 +377,20 @@ export function HomeHeroVisual() {
         <div className="absolute bottom-[1%] left-[16%] z-0 h-24 w-[78%] rounded-[48%] bg-[var(--orange-tint)]/45" />
         <div className="absolute -left-[2%] top-[16%] z-[5] h-[72%] w-[44%] rounded-[42%] bg-[var(--paper-surface)]/55" />
 
-        <div className="absolute left-[35%] top-[4%] z-10 w-[62%]">
+        <div
+          className="reveal absolute left-[35%] top-[4%] z-10 w-[62%]"
+          style={stagger(1)}
+        >
           <InspectTargetBrowser />
         </div>
 
-        <HomeInspectorCharacter className="absolute left-0 top-[16.5%] z-20 w-[50%]" />
+        <HomeInspectorCharacter className="reveal-solid absolute left-0 top-[16.5%] z-20 w-[50%]" />
 
         <HeroWorkflowTrace />
 
         <div
-          className="absolute right-0 top-[39%] z-40 w-[52%]"
+          className="reveal absolute right-0 top-[39%] z-40 w-[52%]"
+          style={stagger(6)}
           data-hero-step="run"
         >
           <PracticePreview
@@ -375,7 +399,10 @@ export function HomeHeroVisual() {
           />
         </div>
 
-        <div className="absolute bottom-0 right-0 z-50 w-[25%]">
+        <div
+          className="reveal absolute bottom-0 right-0 z-50 w-[25%]"
+          style={stagger(11)}
+        >
           <VerificationResult />
         </div>
       </div>
@@ -411,7 +438,7 @@ export function LearnHeroVisual({
         className,
       )}
     >
-      <div className="absolute left-0 top-3 z-20 rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] sm:left-[2%] sm:top-[5%] sm:px-4 sm:py-3 sm:text-[11px]">
+      <div className="absolute left-0 top-3 z-20 rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange-text)] sm:left-[2%] sm:top-[5%] sm:px-4 sm:py-3 sm:text-[11px]">
         <span className="block text-[9px] text-[var(--muted-graphite)] sm:text-[10px]">
           01 /
         </span>
@@ -422,14 +449,14 @@ export function LearnHeroVisual({
         </div>
       </div>
 
-      <div className="absolute right-0 top-[21%] z-20 rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] sm:right-[1%] sm:top-[24%] sm:px-4 sm:py-3 sm:text-[11px]">
+      <div className="absolute right-0 top-[21%] z-20 rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange-text)] sm:right-[1%] sm:top-[24%] sm:px-4 sm:py-3 sm:text-[11px]">
         <span className="block text-[9px] text-[var(--muted-graphite)] sm:text-[10px]">
           02 /
         </span>
         {labels.execute}
         <div className="mt-2 flex items-center gap-2 border-t border-[var(--soft-border)] pt-2 text-[var(--graphite)]">
           <Code2
-            className="h-4 w-4 text-[var(--brand-orange)]"
+            className="h-4 w-4 text-[var(--brand-orange-text)]"
             aria-hidden="true"
           />
           <span>{labels.artifact}</span>
@@ -468,12 +495,12 @@ export function AboutHeroVisual() {
         loading="eager"
         fetchPriority="high"
       />
-      <div className="absolute left-0 top-[18%] rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[11px] text-[var(--brand-orange)] shadow-sm">
+      <div className="absolute left-0 top-[18%] rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[11px] text-[var(--brand-orange-text)] shadow-sm">
         01 / INSPECT
       </div>
       <div className="absolute right-0 top-[34%] rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 py-2 font-mono text-[11px] text-[var(--graphite)] shadow-sm">
         <Code2
-          className="mr-2 inline h-3.5 w-3.5 text-[var(--brand-orange)]"
+          className="mr-2 inline h-3.5 w-3.5 text-[var(--brand-orange-text)]"
           aria-hidden="true"
         />
         AUTOMATION
@@ -493,7 +520,7 @@ export function ContactHeroVisual() {
     <div className="relative mx-auto min-h-[280px] w-full max-w-[680px] sm:min-h-[295px]">
       <div className="absolute left-[8%] top-[10%] z-20 h-20 w-20 -rotate-6 rounded-md border border-[var(--graphite)] bg-[var(--paper-surface)] p-2 shadow-[0_8px_22px_rgba(29,29,27,0.08)]">
         <div className="flex items-center justify-between border-b border-[var(--soft-border)] pb-1">
-          <CalendarDays className="h-4 w-4 text-[var(--brand-orange)]" aria-hidden="true" />
+          <CalendarDays className="h-4 w-4 text-[var(--brand-orange-text)]" aria-hidden="true" />
           <span className="font-mono text-[8px] text-[var(--muted-graphite)]">JUN</span>
         </div>
         <div className="mt-2 grid grid-cols-4 gap-1">
@@ -515,7 +542,7 @@ export function ContactHeroVisual() {
             <span className="h-px flex-1 bg-[var(--soft-border)]" />
           </div>
           <div className="flex items-center gap-2">
-            <Bug className="h-4 w-4 text-[var(--brand-orange)]" aria-hidden="true" />
+            <Bug className="h-4 w-4 text-[var(--brand-orange-text)]" aria-hidden="true" />
             <span className="h-px flex-1 bg-[var(--soft-border)]" />
           </div>
           <div className="flex items-center gap-2">
@@ -540,17 +567,17 @@ export function ContactHeroVisual() {
       />
 
       <div className="absolute bottom-[4%] right-[1%] z-30 hidden w-[34%] rounded-md border border-[var(--graphite)] bg-[var(--paper-surface)] p-3 shadow-sm sm:block">
-        <div className="mb-2 flex items-center gap-2 font-mono text-[9px] text-[var(--brand-orange)]">
+        <div className="mb-2 flex items-center gap-2 font-mono text-[9px] text-[var(--brand-orange-text)]">
           <Code2 className="h-3.5 w-3.5" aria-hidden="true" />
           TEST / CONTACT
         </div>
         <div className="space-y-1 font-mono text-[8px] leading-4 text-[var(--graphite)]">
-          <p><span className="text-[var(--brand-orange)]">await</span> page.getByRole(<span className="text-[var(--brand-success)]">&apos;button&apos;</span>)</p>
-          <p><span className="text-[var(--brand-orange)]">await</span> expect(page).toBeVisible()</p>
+          <p><span className="text-[var(--brand-orange-text)]">await</span> page.getByRole(<span className="text-[var(--brand-success)]">&apos;button&apos;</span>)</p>
+          <p><span className="text-[var(--brand-orange-text)]">await</span> expect(page).toBeVisible()</p>
         </div>
       </div>
 
-      <div className="absolute bottom-[1%] left-[46%] z-30 hidden -translate-x-1/2 rounded-md border border-[var(--brand-orange)]/40 bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange)] sm:block">
+      <div className="absolute bottom-[1%] left-[46%] z-30 hidden -translate-x-1/2 rounded-md border border-[var(--brand-orange)]/40 bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange-text)] sm:block">
         LET&apos;S TALK <ArrowRight className="ml-1 inline h-3.5 w-3.5" aria-hidden="true" />
       </div>
     </div>

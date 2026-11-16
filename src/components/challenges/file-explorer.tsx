@@ -81,7 +81,7 @@ export function FileExplorer({
 
   const getFileIcon = (fileName: string) => {
     if (fileName.endsWith('.html'))
-      return <Globe className="h-4 w-4 text-brand-orange" />;
+      return <Globe className="h-4 w-4 text-[var(--brand-orange-text)]" />;
     if (fileName.endsWith('.ts') || fileName.endsWith('.js'))
       return <FileCode className="h-4 w-4 text-brand-success" />;
     return <File className="h-4 w-4 text-slate-400" />;
@@ -114,7 +114,7 @@ export function FileExplorer({
           className={cn(
             'group flex items-center py-1.5 px-2 cursor-pointer rounded-md transition-colors',
             isSelected
-              ? 'bg-brand-orange/15 text-brand-orange'
+              ? 'bg-brand-orange/15 text-[var(--brand-orange-text)]'
               : 'hover:bg-workspace-elevated text-workspace-muted',
           )}
           style={{ paddingLeft: `${depth * 12 + 8}px` }}

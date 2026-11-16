@@ -86,9 +86,9 @@ function ContactPage() {
     <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
       <section className="mx-auto grid max-w-[1348px] items-center gap-6 px-6 pb-5 pt-8 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-8 lg:px-10 lg:pb-6 lg:pt-10">
         <div className="max-w-xl">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">{t('hero.eyebrow')}</p>
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">{t('hero.eyebrow')}</p>
           <h1 className="mt-4 text-[clamp(3.5rem,6.5vw,5.25rem)] font-semibold leading-[0.94] tracking-[-0.06em]">
-            {t('hero.title')}<span className="text-[var(--brand-orange)]">.</span>
+            {t('hero.title')}<span className="text-[var(--brand-orange-text)]">.</span>
           </h1>
           <p className="mt-5 max-w-[31rem] text-[1.08rem] leading-8 text-[var(--muted-graphite)]">{t('hero.description')}</p>
         </div>
@@ -126,18 +126,18 @@ function ContactPage() {
 
         <div className="relative mt-3 lg:pl-16">
           <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 items-center gap-2 lg:flex">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--brand-orange)] font-mono text-xs font-medium text-[var(--brand-orange)]">03</span>
-            <ArrowRight className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+            <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--brand-orange)] font-mono text-xs font-medium text-[var(--brand-orange-text)]">03</span>
+            <ArrowRight className="h-5 w-5 text-[var(--brand-orange-text)]" aria-hidden="true" />
           </div>
 
           <div id="message-form" className="grid gap-6 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-4 sm:p-5 lg:grid-cols-[0.68fr_1.32fr] lg:gap-8 lg:p-5">
           <div className="flex items-center gap-5 border-b border-[var(--soft-border)] pb-6 lg:border-b-0 lg:border-r lg:pb-0 lg:pr-8">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange)]">
+            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange-text)]">
               <Mail className="h-9 w-9" strokeWidth={1.4} aria-hidden="true" />
             </div>
             <div>
               <div className="mb-2 flex items-center gap-3 sm:hidden">
-                <span className="font-mono text-xs text-[var(--brand-orange)]">03</span>
+                <span className="font-mono text-xs text-[var(--brand-orange-text)]">03</span>
                 <span className="h-px w-8 bg-[var(--brand-orange)]/40" />
               </div>
               <h2 className="text-2xl font-semibold tracking-[-0.03em]">{t('form.title')}</h2>
@@ -194,19 +194,19 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
   return (
     <div className="relative lg:pl-16">
       <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 items-center gap-2 lg:flex">
-        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--brand-orange)] font-mono text-xs font-medium text-[var(--brand-orange)]">{number}</span>
-        <ArrowRight className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+        <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-[var(--brand-orange)] font-mono text-xs font-medium text-[var(--brand-orange-text)]">{number}</span>
+        <ArrowRight className="h-5 w-5 text-[var(--brand-orange-text)]" aria-hidden="true" />
       </div>
 
       <div className="grid gap-5 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:grid-cols-[96px_minmax(0,1fr)_1px_15rem] sm:items-center sm:gap-6 sm:p-6">
         <div className="flex items-center gap-3 sm:justify-center">
-          <span className="font-mono text-xs text-[var(--brand-orange)] sm:hidden">{number}</span>
-          <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange)]">{icon}</div>
+          <span className="font-mono text-xs text-[var(--brand-orange-text)] sm:hidden">{number}</span>
+          <div className="relative flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-[var(--brand-orange)]/35 bg-[var(--orange-tint)] text-[var(--brand-orange-text)]">{icon}</div>
         </div>
         <div>
           <h2 className="text-xl font-semibold tracking-[-0.025em]">{title}</h2>
           <p className="mt-1.5 max-w-[34rem] text-sm leading-6 text-[var(--muted-graphite)]">{description}</p>
-          {note && <p className="mt-1.5 text-sm font-medium text-[var(--brand-orange)]">{note}</p>}
+          {note && <p className="mt-1.5 text-sm font-medium text-[var(--brand-orange-text)]">{note}</p>}
         </div>
         <div className="hidden h-16 w-px bg-[var(--soft-border)] sm:block" />
         <div className="flex flex-col items-stretch gap-2 sm:items-end">
@@ -214,7 +214,7 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
             asChild
             variant={ctaVariant}
             className={ctaVariant === 'link'
-              ? 'h-auto w-full justify-start px-0 py-1 text-left text-[var(--brand-orange)] hover:bg-transparent hover:text-[var(--brand-orange)] hover:no-underline focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] sm:w-auto sm:justify-end'
+              ? 'h-auto w-full justify-start px-0 py-1 text-left text-[var(--brand-orange-text)] hover:bg-transparent hover:text-[var(--brand-orange-text)] hover:no-underline focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] sm:w-auto sm:justify-end'
               : 'w-full sm:w-auto'}
           >
             <a href={href} target={href.startsWith('http') ? '_blank' : undefined} rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}>
@@ -226,7 +226,7 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
               href={secondaryHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1 text-sm font-medium text-[var(--brand-orange)] underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] sm:justify-end"
+              className="inline-flex items-center justify-center gap-1 text-sm font-medium text-[var(--brand-orange-text)] underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] sm:justify-end"
             >
               {secondaryCta} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
             </a>

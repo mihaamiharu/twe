@@ -141,14 +141,14 @@ function ChallengeItemContent({
             className="order-2 inline-flex items-center gap-1 whitespace-nowrap text-xs font-medium tabular-nums text-muted-foreground lg:order-none lg:justify-self-end"
             data-testid="challenge-row-xp"
           >
-            <Zap className="h-3.5 w-3.5 text-brand-orange" aria-hidden="true" />
+            <Zap className="h-3.5 w-3.5 text-[var(--brand-orange-text)]" aria-hidden="true" />
             {challenge.xpReward} XP
           </span>
         )}
 
         {!isComingSoon && (
           <span
-            className="order-4 ml-auto inline-flex min-h-7 items-center gap-1 whitespace-nowrap text-xs font-medium text-muted-foreground transition-colors group-hover:text-brand-orange lg:order-none lg:ml-0 lg:justify-self-end"
+            className="order-4 ml-auto inline-flex min-h-7 items-center gap-1 whitespace-nowrap text-xs font-medium text-muted-foreground transition-colors group-hover:text-[var(--brand-orange-text)] lg:order-none lg:ml-0 lg:justify-self-end"
             data-testid="challenge-row-action"
           >
             {actionLabel}
@@ -240,7 +240,7 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
           {!isComingSoon && (
             <span className="inline-flex items-center gap-1 text-xs font-medium tabular-nums text-muted-foreground">
               <Zap
-                className="h-3.5 w-3.5 text-brand-orange"
+                className="h-3.5 w-3.5 text-[var(--brand-orange-text)]"
                 aria-hidden="true"
               />
               {props.challenge.xpReward} XP
@@ -248,7 +248,7 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
           )}
         </div>
         {!isComingSoon && (
-          <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover:text-brand-orange">
+          <span className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground transition-colors group-hover:text-[var(--brand-orange-text)]">
             {props.challenge.isCompleted
               ? props.labels.review
               : props.labels.start}

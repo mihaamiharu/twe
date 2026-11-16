@@ -70,9 +70,9 @@ export function LevelUpNotification({
           {/* Sparkle animation */}
           <div className="flex justify-center mb-4">
             <div className="relative">
-              <Sparkles className="h-16 w-16 text-brand-orange animate-pulse motion-reduce:animate-none" />
-              <Star className="absolute -right-2 -top-2 h-8 w-8 text-brand-orange animate-bounce motion-reduce:animate-none" />
-              <Star className="absolute -bottom-1 -left-3 h-6 w-6 text-brand-orange animate-bounce motion-reduce:animate-none delay-100" />
+              <Sparkles className="h-16 w-16 text-[var(--brand-orange-text)] animate-pulse motion-reduce:animate-none" />
+              <Star className="absolute -right-2 -top-2 h-8 w-8 text-[var(--brand-orange-text)] animate-bounce motion-reduce:animate-none" />
+              <Star className="absolute -bottom-1 -left-3 h-6 w-6 text-[var(--brand-orange-text)] animate-bounce motion-reduce:animate-none delay-100" />
             </div>
           </div>
 
@@ -101,7 +101,7 @@ export function LevelUpNotification({
             {t('challenges:success.levelUpMessage', {
               defaultValue: 'You are now a ',
             })}{' '}
-            <span className="font-semibold text-brand-orange">{newTitle}</span>!
+            <span className="font-semibold text-[var(--brand-orange-text)]">{newTitle}</span>!
           </p>
 
           <p className="text-muted-foreground text-sm mb-6">

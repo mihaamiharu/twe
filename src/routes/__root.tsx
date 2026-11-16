@@ -20,8 +20,11 @@ import { Footer } from '@/components/footer';
 import { ThemeProvider } from '@/components/theme-provider';
 import { GoogleAnalytics } from '@/components/analytics/google-analytics';
 import { CookieConsent } from '@/components/cookie-consent';
+import { ScrollReveal } from '@/components/scroll-reveal';
 import { Toaster } from 'sonner';
 import appCss from '@/styles.css?url';
+import instrumentSans400 from '@fontsource/instrument-sans/files/instrument-sans-latin-400-normal.woff2?url';
+import instrumentSans600 from '@fontsource/instrument-sans/files/instrument-sans-latin-600-normal.woff2?url';
 import { organizationSchema } from '@/lib/seo';
 import { omitUndefined } from '@/lib/omit-undefined';
 import { getConsent } from '@/server/consent.fn';
@@ -108,14 +111,19 @@ export const Route = createRootRouteWithContext<RootContext>()({
     return {
       meta,
       links: [
-        // Preload critical fonts removed to avoid warnings (loaded via CSS)
-        // { rel: 'preload', href: '/fonts/outfit-latin-400.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-        // { rel: 'preload', href: '/fonts/outfit-latin-600.woff2', as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' },
-        // Deferred loading for Lora (reading font - not critical for LCP)
-        { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
+        // Fonts are self-hosted (@fontsource); preload the two hero weights.
         {
-          rel: 'preconnect',
-          href: 'https://fonts.gstatic.com',
+          rel: 'preload',
+          href: instrumentSans400,
+          as: 'font',
+          type: 'font/woff2',
+          crossOrigin: 'anonymous',
+        },
+        {
+          rel: 'preload',
+          href: instrumentSans600,
+          as: 'font',
+          type: 'font/woff2',
           crossOrigin: 'anonymous',
         },
         {
@@ -281,6 +289,7 @@ function AppLayout({ children }: { children: React.ReactNode }) {
         onConsentChange={handleConsentChange}
         initialConsent={consent}
       />
+      <ScrollReveal />
       <div className="flex flex-col min-h-screen">
         <Header session={auth || null} />
         <main className="flex-1">

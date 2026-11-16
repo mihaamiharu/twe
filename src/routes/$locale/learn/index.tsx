@@ -26,6 +26,7 @@ import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { filterLearnCatalog } from '@/lib/learn-catalog';
 import { LearnSearchSchema, type LearnSearch } from '@/lib/learn-search';
 import type { TutorialCatalogListItemWithOverlay } from '@/lib/catalog-overlays';
+import { stagger } from '@/lib/motion';
 
 export { LearnSearchSchema } from '@/lib/learn-search';
 
@@ -191,7 +192,7 @@ function LearnPage() {
           className="grid gap-12 border-b border-border pb-12 md:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] md:gap-14 md:pb-20"
         >
           <div className="max-w-2xl md:pt-10">
-            <div className="mb-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
+            <div className="reveal mb-6 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.18em] text-primary">
               <span>{t('learn.eyebrow')}</span>
               <span className="h-px w-10 bg-border" aria-hidden="true" />
               <span className="text-muted-foreground">
@@ -201,15 +202,21 @@ function LearnPage() {
 
             <h1
               id="learn-title"
-              className="max-w-xl text-4xl font-semibold tracking-[-0.045em] text-foreground sm:text-5xl md:text-6xl md:leading-[1.02]"
+              className="reveal-solid max-w-xl text-4xl font-semibold tracking-[-0.045em] text-foreground sm:text-5xl md:text-6xl md:leading-[1.02]"
             >
               {t('learn.title')}
             </h1>
-            <p className="mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
+            <p
+              className="reveal mt-6 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8"
+              style={stagger(2)}
+            >
               {t('learn.description')}
             </p>
 
-            <div className="mt-7 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground">
+            <div
+              className="reveal mt-7 flex flex-wrap gap-x-5 gap-y-2 font-mono text-[11px] uppercase tracking-[0.1em] text-muted-foreground"
+              style={stagger(3)}
+            >
               {(
                 ['webFundamentals', 'handsOnPractice', 'builtForQa'] as const
               ).map((item) => (
@@ -222,7 +229,8 @@ function LearnPage() {
 
             <a
               href="#web-automation-lessons"
-              className="mt-9 inline-flex min-h-11 items-center gap-3 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              style={stagger(4)}
+              className="reveal motion-hover-lift motion-press mt-9 inline-flex min-h-11 items-center gap-3 rounded-md bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {t('learn.primaryCta')}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
@@ -247,11 +255,12 @@ function LearnPage() {
                 className="absolute bottom-8 left-3 top-8 hidden border-l border-dashed border-[var(--brand-orange)]/45 md:block"
                 aria-hidden="true"
               />
-              {learningPathSteps.map((step) => (
+              {learningPathSteps.map((step, index) => (
                 <LearningPathCard
                   key={step.number}
                   step={step}
                   locale={locale}
+                  index={index}
                 />
               ))}
               {learningPathSteps.length === 0 && (
@@ -421,7 +430,7 @@ function LearnPage() {
               {lessonGroups.map(({ module, lessons }) => (
                 <section
                   key={module.slug}
-                  className="border-b border-border py-7"
+                  className="reveal-scroll border-b border-border py-7"
                   data-testid="learn-module"
                 >
                   <div className="mb-3 grid gap-3 sm:grid-cols-[3rem_minmax(0,1fr)_auto] sm:gap-6">
@@ -503,9 +512,11 @@ function LearnCatalogError() {
 function LearningPathCard({
   step,
   locale,
+  index,
 }: {
   step: LearningPathStep;
   locale: string;
+  index: number;
 }) {
   const { t } = useTranslation('tutorials');
   const cardContent = (
@@ -543,7 +554,8 @@ function LearningPathCard({
     <Link
       to="/$locale/learn/$slug"
       params={{ locale, slug: step.slug }}
-      className="block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      style={stagger(index + 2)}
+      className="reveal block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {cardContent}
     </Link>
@@ -616,7 +628,10 @@ function LessonRow({
       </span>
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-3">
-          <h3 className="text-lg font-semibold tracking-[-0.015em] text-foreground transition-colors group-hover:text-primary">
+          <h3
+            className="text-lg font-semibold tracking-[-0.015em] text-foreground transition-colors group-hover:text-primary"
+            style={{ viewTransitionName: `lesson-${lesson.slug}` }}
+          >
             {lesson.title}
           </h3>
           <LessonStatus lesson={lesson} />

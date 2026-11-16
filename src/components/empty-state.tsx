@@ -109,7 +109,7 @@ export function EmptyState({
           <img
             src={illustrationSources[illustration]}
             alt={illustrationAlt}
-            className="h-full w-full object-contain"
+            className="motion-float h-full w-full object-contain"
             width={1148}
             height={1370}
             loading="lazy"

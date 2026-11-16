@@ -34,24 +34,24 @@ function LabsPage() {
     <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
       <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10 lg:px-12 lg:pb-28 lg:pt-20">
         <div className="max-w-xl">
-          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+          <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">
             {t('hero.eyebrow')}
           </p>
-          <h1 className="mt-5 text-[clamp(2.8rem,6vw,4.4rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
+          <h1 className="reveal-solid mt-5 text-[clamp(2.8rem,6vw,4.4rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
             {t('hero.title')}
-            <span className="text-[var(--brand-orange)]">.</span>
+            <span className="text-[var(--brand-orange-text)]">.</span>
           </h1>
           <p className="mt-6 max-w-lg text-xl leading-8 text-[var(--graphite)]">
             {t('hero.description')}
           </p>
-          <span className="mt-7 inline-flex items-center rounded bg-[var(--orange-tint)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--brand-orange)]">
+          <span className="mt-7 inline-flex items-center rounded bg-[var(--orange-tint)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--brand-orange-text)]">
             {t('hero.badge')}
           </span>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               to={LocaleRoutes.practice}
               params={params}
-              className="motion-hover-lift inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange)] px-5 text-[15px] font-medium text-white hover:bg-[#d9502d] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+              className="motion-hover-lift inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange-deep)] px-5 text-[15px] font-medium text-white hover:bg-[#9c3618] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
             >
               <Code2 className="h-4 w-4" aria-hidden="true" />
               {t('actions.practice')}
@@ -73,18 +73,18 @@ function LabsPage() {
             <div className="flex items-center justify-between border-b border-[var(--soft-border)] pb-5">
               <div className="flex items-center gap-3">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--orange-tint)]">
-                  <FlaskConical className="h-5 w-5 text-[var(--brand-orange)]" aria-hidden="true" />
+                  <FlaskConical className="h-5 w-5 text-[var(--brand-orange-text)]" aria-hidden="true" />
                 </span>
                 <span className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
                   {t('hero.visualLabel')}
                 </span>
               </div>
-                <span className="font-mono text-[10px] text-[var(--brand-orange)]">
+                <span className="font-mono text-[10px] text-[var(--brand-orange-text)]">
                   01
                 </span>
             </div>
             <div className="py-10">
-              <p className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+              <p className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">
                 {t('note.eyebrow')}
               </p>
               <h2 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em]">
@@ -109,7 +109,7 @@ function LabsPage() {
                     </p>
                     {index < steps.length - 1 && (
                       <ArrowDown
-                        className="my-1 h-3.5 w-3.5 text-[var(--brand-orange)]"
+                        className="my-1 h-3.5 w-3.5 text-[var(--brand-orange-text)]"
                         aria-hidden="true"
                       />
                     )}
@@ -119,7 +119,7 @@ function LabsPage() {
             </div>
             <div className="flex items-center justify-between border-t border-[var(--soft-border)] pt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
                 <span>{t('hero.status')}</span>
-              <span className="text-[var(--brand-orange)]">{t('hero.badge')}</span>
+              <span className="text-[var(--brand-orange-text)]">{t('hero.badge')}</span>
             </div>
           </div>
         </div>

@@ -58,7 +58,7 @@ export interface ChallengeCardProps {
 // Type icons mapping
 const typeIcons: Record<ChallengeType, React.ReactNode> = {
   JAVASCRIPT: <Code2 className="h-4 w-4" />,
-  TYPESCRIPT: <Code2 className="h-4 w-4 text-brand-orange" />,
+  TYPESCRIPT: <Code2 className="h-4 w-4 text-[var(--brand-orange-text)]" />,
   PLAYWRIGHT: <Theater className="h-4 w-4" />,
   CSS_SELECTOR: <Palette className="h-4 w-4" />,
   XPATH_SELECTOR: <Route className="h-4 w-4" />,

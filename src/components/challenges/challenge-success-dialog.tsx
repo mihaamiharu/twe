@@ -70,7 +70,7 @@ export function ChallengeSuccessDialog({
         <div className="space-y-5 py-4">
           {/* XP Reward */}
           <div className="flex flex-col items-center rounded-md border border-workspace-border bg-workspace-elevated p-4">
-            <span className="font-mono text-xl font-medium text-brand-orange">
+            <span className="font-mono text-xl font-medium text-[var(--brand-orange-text)]">
               +{xpEarned} {t('common:labels.xp')}
             </span>
             <span className="mt-1 text-sm text-workspace-muted">

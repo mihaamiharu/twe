@@ -334,6 +334,10 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
 
   return (
     <main className="min-h-screen bg-background">
+      <div
+        className="scroll-progress-bar fixed inset-x-0 top-0 z-50 h-0.5 bg-[var(--brand-orange)]"
+        aria-hidden="true"
+      />
       <div className="mx-auto max-w-6xl px-5 pb-20 pt-8 md:px-10 md:pt-12">
         <nav
           aria-label={t('detail.breadcrumbLabel')}
@@ -378,10 +382,13 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
               })}
             </span>
           </div>
-          <h1 className="mt-6 max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-foreground sm:text-5xl md:text-6xl">
+          <h1
+            className="mt-6 max-w-4xl text-4xl font-semibold leading-[1.05] tracking-[-0.05em] text-foreground sm:text-5xl md:text-6xl"
+            style={{ viewTransitionName: `lesson-${tutorial.slug}` }}
+          >
             {tutorial.title}
           </h1>
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
+          <p className="reveal mt-6 max-w-3xl text-lg leading-8 text-muted-foreground">
             {tutorial.description}
           </p>
           <div

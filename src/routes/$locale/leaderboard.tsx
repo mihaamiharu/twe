@@ -103,19 +103,19 @@ function LeaderboardPage() {
           className="grid items-center gap-8 border-b border-[var(--soft-border)] pb-9 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)] lg:gap-12"
         >
           <div className="max-w-2xl">
-            <p className="flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange)]">
+            <p className="reveal flex items-center gap-2 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">
               <UsersRound className="h-4 w-4" aria-hidden="true" />
               {t('leaderboard:header.eyebrow')}
             </p>
-            <h1 className="mt-4 max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl">
+            <h1 className="reveal-solid mt-4 max-w-xl text-4xl font-semibold tracking-tight sm:text-5xl">
               {t('leaderboard:header.title')}
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-7 text-[var(--muted-graphite)] sm:text-lg">
+            <p className="reveal mt-5 max-w-xl text-base leading-7 text-[var(--muted-graphite)] sm:text-lg [--i:2]">
               {t('leaderboard:header.subtitle')}
             </p>
           </div>
 
-          <div className="flex justify-center lg:justify-end">
+          <div className="reveal flex justify-center lg:justify-end [--i:3]">
             <img
               data-testid="leaderboard-illustration"
               src="/illustrations/twe-leaderboard-community.png"
@@ -191,10 +191,10 @@ function LeaderboardPage() {
                   data-testid="leaderboard-empty-state"
                   className="flex flex-col items-center justify-center px-6 py-20 text-center"
                 >
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-orange)]/30 bg-[var(--orange-tint)] text-[var(--brand-orange)]">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full border border-[var(--brand-orange)]/30 bg-[var(--orange-tint)] text-[var(--brand-orange-text)]">
                     <UsersRound className="h-6 w-6" aria-hidden="true" />
                   </div>
-                  <p className="mt-6 font-mono text-xs font-medium uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+                  <p className="mt-6 font-mono text-xs font-medium uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">
                     {t('leaderboard:table.emptyEyebrow')}
                   </p>
                   <h3 className="mt-3 text-xl font-semibold">
@@ -241,7 +241,7 @@ function LeaderboardPage() {
                               className={cn(
                                 'font-mono text-sm font-medium',
                                 isCurrentUser
-                                  ? 'text-[var(--brand-orange)]'
+                                  ? 'text-[var(--brand-orange-text)]'
                                   : 'text-[var(--muted-graphite)]',
                               )}
                             >
@@ -259,7 +259,7 @@ function LeaderboardPage() {
                                   loading="lazy"
                                 />
                               ) : (
-                                <div className="flex h-full w-full items-center justify-center font-semibold text-[var(--brand-orange)]">
+                                <div className="flex h-full w-full items-center justify-center font-semibold text-[var(--brand-orange-text)]">
                                   {displayName.charAt(0).toUpperCase()}
                                 </div>
                               )}
@@ -273,7 +273,7 @@ function LeaderboardPage() {
                               {isCurrentUser && (
                                 <span
                                   data-testid="leaderboard-current-user"
-                                  className="flex-none rounded-full bg-[var(--brand-orange)] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-white"
+                                  className="flex-none rounded-full bg-[var(--brand-orange-deep)] px-2 py-0.5 font-mono text-[10px] font-medium uppercase tracking-[0.08em] text-white"
                                 >
                                   {t('leaderboard:table.you')}
                                 </span>
@@ -321,7 +321,7 @@ function LeaderboardPage() {
                           </div>
 
                           <div className="flex-none text-right">
-                            <p className="font-semibold text-[var(--brand-orange)]">
+                            <p className="font-semibold text-[var(--brand-orange-text)]">
                               {formatXp(user)}
                             </p>
                             <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-[var(--muted-graphite)]">
@@ -342,7 +342,7 @@ function LeaderboardPage() {
                 className="flex flex-col gap-5 rounded-xl border border-[var(--brand-orange)]/25 bg-[var(--orange-tint)]/45 p-6 sm:flex-row sm:items-center sm:justify-between sm:p-7"
               >
                 <div className="max-w-xl">
-                  <p className="font-mono text-xs font-medium uppercase tracking-[0.16em] text-[var(--brand-orange)]">
+                  <p className="font-mono text-xs font-medium uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">
                     {t('leaderboard:gating.eyebrow')}
                   </p>
                   <h3 className="mt-2 text-xl font-semibold">
@@ -358,7 +358,7 @@ function LeaderboardPage() {
                   search={{ redirect: '/leaderboard' }}
                   className="flex-none"
                 >
-                  <Button className="h-11 w-full rounded-lg bg-[var(--brand-orange)] px-5 text-white hover:bg-[#d9502d] sm:w-auto">
+                  <Button className="h-11 w-full rounded-lg bg-[var(--brand-orange-deep)] px-5 text-white hover:bg-[#9c3618] sm:w-auto">
                     {t('leaderboard:gating.button')}
                   </Button>
                 </Link>

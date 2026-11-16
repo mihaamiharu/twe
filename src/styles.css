@@ -81,6 +81,7 @@
   --animate-practice-run: practice-run 4.8s ease-in-out infinite;
   --animate-practice-target: practice-target 4.8s ease-in-out infinite;
   --animate-practice-verify: practice-verify 4.8s ease-in-out infinite;
+  --color-brand-orange-deep: var(--brand-orange-deep);
   --ease-ui-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
@@ -253,6 +254,9 @@
   --muted-graphite: #68645e;
   --soft-border: #d9d3c8;
   --brand-orange: #e65f3a;
+  /* AA-contrast orange for small text and filled buttons on warm surfaces. */
+  --brand-orange-deep: #b23f1c;
+  --brand-orange-text: var(--brand-orange-deep);
   --orange-tint: #f7ded4;
   --brand-success: #23856d;
   --brand-error: #c74b42;
@@ -276,7 +280,7 @@
   --card-foreground: var(--graphite);
   --popover: var(--paper-surface);
   --popover-foreground: var(--graphite);
-  --primary: var(--brand-orange);
+  --primary: var(--brand-orange-deep);
   --primary-foreground: var(--paper-surface);
   --secondary: var(--paper-surface);
   --secondary-foreground: var(--graphite);
@@ -290,6 +294,13 @@
   --input: var(--soft-border);
   --ring: var(--brand-orange);
   --shadow-strength: 0px;
+}
+
+/* Dark surfaces keep the brighter brand orange, which already passes there. */
+.dark,
+.technical-surface,
+.surface-dark {
+  --brand-orange-text: var(--brand-orange);
 }
 
 /* Keep the editorial wordmark accent attached to the Ekki word at every size. */
@@ -353,7 +364,7 @@
   --card-foreground: var(--graphite);
   --popover: var(--paper-surface);
   --popover-foreground: var(--graphite);
-  --primary: var(--brand-orange);
+  --primary: var(--brand-orange-deep);
   --primary-foreground: var(--paper-surface);
   --secondary: var(--paper-surface);
   --secondary-foreground: var(--graphite);
@@ -421,6 +432,7 @@
   --workspace-border: var(--soft-border);
   --workspace-text: var(--graphite);
   --workspace-muted: var(--muted-graphite);
+  --brand-orange-text: var(--brand-orange-deep);
 
   --background: var(--warm-canvas);
   --foreground: var(--graphite);
@@ -536,6 +548,16 @@ body {
   transition: transform 150ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/* Lifted and pressable controls keep their colour transitions too. */
+.motion-hover-lift,
+.motion-press {
+  transition:
+    transform 150ms var(--ease-ui-out),
+    color 150ms var(--ease-ui-out),
+    background-color 150ms var(--ease-ui-out),
+    border-color 150ms var(--ease-ui-out);
+}
+
 @media (hover: hover) and (pointer: fine) {
   .motion-hover-lift:hover {
     transform: translateY(-1px);
@@ -552,6 +574,190 @@ body {
   .motion-hover-grip-group:hover .motion-hover-grip {
     transform: scale(1);
   }
+}
+
+/*
+ * Motion system. Entrances are CSS-only so they run from first paint under SSR.
+ * Stagger siblings with style={{ '--i': n }}; everything stays on
+ * transform/opacity and is disabled under prefers-reduced-motion below.
+ */
+/* Uses `translate` so hover/press `transform` feedback still composes. */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+/* Movement-only variant for LCP candidates, which must never start hidden. */
+@keyframes rise-in-solid {
+  from {
+    translate: 0 12px;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  60% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes trace-in {
+  from {
+    opacity: 0;
+    stroke-dashoffset: 36;
+  }
+}
+
+@keyframes ring-pulse {
+  from {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: scale(1.3);
+  }
+}
+
+@keyframes shake-x {
+  20% {
+    transform: translateX(-4px);
+  }
+
+  40% {
+    transform: translateX(4px);
+  }
+
+  60% {
+    transform: translateX(-3px);
+  }
+
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+@keyframes idle-float {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes fill-in {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes scroll-progress {
+  from {
+    transform: scaleX(0);
+  }
+
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.reveal,
+.reveal-solid,
+.reveal-fade,
+.reveal-pop {
+  animation-duration: 500ms;
+  animation-timing-function: var(--ease-ui-out);
+  animation-delay: calc(var(--reveal-base, 0ms) + var(--i, 0) * 60ms);
+  animation-fill-mode: backwards;
+}
+
+.reveal {
+  animation-name: rise-in;
+}
+
+.reveal-solid {
+  animation-name: rise-in-solid;
+}
+
+.reveal-fade {
+  animation-name: fade-in;
+}
+
+.reveal-pop {
+  animation-name: pop-in;
+  animation-duration: 420ms;
+}
+
+.reveal-trace {
+  animation: trace-in 700ms var(--ease-ui-out) backwards;
+  animation-delay: calc(var(--reveal-base, 0ms) + var(--i, 0) * 60ms);
+}
+
+.motion-ring-pulse {
+  opacity: 0;
+  animation: ring-pulse 900ms var(--ease-ui-out) 2 backwards;
+  animation-delay: calc(var(--reveal-base, 0ms) + var(--i, 0) * 60ms);
+}
+
+.motion-shake {
+  animation: shake-x 360ms var(--ease-ui-out);
+}
+
+.motion-float {
+  animation: idle-float 5.5s ease-in-out infinite;
+}
+
+.motion-fill-in {
+  animation: fill-in 900ms var(--ease-ui-out) backwards;
+  animation-delay: 150ms;
+}
+
+.motion-press:active {
+  transform: translateY(1px);
+}
+
+/*
+ * `.reveal-scroll` is animated by <ScrollReveal /> as elements enter the
+ * viewport; it has no CSS so content is never hidden at rest.
+ * The reading progress bar is scroll-linked: progressive enhancement.
+ */
+.scroll-progress-bar {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  @media screen and (prefers-reduced-motion: no-preference) {
+    .scroll-progress-bar {
+      display: block;
+      transform-origin: left center;
+      animation: scroll-progress linear both;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+/* Route cross-fade; named elements (lesson and challenge titles) morph. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 180ms;
+  animation-timing-function: var(--ease-ui-out);
+}
+
+::view-transition-group(*) {
+  animation-duration: 280ms;
+  animation-timing-function: var(--ease-ui-out);
 }
 
 /* Technical grid is intentionally opt-in for later product compositions. */
@@ -603,6 +809,24 @@ body {
   .motion-hover-grip {
     transition: none !important;
     transform: none !important;
+  }
+
+  .reveal,
+  .reveal-solid,
+  .reveal-fade,
+  .reveal-pop,
+  .reveal-trace,
+  .motion-ring-pulse,
+  .motion-shake,
+  .motion-float,
+  .motion-fill-in {
+    animation: none !important;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 
