@@ -1,15 +1,34 @@
 {
   "seo": {
-    "title": "Labs — Coming Soon | TestingWithEkki",
-    "description": "Practice QA in real environments with repositories, test frameworks, APIs, and CI pipelines. TestingWithEkki Labs is coming soon."
+    "title": "Labs Waitlist — Practice QA in Real Environments | TestingWithEkki",
+    "description": "Join the TestingWithEkki Labs waitlist for Lab 001 and new QA lessons. Practice with real repositories, test frameworks, APIs, and CI pipelines."
   },
   "hero": {
-    "eyebrow": "LABS · COMING SOON",
+    "eyebrow": "LABS · WAITLIST OPEN",
     "title": "Practice QA in real environments",
-    "description": "Some testing skills are better learned outside a browser sandbox. Labs will give you guided projects using real repositories, test frameworks, APIs, CI pipelines, and other tools you would encounter in QA work.",
-    "badge": "COMING SOON",
+    "description": "Some testing skills are better learned outside a browser sandbox. Labs will give you guided projects using real repositories, test frameworks, APIs, CI pipelines, and other tools you encounter in day-to-day QA work.",
+    "badge": "LAB 001 WAITLIST",
     "visualLabel": "LABS",
-    "status": "STATUS"
+    "status": "STATUS",
+    "secondaryPrompt": "While Lab 001 is being built, keep practicing in the browser:"
+  },
+  "waitlist": {
+    "eyebrow": "EARLY ACCESS",
+    "title": "Get notified when Lab 001 launches",
+    "description": "Join the waitlist for Lab 001 early access plus occasional updates when new Playwright lessons and practice challenges go live.",
+    "emailLabel": "Email address",
+    "emailPlaceholder": "you@example.com",
+    "submit": "Join waitlist",
+    "submitting": "Joining...",
+    "helper": "Double opt-in · We'll send a confirmation link to your inbox. No spam.",
+    "invalidEmail": "Please enter a valid email address.",
+    "successTitle": "Check your inbox to confirm",
+    "successMessage": "We sent a confirmation link to your email. Click it to finish joining the Lab 001 waitlist and lesson updates.",
+    "alreadySubscribedTitle": "You're already on the list",
+    "alreadySubscribedMessage": "This email is already confirmed for TestingWithEkki updates and the Lab 001 waitlist.",
+    "rateLimitError": "Too many signup attempts. Please wait a few minutes before trying again.",
+    "errorMessage": "We couldn't save your signup right now. Please try again in a moment.",
+    "reset": "Use a different email"
   },
   "note": {
     "eyebrow": "REAL ENVIRONMENTS",

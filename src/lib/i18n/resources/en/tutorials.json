@@ -105,7 +105,27 @@
     "completionTitle": "Finished reading?",
     "completionDescription": "Mark this lesson as complete before moving on.",
     "completionCompletedDescription": "This lesson is complete. Continue with the lesson navigation below.",
-    "lessonNavigationLabel": "Lesson navigation"
+    "lessonNavigationLabel": "Lesson navigation",
+    "creatorFooter": {
+      "eyebrow": "FROM EKKI · EMAIL UPDATES",
+      "title": "Get new lessons & Lab 001 updates",
+      "description": "Practical web automation notes, newly published Playwright lessons, and early notice when Labs opens—no spam.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "you@example.com",
+      "submit": "Subscribe",
+      "submitting": "Subscribing...",
+      "helper": "Double opt-in · Confirm via the link we send to your inbox.",
+      "invalidEmail": "Please enter a valid email address.",
+      "successTitle": "Check your inbox to confirm",
+      "successMessage": "We sent a confirmation link to your inbox. Click it to activate lesson and Lab 001 updates.",
+      "alreadySubscribedTitle": "You're already subscribed",
+      "alreadySubscribedMessage": "This email is already confirmed for TestingWithEkki lesson and Labs updates.",
+      "rateLimitError": "Too many signup attempts. Please wait a few minutes before trying again.",
+      "errorMessage": "We couldn't complete your subscription right now. Please try again in a moment.",
+      "reset": "Use another email",
+      "mentoringPrompt": "Want tailored feedback on your Playwright setup or QA automation path?",
+      "mentoringCta": "1:1 QA Mentoring"
+    }
   },
   "toasts": {
     "completed": "Lesson completed! 🎉",

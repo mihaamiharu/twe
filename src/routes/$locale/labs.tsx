@@ -6,6 +6,7 @@ import {
   FlaskConical,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { NewsletterSignup } from '@/components/newsletter-signup';
 import { createSeoHead } from '@/lib/seo';
 import i18n from '@/lib/i18n';
 import { LocaleRoutes, localeParams } from '@/lib/navigation';
@@ -25,14 +26,14 @@ export const Route = createFileRoute('/$locale/labs')({
 
 const routeApi = getRouteApi('/$locale/labs');
 
-function LabsPage() {
+export function LabsPage() {
   const { locale } = routeApi.useParams();
   const { t } = useTranslation('labs');
   const params = localeParams(locale);
 
   return (
     <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
-      <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.85fr_1.15fr] lg:gap-10 lg:px-12 lg:pb-28 lg:pt-20">
+      <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.95fr_1.05fr] lg:gap-10 lg:px-12 lg:pb-28 lg:pt-20">
         <div className="max-w-xl">
           <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">
             {t('hero.eyebrow')}
@@ -41,29 +42,56 @@ function LabsPage() {
             {t('hero.title')}
             <span className="text-[var(--brand-orange-text)]">.</span>
           </h1>
-          <p className="mt-6 max-w-lg text-xl leading-8 text-[var(--graphite)]">
+          <p className="mt-6 max-w-lg text-lg leading-8 text-[var(--muted-graphite)] sm:text-xl">
             {t('hero.description')}
           </p>
-          <span className="mt-7 inline-flex items-center rounded bg-[var(--orange-tint)] px-2.5 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--brand-orange-text)]">
-            {t('hero.badge')}
-          </span>
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link
-              to={LocaleRoutes.practice}
-              params={params}
-              className="motion-hover-lift inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange-deep)] px-5 text-[15px] font-medium text-white hover:bg-[#9c3618] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
-            >
-              <Code2 className="h-4 w-4" aria-hidden="true" />
-              {t('actions.practice')}
-            </Link>
-            <Link
-              to={LocaleRoutes.learn}
-              params={params}
-              className="inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
-            >
-              <BookOpen className="h-4 w-4" aria-hidden="true" />
-              {t('actions.learn')}
-            </Link>
+
+          <NewsletterSignup
+            variant="editorial"
+            testId="labs-waitlist-signup"
+            className="mt-8"
+            copy={{
+              eyebrow: t('waitlist.eyebrow'),
+              title: t('waitlist.title'),
+              description: t('waitlist.description'),
+              emailLabel: t('waitlist.emailLabel'),
+              emailPlaceholder: t('waitlist.emailPlaceholder'),
+              submit: t('waitlist.submit'),
+              submitting: t('waitlist.submitting'),
+              helper: t('waitlist.helper'),
+              invalidEmail: t('waitlist.invalidEmail'),
+              successTitle: t('waitlist.successTitle'),
+              successMessage: t('waitlist.successMessage'),
+              alreadySubscribedTitle: t('waitlist.alreadySubscribedTitle'),
+              alreadySubscribedMessage: t('waitlist.alreadySubscribedMessage'),
+              rateLimitError: t('waitlist.rateLimitError'),
+              errorMessage: t('waitlist.errorMessage'),
+              reset: t('waitlist.reset'),
+            }}
+          />
+
+          <div className="mt-7">
+            <p className="text-sm text-[var(--muted-graphite)]">
+              {t('hero.secondaryPrompt')}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              <Link
+                to={LocaleRoutes.practice}
+                params={params}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-4 text-sm font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+              >
+                <Code2 className="h-4 w-4 text-[var(--brand-orange-text)]" aria-hidden="true" />
+                {t('actions.practice')}
+              </Link>
+              <Link
+                to={LocaleRoutes.learn}
+                params={params}
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-4 text-sm font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+              >
+                <BookOpen className="h-4 w-4 text-[var(--brand-orange-text)]" aria-hidden="true" />
+                {t('actions.learn')}
+              </Link>
+            </div>
           </div>
         </div>
 
@@ -79,9 +107,9 @@ function LabsPage() {
                   {t('hero.visualLabel')}
                 </span>
               </div>
-                <span className="font-mono text-[10px] text-[var(--brand-orange-text)]">
-                  01
-                </span>
+              <span className="font-mono text-[10px] text-[var(--brand-orange-text)]">
+                01
+              </span>
             </div>
             <div className="py-10">
               <p className="font-mono text-xs uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">
@@ -118,13 +146,12 @@ function LabsPage() {
               </div>
             </div>
             <div className="flex items-center justify-between border-t border-[var(--soft-border)] pt-5 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
-                <span>{t('hero.status')}</span>
+              <span>{t('hero.status')}</span>
               <span className="text-[var(--brand-orange-text)]">{t('hero.badge')}</span>
             </div>
           </div>
         </div>
       </section>
-
     </div>
   );
 }

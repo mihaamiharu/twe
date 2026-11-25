@@ -1,15 +1,34 @@
 {
   "seo": {
-    "title": "Labs — Segera Hadir | TestingWithEkki",
-    "description": "Berlatih QA di lingkungan nyata dengan repository, framework test, API, dan pipeline CI. Labs TestingWithEkki segera hadir."
+    "title": "Daftar Tunggu Labs — Berlatih QA di Lingkungan Nyata | TestingWithEkki",
+    "description": "Gabung daftar tunggu Labs TestingWithEkki untuk Lab 001 dan pelajaran QA baru. Berlatih dengan repository nyata, framework test, API, dan pipeline CI."
   },
   "hero": {
-    "eyebrow": "LABS · SEGERA HADIR",
+    "eyebrow": "LABS · DAFTAR TUNGGU DIBUKA",
     "title": "Berlatih QA di lingkungan nyata",
-    "description": "Sebagian keterampilan testing lebih tepat dipelajari di luar sandbox browser. Labs akan menghadirkan proyek terpandu dengan repository nyata, framework test, API, pipeline CI, dan tools lain yang akan kamu temui dalam pekerjaan QA.",
-    "badge": "SEGERA HADIR",
+    "description": "Sebagian keterampilan testing lebih tepat dipelajari di luar sandbox browser. Labs akan menghadirkan proyek terpandu dengan repository nyata, framework test, API, pipeline CI, dan tools lain yang kamu temui dalam pekerjaan QA sehari-hari.",
+    "badge": "DAFTAR TUNGGU LAB 001",
     "visualLabel": "LABS",
-    "status": "STATUS"
+    "status": "STATUS",
+    "secondaryPrompt": "Sambil Lab 001 disiapkan, lanjutkan latihan langsung di browser:"
+  },
+  "waitlist": {
+    "eyebrow": "AKSES AWAL",
+    "title": "Dapatkan kabar saat Lab 001 meluncur",
+    "description": "Gabung daftar tunggu untuk akses awal Lab 001 serta pembaruan berkala saat pelajaran Playwright dan tantangan latihan baru tersedia.",
+    "emailLabel": "Alamat email",
+    "emailPlaceholder": "nama@contoh.com",
+    "submit": "Gabung daftar tunggu",
+    "submitting": "Mendaftar...",
+    "helper": "Konfirmasi ganda · Kami akan mengirim tautan konfirmasi ke kotak masukmu. Tanpa spam.",
+    "invalidEmail": "Masukkan alamat email yang valid.",
+    "successTitle": "Periksa kotak masukmu untuk konfirmasi",
+    "successMessage": "Kami telah mengirim tautan konfirmasi ke emailmu. Klik tautan tersebut untuk menyelesaikan pendaftaran daftar tunggu Lab 001 dan pembaruan pelajaran.",
+    "alreadySubscribedTitle": "Kamu sudah terdaftar",
+    "alreadySubscribedMessage": "Email ini sudah terkonfirmasi untuk pembaruan TestingWithEkki dan daftar tunggu Lab 001.",
+    "rateLimitError": "Terlalu banyak percobaan pendaftaran. Silakan tunggu beberapa menit sebelum mencoba lagi.",
+    "errorMessage": "Pendaftaran belum dapat diproses saat ini. Silakan coba lagi sebentar lagi.",
+    "reset": "Gunakan email lain"
   },
   "note": {
     "eyebrow": "LINGKUNGAN NYATA",
