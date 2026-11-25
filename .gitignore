@@ -63,3 +63,7 @@ conductor/
 src/worker-bindings.generated.d.ts
 # Private, short-lived data-only Wrangler configs; removed after proxy startup.
 .*.data-proxy-*.json
+
+# Editor swap files
+*.swp
+*.swo
