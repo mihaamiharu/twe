@@ -27,96 +27,121 @@ export function PreviewHeader({
     handleZoomOut,
     showControls,
 }: PreviewHeaderProps) {
+    const previewUrl = files
+        ? `testingwithekki.local${currentPath || '/index.html'}`
+        : targetElementId
+            ? `target-website.com/preview#${targetElementId}`
+            : 'target-website.com/preview';
+
     return (
-        <div className="flex items-center gap-4 px-4 py-2 border-b border-border bg-muted/50 shrink-0">
-            {/* Window Controls */}
-            <div className="flex gap-1.5 group">
-                <div className="w-3 h-3 rounded-full bg-red-500/80 group-hover:bg-red-500 transition-colors" />
-                <div className="w-3 h-3 rounded-full bg-yellow-500/80 group-hover:bg-yellow-500 transition-colors" />
-                <div className="w-3 h-3 rounded-full bg-green-500/80 group-hover:bg-green-500 transition-colors" />
+        <div
+            data-testid="preview-header"
+            className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-3 py-2 border-b border-border bg-muted/50 shrink-0"
+        >
+            {/* Window Controls & URL Bar */}
+            <div className="flex min-w-0 flex-[1_1_220px] items-center gap-2.5">
+                <div className="hidden sm:flex gap-1.5 shrink-0 group" aria-hidden="true">
+                    <div className="w-2.5 h-2.5 rounded-full bg-red-500/80 group-hover:bg-red-500 transition-colors" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80 group-hover:bg-yellow-500 transition-colors" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-green-500/80 group-hover:bg-green-500 transition-colors" />
+                </div>
+
+                <div className="flex min-w-0 flex-1 items-center bg-background border border-border rounded-md px-2.5 h-8 shadow-sm">
+                    <Lock className="h-3 w-3 text-muted-foreground mr-2 shrink-0" aria-hidden="true" />
+                    <span
+                        className="min-w-0 flex-1 truncate text-xs text-muted-foreground"
+                        title={previewUrl}
+                    >
+                        {previewUrl}
+                    </span>
+                </div>
             </div>
 
-            {/* URL Bar & Controls */}
-            <div className="flex-1 flex gap-2 max-w-2xl mx-auto w-full">
-                <div className="flex-1 flex items-center bg-background border border-border rounded-md px-3 h-8 shadow-sm relative overflow-hidden">
-                    <Lock className="h-3 w-3 text-muted-foreground mr-2 shrink-0" />
-                    <span className="text-xs text-muted-foreground truncate flex-1">
-                        {files
-                            ? `testingwithekki.local${currentPath || '/index.html'}`
-                            : targetElementId
-                                ? `target-website.com/preview#${targetElementId}`
-                                : 'target-website.com/preview'}
-                    </span>
+            {/* Preview Controls */}
+            <div className="flex flex-wrap items-center gap-2 shrink-0 max-w-full">
+                {/* Visual/Source Toggle */}
+                <div className="flex items-center gap-0.5 bg-background border border-border rounded-md p-0.5 shrink-0">
+                    <button
+                        type="button"
+                        onClick={() => setViewMode('preview')}
+                        className={cn(
+                            'p-1 rounded transition-colors',
+                            viewMode === 'preview'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                        )}
+                        title="Visual Preview"
+                        aria-label="Visual Preview"
+                        aria-pressed={viewMode === 'preview'}
+                    >
+                        <Eye className="h-3.5 w-3.5" aria-hidden="true" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={() => setViewMode('source')}
+                        className={cn(
+                            'p-1 rounded transition-colors',
+                            viewMode === 'source'
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'text-muted-foreground hover:text-foreground hover:bg-muted',
+                        )}
+                        title="View Source"
+                        aria-label="View Source"
+                        aria-pressed={viewMode === 'source'}
+                    >
+                        <Code2 className="h-3.5 w-3.5" aria-hidden="true" />
+                    </button>
+                </div>
 
-                    {/* Visual/Source Toggle inside URL bar */}
-                    <div className="flex items-center gap-1 bg-muted/50 rounded-md p-0.5 ml-2 shrink-0">
-                        <button
-                            onClick={() => setViewMode('preview')}
-                            className={cn(
-                                'p-1 rounded transition-colors',
-                                viewMode === 'preview'
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                            )}
-                            title="Visual Preview"
+                {/* Inspect Mode Badge */}
+                {showControls && viewMode === 'preview' && (
+                    <Badge
+                        variant="secondary"
+                        data-testid="preview-inspect-badge"
+                        className="h-6 shrink-0 whitespace-nowrap px-2 text-[11px] gap-1.5 font-normal bg-primary/10 text-primary border-primary/20 pointer-events-none"
+                    >
+                        <MousePointerClick className="h-3 w-3 shrink-0" aria-hidden="true" />
+                        <span>Inspect Active</span>
+                    </Badge>
+                )}
+
+                {/* Zoom Controls */}
+                {viewMode === 'preview' && (
+                    <div
+                        data-testid="preview-zoom-controls"
+                        className="flex items-center gap-0.5 shrink-0"
+                    >
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
+                            onClick={handleZoomOut}
+                            title="Zoom Out"
+                            aria-label="Zoom Out"
                         >
-                            <Eye className="h-3 w-3" />
-                        </button>
-                        <button
-                            onClick={() => setViewMode('source')}
-                            className={cn(
-                                'p-1 rounded transition-colors',
-                                viewMode === 'source'
-                                    ? 'bg-primary text-primary-foreground shadow-sm'
-                                    : 'text-muted-foreground hover:text-foreground hover:bg-muted',
-                            )}
-                            title="View Source"
+                            <Minus className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
+                        <span
+                            data-testid="preview-zoom-value"
+                            className="text-xs min-w-[2.5rem] text-center tabular-nums text-muted-foreground whitespace-nowrap shrink-0"
                         >
-                            <Code2 className="h-3 w-3" />
-                        </button>
+                            {zoom}%
+                        </span>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            className="h-7 w-7 shrink-0"
+                            onClick={handleZoomIn}
+                            title="Zoom In"
+                            aria-label="Zoom In"
+                        >
+                            <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+                        </Button>
                     </div>
-
-                    {/* Inspect Mode Badge Inline */}
-                    {showControls && viewMode === 'preview' && (
-                        <div className="ml-3 flex items-center pr-2 border-l border-border pl-3">
-                            <Badge
-                                variant="secondary"
-                                className="h-5 px-1.5 text-[10px] gap-1.5 font-normal bg-primary/10 text-primary border-primary/20 pointer-events-none"
-                            >
-                                <MousePointerClick className="h-3 w-3" />
-                                Inspect Active
-                            </Badge>
-                        </div>
-                    )}
-                </div>
+                )}
             </div>
-
-            {/* Right Actions - Zoom Controls */}
-            {viewMode === 'preview' && (
-                <div className="flex items-center gap-1 shrink-0">
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={handleZoomOut}
-                        title="Zoom Out"
-                    >
-                        <Minus className="h-3.5 w-3.5" />
-                    </Button>
-                    <span className="text-xs w-8 text-center tabular-nums text-muted-foreground">
-                        {zoom}%
-                    </span>
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-7 w-7"
-                        onClick={handleZoomIn}
-                        title="Zoom In"
-                    >
-                        <Plus className="h-3.5 w-3.5" />
-                    </Button>
-                </div>
-            )}
         </div>
     );
 }

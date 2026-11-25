@@ -97,7 +97,7 @@ function LeaderboardPage() {
       data-testid="leaderboard-page"
       className="min-h-screen overflow-hidden bg-[var(--warm-canvas)] px-4 py-8 text-[var(--graphite)] sm:px-6 md:py-12 lg:px-8"
     >
-      <main className="mx-auto max-w-6xl">
+      <div className="mx-auto max-w-6xl">
         <header
           data-testid="leaderboard-header"
           className="grid items-center gap-8 border-b border-[var(--soft-border)] pb-9 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)] lg:gap-12"
@@ -366,7 +366,7 @@ function LeaderboardPage() {
             )}
           </TabsContent>
         </Tabs>
-      </main>
+      </div>
     </div>
   );
 }

@@ -76,7 +76,7 @@ type TutorialDetail = Extract<
 
 function LessonDetailSkeleton() {
   return (
-    <main
+    <div
       className="min-h-screen bg-background"
       aria-busy="true"
       data-testid="lesson-loading"
@@ -97,7 +97,7 @@ function LessonDetailSkeleton() {
           <Skeleton className="h-64 w-full" />
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -126,7 +126,7 @@ function TutorialDetailError() {
   const { t } = useTranslation(['tutorials', 'common']);
 
   return (
-    <main className="min-h-screen bg-background px-5 py-10 md:px-10 md:py-16">
+    <div className="min-h-screen bg-background px-5 py-10 md:px-10 md:py-16">
       <div className="mx-auto max-w-4xl">
         <Link
           to="/$locale/learn"
@@ -157,7 +157,7 @@ function TutorialDetailError() {
           </Button>
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -333,7 +333,7 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
   };
 
   return (
-    <main className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <div
         className="scroll-progress-bar fixed inset-x-0 top-0 z-50 h-0.5 bg-[var(--brand-orange)]"
         aria-hidden="true"
@@ -582,7 +582,7 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
         title={t('auth:guard.title')}
         description={t('auth:guard.description')}
       />
-    </main>
+    </div>
   );
 }
 
