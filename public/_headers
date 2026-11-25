@@ -6,3 +6,7 @@
 
 /og/*
   Cache-Control: public, max-age=3600
+
+/speculation-rules.json
+  Content-Type: application/speculationrules+json; charset=utf-8
+  Cache-Control: public, max-age=3600

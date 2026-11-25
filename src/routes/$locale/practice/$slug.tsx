@@ -44,14 +44,31 @@ import {
 import { omitUndefined } from '@/lib/omit-undefined';
 import { createPracticeDetailSeoHead } from '@/lib/practice-seo';
 
-const loadChallengePlayground = createClientOnlyFn(async () => {
-  const module = await import('@/components/challenges/challenge-playground');
-  return { default: module.ChallengePlayground };
+let challengePlaygroundPromise: Promise<{
+  default: typeof import('@/components/challenges/challenge-playground').ChallengePlayground;
+}> | null = null;
+
+const loadChallengePlayground = createClientOnlyFn(() => {
+  challengePlaygroundPromise ??= import(
+    '@/components/challenges/challenge-playground'
+  )
+    .then((module) => ({ default: module.ChallengePlayground }))
+    .catch((error: unknown) => {
+      challengePlaygroundPromise = null;
+      throw error;
+    });
+  return challengePlaygroundPromise;
 });
 const ChallengePlayground = lazy(loadChallengePlayground);
 
 export const Route = createFileRoute('/$locale/practice/$slug')({
   loader: async ({ context, params }) => {
+    // Start downloading the playground chunk in parallel with the server
+    // loader on client-side navigations so `<main>` does not sit on a blank
+    // skeleton waiting for a sequential JS fetch after data resolves.
+    if (typeof window !== 'undefined') {
+      void loadChallengePlayground();
+    }
     const auth = await context.queryClient.ensureQueryData(authQueryOptions);
     const response = await context.queryClient.ensureQueryData(
       challengeDetailQueryOptions(params.slug, params.locale, auth.user?.id),

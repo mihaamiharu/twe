@@ -6,6 +6,12 @@ import {
 } from '@tanstack/react-start/server';
 import { getRuntimeEnv } from '#platform';
 import type { RuntimeEnv } from './runtime/env';
+import {
+  createEmptySpeculationRulesResponse,
+  forwardToAppRuntime,
+  isSpeculationRulesRequest,
+  protectResponse,
+} from './server/worker-gateway';
 
 const handleStart = createStartHandler(defaultStreamHandler);
 
@@ -52,23 +58,6 @@ export class AppRuntime extends DurableObject<RuntimeEnv> {
   }
 }
 
-function protect(response: Response, preview: boolean): Response {
-  const headers = new Headers(response.headers);
-  headers.set('X-Content-Type-Options', 'nosniff');
-  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
-  headers.set('X-Frame-Options', 'SAMEORIGIN');
-  if (preview) {
-    headers.set('X-Robots-Tag', 'noindex, nofollow');
-    headers.set('Cache-Control', 'private, no-store');
-  }
-  return new Response(response.body, {
-    status: response.status,
-    statusText: response.statusText,
-    headers,
-  });
-}
-
 export default {
   async scheduled() {
     const env = getRuntimeEnv();
@@ -88,7 +77,7 @@ export default {
     const preview = env.APP_ENV === 'preview';
     if (preview) {
       if (!env.PREVIEW_ACCESS_TOKEN || env.PREVIEW_ACCESS_TOKEN.length < 32)
-        return protect(
+        return protectResponse(
           new Response('Preview access is not configured.', { status: 503 }),
           true,
         );
@@ -102,7 +91,7 @@ export default {
         expected.byteLength !== actual.byteLength ||
         !timingSafeEqual(expected, actual)
       )
-        return protect(
+        return protectResponse(
           new Response('Preview authentication required.', {
             status: 401,
             headers: {
@@ -111,17 +100,25 @@ export default {
           }),
           true,
         );
+      if (isSpeculationRulesRequest(request)) {
+        return protectResponse(createEmptySpeculationRulesResponse(), true);
+      }
       // Preview runs the Worker first so access protects assets too.
       // Asset lookup consumes a request body. Keep mutation bodies untouched
       // for Start/Better Auth; only GET/HEAD can resolve a static asset.
       if (request.method === 'GET' || request.method === 'HEAD') {
         const asset = await env.ASSETS?.fetch(request);
-        if (asset && asset.status !== 404) return protect(asset, true);
+        if (asset && asset.status !== 404) return protectResponse(asset, true);
       }
+    }
+    // Serve the empty Speculation-Rules manifest directly from the gateway
+    // when requests reach the Worker (local dev or fallback) without waking DO.
+    if (isSpeculationRulesRequest(request)) {
+      return protectResponse(createEmptySpeculationRulesResponse(), preview);
     }
     // Block every application request: even a session read can refresh auth data.
     if (env.MAINTENANCE_MODE === 'true')
-      return protect(
+      return protectResponse(
         new Response('Maintenance in progress. Please try again shortly.', {
           status: 503,
           headers: {
@@ -134,10 +131,8 @@ export default {
     try {
       if (!env.APP_RUNTIME)
         throw new Error('Application runtime is unavailable.');
-      const response = await env.APP_RUNTIME.getByName('application', {
-        locationHint: 'apac',
-      }).fetch(request);
-      return protect(response, preview);
+      const response = await forwardToAppRuntime(env.APP_RUNTIME, request);
+      return protectResponse(response, preview);
     } catch {
       // No exception payload, query, headers, user data or credentials in logs.
       console.error(
@@ -146,7 +141,7 @@ export default {
           requestId: crypto.randomUUID(),
         }),
       );
-      return protect(
+      return protectResponse(
         new Response('Internal server error', {
           status: 500,
           headers: { 'Cache-Control': 'private, no-store' },
