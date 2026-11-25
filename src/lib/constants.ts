@@ -75,6 +75,15 @@ export function getTierFromCategory(category?: string): string {
 }
 
 export const TIER_ORDER = ['basic', 'beginner', 'intermediate', 'e2e'];
+
+/** Default Practice catalog tier order: modern Playwright tracks first, legacy selectors last. */
+export const PRACTICE_TIER_ORDER = [
+  'intermediate',
+  'e2e',
+  'beginner',
+  'basic',
+] as const;
+
 export const DIFFICULTY_ORDER = { EASY: 1, MEDIUM: 2, HARD: 3 };
 
 // Define display order for categories within each tier
@@ -90,9 +99,9 @@ export const CATEGORY_ORDER: Record<string, number> = {
   'js-async': 3,
   'ts-fundamentals': 4,
   // Intermediate Tier (Playwright Core) - Order base: 3000
-  'playwright-navigation': 1,
-  'playwright-locators': 2,
-  'playwright-assertions': 3,
+  'playwright-locators': 1,
+  'playwright-assertions': 2,
+  'playwright-navigation': 3,
   'playwright-waits': 4,
   'playwright-debugging': 5,
   // E2E Tier (App Testing) - Order base: 4000

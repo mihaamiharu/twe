@@ -22,18 +22,6 @@ export const TRACK_CONFIG: Record<TrackId, Omit<TrackConfig, 'id'>> = {
   all: {
     match: () => true,
   },
-  selectors: {
-    match: (c) =>
-      ['CSS_SELECTOR', 'XPATH_SELECTOR'].includes(c.type) ||
-      getTierFromCategory(c.category ?? undefined) === 'basic',
-  },
-  scripting: {
-    match: (c) =>
-      c.type === 'JAVASCRIPT' ||
-      c.type === 'TYPESCRIPT' ||
-      getTierFromCategory(c.category ?? undefined) === 'beginner' ||
-      (c.category?.startsWith('ts-') ?? false),
-  },
   core: {
     match: (c) => {
       const cat = c.category ?? '';
@@ -52,6 +40,18 @@ export const TRACK_CONFIG: Record<TrackId, Omit<TrackConfig, 'id'>> = {
       return getTierFromCategory(c.category ?? undefined) === 'e2e';
     },
   },
+  scripting: {
+    match: (c) =>
+      c.type === 'JAVASCRIPT' ||
+      c.type === 'TYPESCRIPT' ||
+      getTierFromCategory(c.category ?? undefined) === 'beginner' ||
+      (c.category?.startsWith('ts-') ?? false),
+  },
+  selectors: {
+    match: (c) =>
+      ['CSS_SELECTOR', 'XPATH_SELECTOR'].includes(c.type) ||
+      getTierFromCategory(c.category ?? undefined) === 'basic',
+  },
 };
 
 export const SIDEBAR_GROUPS: TrackGroup[] = [
@@ -60,12 +60,12 @@ export const SIDEBAR_GROUPS: TrackGroup[] = [
     tracks: ['all'],
   },
   {
-    id: 'coreSkills',
-    tracks: ['selectors', 'scripting'],
-  },
-  {
     id: 'playwright',
     tracks: ['core', 'e2e'],
+  },
+  {
+    id: 'coreSkills',
+    tracks: ['scripting', 'selectors'],
   },
 ];
 
