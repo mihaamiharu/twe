@@ -1,16 +1,19 @@
 import { describe, expect, test } from 'bun:test';
 import {
   CATEGORY_ORDER,
+  PRACTICE_TIER_ORDER,
   TIER_ORDER,
   categoryLabels,
   getTierFromCategory,
 } from '@/lib/constants';
-import { TRACK_CONFIG, type TrackId } from '@/config/tracks';
+import { TRACK_CONFIG, TRACK_IDS, type TrackId } from '@/config/tracks';
 import i18n from '@/lib/i18n';
 import { getChallengeCatalogList } from '@/server/content-catalog.server';
 import {
+  PRACTICE_SOLVE_COUNT_THRESHOLD,
   filterPracticeChallenges,
   groupPracticeChallenges,
+  shouldShowPracticeSolveCount,
   type PracticeChallenge,
 } from '@/lib/practice-catalog';
 import { PracticeSearchSchema } from '@/lib/practice-search';
@@ -222,52 +225,96 @@ describe('Practice catalog projection', () => {
     );
   });
 
-  test('groups deterministically by tier, category, order, and slug', () => {
+  test('hides cold-start solve counts below threshold and shows counts at or above threshold', () => {
+    expect(PRACTICE_SOLVE_COUNT_THRESHOLD).toBe(20);
+    expect(shouldShowPracticeSolveCount(undefined)).toBe(false);
+    expect(shouldShowPracticeSolveCount(null)).toBe(false);
+    expect(shouldShowPracticeSolveCount(Number.NaN)).toBe(false);
+    expect(shouldShowPracticeSolveCount(-1)).toBe(false);
+    expect(shouldShowPracticeSolveCount(0)).toBe(false);
+    expect(shouldShowPracticeSolveCount(1)).toBe(false);
+    expect(shouldShowPracticeSolveCount(19)).toBe(false);
+    expect(shouldShowPracticeSolveCount(20)).toBe(true);
+    expect(shouldShowPracticeSolveCount(21)).toBe(true);
+    expect(shouldShowPracticeSolveCount(150)).toBe(true);
+  });
+
+  test('orders track tabs with modern Playwright tracks ahead of legacy selectors', () => {
+    expect(TRACK_IDS).toEqual(['all', 'core', 'e2e', 'scripting', 'selectors']);
+    expect(PRACTICE_TIER_ORDER).toEqual([
+      'intermediate',
+      'e2e',
+      'beginner',
+      'basic',
+    ]);
+  });
+
+  test('groups deterministically with modern Playwright tracks ahead of legacy selectors', () => {
     const shuffled = [
       challenge({
         slug: 'b',
         category: 'css-basics',
+        type: 'CSS_SELECTOR',
         order: 2,
       }),
       challenge({
         slug: 'z',
         category: 'css-basics',
+        type: 'CSS_SELECTOR',
         order: 1,
       }),
       challenge({
         slug: 'a',
         category: 'css-basics',
+        type: 'CSS_SELECTOR',
         order: 1,
+      }),
+      challenge({
+        slug: 'e2e-pom-login',
+        category: 'e2e-pom',
+        type: 'PLAYWRIGHT',
+        order: 4000,
+      }),
+      challenge({
+        slug: 'js-intro',
+        category: 'js-fundamentals',
+        type: 'JAVASCRIPT',
+        order: 2000,
       }),
       challenge({
         slug: 'playwright',
         category: 'playwright-locators',
-        order: 1,
+        type: 'PLAYWRIGHT',
+        order: 2990,
       }),
     ];
 
     const groups = groupPracticeChallenges(shuffled);
     expect(groups.map((group) => group.category)).toEqual([
-      'css-basics',
       'playwright-locators',
+      'e2e-pom',
+      'js-fundamentals',
+      'css-basics',
     ]);
-    expect(groups[0]?.challenges.map((item) => item.slug)).toEqual([
+    expect(groups[3]?.challenges.map((item) => item.slug)).toEqual([
       'a',
       'z',
       'b',
     ]);
   });
 
-  test('puts the category containing the earliest challenge first', () => {
+  test('puts the category containing the earliest challenge first within the same tier', () => {
     const groups = groupPracticeChallenges([
       challenge({
         slug: 'later-start',
         category: 'playwright-navigation',
+        type: 'PLAYWRIGHT',
         order: 3200,
       }),
       challenge({
         slug: 'first-playwright-test',
         category: 'playwright-locators',
+        type: 'PLAYWRIGHT',
         order: 2990,
       }),
     ]);
@@ -276,6 +323,65 @@ describe('Practice catalog projection', () => {
       'playwright-locators',
       'playwright-navigation',
     ]);
+  });
+
+  test('leads the real All catalog with Playwright while keeping CSS/XPath accessible via Selectors track and search', async () => {
+    const [englishCatalog, indonesianCatalog] = await Promise.all([
+      getChallengeCatalogList('en'),
+      getChallengeCatalogList('id'),
+    ]);
+
+    for (const rawCatalog of [englishCatalog, indonesianCatalog]) {
+      const items: PracticeChallenge[] = rawCatalog.map((item) => ({
+        ...item,
+        id: item.slug,
+        isPublished: true,
+        completionCount: 0,
+        isCompleted: false,
+      }));
+
+      const allFiltered = filterPracticeChallenges(items, {
+        track: 'all',
+        hideCompleted: false,
+      });
+      const allGroups = groupPracticeChallenges(allFiltered);
+      const groupCategories = allGroups.map((group) => group.category);
+
+      expect(groupCategories[0]).toBe('playwright-locators');
+      expect(groupCategories.indexOf('playwright-locators')).toBeLessThan(
+        groupCategories.indexOf('e2e-pom'),
+      );
+      expect(groupCategories.indexOf('e2e-pom')).toBeLessThan(
+        groupCategories.indexOf('js-fundamentals'),
+      );
+      expect(groupCategories.indexOf('js-fundamentals')).toBeLessThan(
+        groupCategories.indexOf('css-basics'),
+      );
+      expect(groupCategories.indexOf('css-basics')).toBeLessThan(
+        groupCategories.indexOf('xpath-basics'),
+      );
+
+      const selectorTrack = filterPracticeChallenges(items, {
+        track: 'selectors',
+        hideCompleted: false,
+      });
+      expect(selectorTrack.length).toBeGreaterThan(0);
+      expect(
+        selectorTrack.some((item) => item.category === 'css-basics'),
+      ).toBe(true);
+      expect(
+        selectorTrack.some((item) => item.category === 'xpath-basics'),
+      ).toBe(true);
+
+      for (const query of ['css', 'xpath', 'selektor']) {
+        const matches = filterPracticeChallenges(items, {
+          query,
+          track: 'all',
+          hideCompleted: false,
+        });
+        expect(matches.length).toBeGreaterThan(0);
+      }
+    }
   });
 
   test('keeps every published category complete across taxonomy and tracks', async () => {

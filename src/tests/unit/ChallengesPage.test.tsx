@@ -119,12 +119,34 @@ describe('ChallengesPage', () => {
     };
   };
 
-  it('should render all challenges by default', async () => {
+  it('should render all challenges with Playwright ordered ahead of JS and CSS fallbacks', async () => {
     await renderPage();
 
-    expect(screen.getByText('JS Basic Challenge')).toBeTruthy();
-    expect(screen.getByText('CSS Selector Master')).toBeTruthy();
-    expect(screen.getByText('Playwright E2E')).toBeTruthy();
+    const headings = screen
+      .getAllByRole('heading', { level: 3 })
+      .map((heading) => heading.textContent);
+    expect(headings).toEqual([
+      'Playwright E2E',
+      'JS Basic Challenge',
+      'CSS Selector Master',
+    ]);
+  });
+
+  it('should hide cold-start solve counts below threshold in both grid and list views', async () => {
+    await renderPage();
+    expect(screen.getAllByTestId('challenge-card-solve-count')).toHaveLength(2);
+
+    cleanup();
+    globalThis.mockSearchParams = {
+      ...globalThis.mockSearchParams,
+      view: 'list',
+    };
+
+    await renderPage();
+    expect(screen.getAllByTestId('challenge-row-solve-count')).toHaveLength(2);
+    expect(
+      screen.getAllByTestId('challenge-row-solve-count-placeholder'),
+    ).toHaveLength(1);
   });
 
   it('should filter by track (selectors)', async () => {

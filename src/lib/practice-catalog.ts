@@ -1,13 +1,27 @@
 import {
   CATEGORY_ORDER,
   getTierFromCategory,
-  TIER_ORDER,
+  PRACTICE_TIER_ORDER,
 } from '@/lib/constants';
 import { TRACK_CONFIG, type TrackId } from '@/config/tracks';
 import type { ChallengeListCatalogResponse } from '@/lib/catalog.types';
 
 export type PracticeChallenge = ChallengeListCatalogResponse['data'][number];
 export type PracticeTier = 'basic' | 'beginner' | 'intermediate' | 'e2e';
+
+/** Minimum solve count required before displaying public solve counters on Practice items. */
+export const PRACTICE_SOLVE_COUNT_THRESHOLD = 20;
+
+/** Returns true when a challenge has enough completions to display its public solve count. */
+export function shouldShowPracticeSolveCount(
+  completionCount?: number | null,
+): boolean {
+  return (
+    typeof completionCount === 'number' &&
+    Number.isFinite(completionCount) &&
+    completionCount >= PRACTICE_SOLVE_COUNT_THRESHOLD
+  );
+}
 
 export interface PracticeCatalogFilters {
   query?: string | undefined;
@@ -173,11 +187,27 @@ function compareStrings(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
-function compareChallenges(
+function getPracticeTierRank(category?: string | null): number {
+  const tier = getTierFromCategory(category ?? undefined) as PracticeTier;
+  const rank = PRACTICE_TIER_ORDER.indexOf(tier);
+  return rank === -1 ? PRACTICE_TIER_ORDER.length : rank;
+}
+
+function compareChallengesWithinGroup(
   left: PracticeChallenge,
   right: PracticeChallenge,
 ): number {
   return left.order - right.order || compareStrings(left.slug, right.slug);
+}
+
+function comparePracticeChallenges(
+  left: PracticeChallenge,
+  right: PracticeChallenge,
+): number {
+  return (
+    getPracticeTierRank(left.category) - getPracticeTierRank(right.category) ||
+    compareChallengesWithinGroup(left, right)
+  );
 }
 
 /** Apply the shareable Practice URL state to the already-loaded catalog. */
@@ -208,10 +238,10 @@ export function filterPracticeChallenges(
 
       return true;
     })
-    .sort(compareChallenges);
+    .sort(comparePracticeChallenges);
 }
 
-/** Group the filtered projection in the same order as the challenges users can start. */
+/** Group the filtered projection with modern Playwright tracks ahead of legacy selector fallbacks. */
 export function groupPracticeChallenges(
   challenges: readonly PracticeChallenge[],
 ): PracticeChallengeGroup[] {
@@ -228,28 +258,24 @@ export function groupPracticeChallenges(
     .map(([category, group]) => ({
       category,
       tier: getTierFromCategory(category) as PracticeTier,
-      challenges: [...group].sort(compareChallenges),
+      challenges: [...group].sort(compareChallengesWithinGroup),
     }))
     .sort((left, right) => {
       if (left.category === 'uncategorized') return 1;
       if (right.category === 'uncategorized') return -1;
 
+      const leftTier = getPracticeTierRank(left.category);
+      const rightTier = getPracticeTierRank(right.category);
+      if (leftTier !== rightTier) return leftTier - rightTier;
+
       const leftFirst = left.challenges[0];
       const rightFirst = right.challenges[0];
       if (leftFirst && rightFirst) {
-        const firstChallengeOrder = compareChallenges(leftFirst, rightFirst);
+        const firstChallengeOrder = leftFirst.order - rightFirst.order;
         if (firstChallengeOrder !== 0) return firstChallengeOrder;
       }
 
-      const leftTier = TIER_ORDER.indexOf(
-        getTierFromCategory(left.category) as PracticeTier,
-      );
-      const rightTier = TIER_ORDER.indexOf(
-        getTierFromCategory(right.category) as PracticeTier,
-      );
-
       return (
-        leftTier - rightTier ||
         (CATEGORY_ORDER[left.category] ?? 999) -
           (CATEGORY_ORDER[right.category] ?? 999) ||
         compareStrings(left.category, right.category)

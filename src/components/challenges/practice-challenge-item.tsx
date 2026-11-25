@@ -1,6 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowRight, Check, Lock, Zap } from 'lucide-react';
+import {
+  PRACTICE_SOLVE_COUNT_THRESHOLD,
+  shouldShowPracticeSolveCount,
+} from '@/lib/practice-catalog';
 import { cn } from '@/lib/utils';
+
+export { PRACTICE_SOLVE_COUNT_THRESHOLD, shouldShowPracticeSolveCount };
 
 export interface PracticeChallengeItemData {
   slug: string;
@@ -63,6 +69,8 @@ function ChallengeItemContent({
   labels,
 }: Omit<PracticeChallengeItemProps, 'locale'>) {
   const isComingSoon = challenge.tags?.includes('coming-soon') ?? false;
+  const showSolveCount =
+    !isComingSoon && shouldShowPracticeSolveCount(challenge.completionCount);
   const actionLabel = challenge.isCompleted ? labels.review : labels.start;
 
   return (
@@ -127,14 +135,21 @@ function ChallengeItemContent({
           />
         )}
 
-        {!isComingSoon && challenge.completionCount !== undefined && (
+        {showSolveCount ? (
           <span
             className="order-5 inline-flex items-center whitespace-nowrap text-xs tabular-nums text-muted-foreground lg:order-none lg:justify-self-start"
             aria-label={labels.completionCount}
+            data-testid="challenge-row-solve-count"
           >
             {labels.completionCount}
           </span>
-        )}
+        ) : !isComingSoon ? (
+          <span
+            className="order-5 hidden items-center lg:inline-flex lg:order-none"
+            aria-hidden="true"
+            data-testid="challenge-row-solve-count-placeholder"
+          />
+        ) : null}
 
         {!isComingSoon && (
           <span
@@ -191,6 +206,9 @@ export function PracticeChallengeRow(props: PracticeChallengeItemProps) {
 
 export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
   const isComingSoon = props.challenge.tags?.includes('coming-soon') ?? false;
+  const showSolveCount =
+    !isComingSoon &&
+    shouldShowPracticeSolveCount(props.challenge.completionCount);
   const content = (
     <div
       className={cn(
@@ -232,8 +250,11 @@ export function PracticeChallengeGridCard(props: PracticeChallengeItemProps) {
             difficulty={props.challenge.difficulty}
             label={props.labels.difficulty}
           />
-          {props.challenge.completionCount !== undefined && (
-            <span className="text-xs tabular-nums text-muted-foreground">
+          {showSolveCount && (
+            <span
+              className="text-xs tabular-nums text-muted-foreground"
+              data-testid="challenge-card-solve-count"
+            >
               {props.labels.completionCount}
             </span>
           )}
