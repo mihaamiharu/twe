@@ -25,7 +25,9 @@ import {
   Zap,
 } from 'lucide-react';
 import { EmptyState } from '@/components/empty-state';
+import { CompletionCardsSection } from '@/components/profile/completion-cards-section';
 import { getUserSettings } from '@/server/user.fn';
+import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { localeParams, LocaleRoutes } from '@/lib/navigation';
 import { createSeoHead } from '@/lib/seo';
 import i18n from '@/lib/i18n';
@@ -106,6 +108,12 @@ function ProfilePage() {
         data: result.data as UserProfile,
       };
     },
+  });
+
+  const viewerId = data?.success ? data.data?.id : undefined;
+  const { data: tutorialsData, isLoading: isTutorialsLoading } = useQuery({
+    ...tutorialsListQueryOptions({ locale, viewerId }),
+    enabled: Boolean(viewerId),
   });
 
   if (isLoading) {
@@ -294,7 +302,16 @@ function ProfilePage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="progress" className="mt-6">
+          <TabsContent value="progress" className="mt-6 space-y-6">
+            <CompletionCardsSection
+              locale={locale}
+              userName={user.name}
+              tutorialMeta={
+                tutorialsData?.success ? tutorialsData.meta : undefined
+              }
+              isLoading={isTutorialsLoading}
+            />
+
             <Card>
               <CardHeader>
                 <CardTitle>{t('profile:tierProgress.title')}</CardTitle>
