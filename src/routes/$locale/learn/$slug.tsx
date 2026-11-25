@@ -23,6 +23,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MarkdownRenderer } from '@/components/markdown-renderer';
+import { LessonCreatorFooter } from '@/components/newsletter-signup';
 import { AuthGuardDialog } from '@/components/auth/auth-guard-dialog';
 import { NotFound } from '@/components/not-found';
 import {
@@ -451,6 +452,7 @@ function TutorialDetailContent({ tutorial }: { tutorial: TutorialDetail }) {
               previousTutorial={tutorial.previousTutorial}
               nextTutorial={tutorial.nextTutorial}
             />
+            <LessonCreatorFooter locale={locale} />
           </article>
 
           <aside className="order-first space-y-5 lg:order-none lg:sticky lg:top-24">

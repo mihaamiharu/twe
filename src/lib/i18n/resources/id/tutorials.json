@@ -105,7 +105,27 @@
     "completionTitle": "Selesai membaca?",
     "completionDescription": "Tandai pelajaran ini sebagai selesai sebelum melanjutkan.",
     "completionCompletedDescription": "Pelajaran ini sudah selesai. Lanjutkan melalui navigasi pelajaran di bawah.",
-    "lessonNavigationLabel": "Navigasi pelajaran"
+    "lessonNavigationLabel": "Navigasi pelajaran",
+    "creatorFooter": {
+      "eyebrow": "DARI EKKI · PEMBARUAN EMAIL",
+      "title": "Dapatkan pelajaran baru & kabar Lab 001",
+      "description": "Catatan otomasi web praktis, pelajaran Playwright terbaru, dan info awal saat Labs dibuka—tanpa spam.",
+      "emailLabel": "Alamat email",
+      "emailPlaceholder": "nama@contoh.com",
+      "submit": "Langganan",
+      "submitting": "Mendaftar...",
+      "helper": "Konfirmasi ganda · Konfirmasi lewat tautan yang kami kirim ke emailmu.",
+      "invalidEmail": "Masukkan alamat email yang valid.",
+      "successTitle": "Periksa kotak masukmu untuk konfirmasi",
+      "successMessage": "Kami telah mengirim tautan konfirmasi ke kotak masukmu. Klik tautan tersebut untuk mengaktifkan pembaruan pelajaran dan Lab 001.",
+      "alreadySubscribedTitle": "Kamu sudah berlangganan",
+      "alreadySubscribedMessage": "Email ini sudah terkonfirmasi untuk pembaruan pelajaran dan Labs TestingWithEkki.",
+      "rateLimitError": "Terlalu banyak percobaan pendaftaran. Silakan tunggu beberapa menit sebelum mencoba lagi.",
+      "errorMessage": "Pendaftaran langganan belum dapat diproses saat ini. Silakan coba lagi sebentar lagi.",
+      "reset": "Gunakan email lain",
+      "mentoringPrompt": "Butuh masukan langsung untuk setup Playwright atau jalur otomasi QA kamu?",
+      "mentoringCta": "Mentoring QA 1:1"
+    }
   },
   "toasts": {
     "completed": "Pelajaran selesai! 🎉",
