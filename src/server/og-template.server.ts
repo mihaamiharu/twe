@@ -1,5 +1,10 @@
+import {
+  CompletionOgImageTemplate,
+  getCompletionCardCopy,
+} from '../components/completion-og-image-template';
 import { HomeOgImageTemplate } from '../components/home-og-image-template';
 import { OgImageTemplate } from '../components/og-image-template';
+import type { CompletionCardRenderProps } from '../lib/completion-card';
 import type { OgImageParams } from '../lib/og-params';
 import type { OgRenderOptions, OgResources } from './og-types';
 import { loadOgFallbackFonts } from './og-fonts.server';
@@ -36,14 +41,12 @@ function baseRenderOptions(resources: OgResources): OgRenderOptions {
   return options;
 }
 
-export async function getOgRenderOptions(
+async function withFallbackFonts(
   resources: OgResources,
-  params: OgImageParams,
+  text: string,
 ): Promise<OgRenderOptions> {
   const base = baseRenderOptions(resources);
-  const fallback = await loadOgFallbackFonts(
-    `${params.title} ${params.type} ${params.difficulty ?? ''} ${params.xp ?? ''}`,
-  );
+  const fallback = await loadOgFallbackFonts(text);
   // Keep the small Latin options stable. Fallback bytes have their own bounded
   // cache; the workerd adapter also bounds retained Satori font loaders.
   return fallback.length
@@ -51,9 +54,42 @@ export async function getOgRenderOptions(
     : base;
 }
 
+export async function getOgRenderOptions(
+  resources: OgResources,
+  params: OgImageParams,
+): Promise<OgRenderOptions> {
+  return withFallbackFonts(
+    resources,
+    `${params.title} ${params.type} ${params.difficulty ?? ''} ${params.xp ?? ''}`,
+  );
+}
+
 export function getOgElement(params: OgImageParams, resources: OgResources) {
   if (params.type !== 'Home') return OgImageTemplate(params);
   if (!resources.inspectorImage)
     throw new Error('Home OG cards require the build-time illustration.');
   return HomeOgImageTemplate({ inspectorImage: resources.inspectorImage });
+}
+
+export async function getCompletionOgRenderOptions(
+  resources: OgResources,
+  props: CompletionCardRenderProps,
+): Promise<OgRenderOptions> {
+  const copy = getCompletionCardCopy(props);
+  const renderedText = [
+    props.title,
+    props.learner ?? props.subtitle,
+    copy.badgeLabel,
+    copy.eyebrow,
+    copy.completedByLabel,
+    copy.lessonLabel,
+    copy.practiceLabel ?? '',
+    copy.modulesLabel ?? '',
+    copy.footerTagline,
+  ].join(' ');
+  return withFallbackFonts(resources, renderedText);
+}
+
+export function getCompletionOgElement(props: CompletionCardRenderProps) {
+  return CompletionOgImageTemplate(props);
 }

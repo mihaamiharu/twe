@@ -1,12 +1,18 @@
 import { renderOgSvg } from '#og-layout';
 import { renderOgPng } from '#og-png';
 import bundledResources from './generated/og-resources.json';
+import type { CompletionCardRenderProps } from '../lib/completion-card';
 import {
   getOgKey,
   normalizeOgParams,
   type OgImageInput,
 } from '../lib/og-params';
-import { getOgElement, getOgRenderOptions } from './og-template.server';
+import {
+  getCompletionOgElement,
+  getCompletionOgRenderOptions,
+  getOgElement,
+  getOgRenderOptions,
+} from './og-template.server';
 import type { OgResources } from './og-types';
 import { OgRenderError } from './og-errors.server';
 
@@ -40,12 +46,10 @@ function remember(key: string, image: ArrayBuffer) {
   cacheBytes += image.byteLength;
 }
 
-/** Arbitrary legacy queries remain dynamic; common SEO cards use Static Assets. */
-export async function renderDynamicOg(
-  input: OgImageInput,
+async function renderBoundedOg(
+  key: string,
+  render: () => Promise<ArrayBuffer>,
 ): Promise<ArrayBuffer> {
-  const params = normalizeOgParams(input);
-  const key = getOgKey(params);
   const cached = cache.get(key);
   if (cached) {
     cache.delete(key);
@@ -62,11 +66,7 @@ export async function renderDynamicOg(
   // Font parsing, Yoga layout and rasterization share one memory budget.
   // Serialize distinct renders; coalesce duplicates and bound the waiting queue.
   const operation = renderTail.then(async () => {
-    const svg = await renderOgSvg(
-      getOgElement(params, resources),
-      await getOgRenderOptions(resources, params),
-    );
-    const image = await renderOgPng(svg);
+    const image = await render();
     remember(key, image);
     return image;
   });
@@ -80,4 +80,39 @@ export async function renderDynamicOg(
   } finally {
     pending.delete(key);
   }
+}
+
+/** Arbitrary legacy queries remain dynamic; common SEO cards use Static Assets. */
+export async function renderDynamicOg(
+  input: OgImageInput,
+): Promise<ArrayBuffer> {
+  const params = normalizeOgParams(input);
+  const key = getOgKey(params);
+  return renderBoundedOg(key, async () => {
+    const svg = await renderOgSvg(
+      getOgElement(params, resources),
+      await getOgRenderOptions(resources, params),
+    );
+    return renderOgPng(svg);
+  });
+}
+
+/** Shareable module and Web Automation track completion cards reuse the same bounded pipeline. */
+export async function renderCompletionOg(
+  props: CompletionCardRenderProps,
+): Promise<ArrayBuffer> {
+  const key = JSON.stringify([
+    'COMPLETION',
+    props.kind,
+    props.slug,
+    props.locale,
+    props.learner ?? '',
+  ]);
+  return renderBoundedOg(key, async () => {
+    const svg = await renderOgSvg(
+      getCompletionOgElement(props),
+      await getCompletionOgRenderOptions(resources, props),
+    );
+    return renderOgPng(svg);
+  });
 }
