@@ -15,6 +15,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
+  getLearningPathPreviewKind,
   LearningPathPreview,
   type LearningPathPreviewKind,
 } from '@/components/learning-path-preview';
@@ -67,16 +68,9 @@ interface LearningPathStep {
   slug: string;
 }
 
-const LEARNING_PATH_PREVIEW_KINDS: LearningPathPreviewKind[] = [
-  'understand',
-  'build',
-  'automate',
-  'practice',
-];
-
 function LearnCatalogSkeleton() {
   return (
-    <main
+    <div
       className="min-h-screen bg-background"
       aria-busy="true"
       data-testid="learn-loading"
@@ -96,7 +90,7 @@ function LearnCatalogSkeleton() {
           ))}
         </div>
       </div>
-    </main>
+    </div>
   );
 }
 
@@ -173,7 +167,7 @@ function LearnPage() {
           );
           return {
             number: String(index + 1).padStart(2, '0'),
-            kind: LEARNING_PATH_PREVIEW_KINDS[index] ?? 'practice',
+            kind: getLearningPathPreviewKind(module.slug, index),
             label: t('learn.stack.moduleLabel', { number: module.order }),
             title: module.title,
             description: module.outcome,
@@ -184,7 +178,7 @@ function LearnPage() {
     : [];
 
   return (
-    <main className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background">
       <div className="mx-auto max-w-7xl px-5 pb-20 pt-10 md:px-10 md:pt-16">
         <section
           id="learning-stack"
@@ -483,7 +477,7 @@ function LearnPage() {
           </p>
         </aside>
       </div>
-    </main>
+    </div>
   );
 }
 

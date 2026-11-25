@@ -12,6 +12,7 @@ import { SelectorPanel } from './selector-panel';
 import { ResultsPanel } from './results-panel';
 import { FileExplorer } from '../file-explorer';
 import { defaultSelectorStyles, e2eSelectorStyles } from './constants';
+import { demoteInstructionHeadings } from './playground-desktop-layout';
 import type { Challenge, PlaygroundState } from './types';
 import type { SelectorType } from '../selector-input';
 import type { ChallengeExecution } from './use-challenge-execution';
@@ -95,6 +96,7 @@ export function PlaygroundMobileLayout({
           <TabsContent
             value="instructions"
             forceMount
+            hidden={activeMode !== 'instructions'}
             className="m-0 min-h-0 flex-1 overflow-y-auto p-4 focus-visible:ring-0 data-[state=inactive]:hidden"
           >
             <div className="flex items-center gap-2 border-b border-workspace-border pb-3 text-xs font-medium uppercase tracking-[0.12em] text-workspace-muted">
@@ -102,13 +104,16 @@ export function PlaygroundMobileLayout({
               {t('challenges:playground.instructions')}
             </div>
             <div className="prose prose-sm mt-4 max-w-none prose-headings:text-workspace-text prose-p:text-workspace-text prose-li:text-workspace-text prose-pre:border prose-pre:border-workspace-border">
-              <MarkdownRenderer content={challenge.instructions} />
+              <MarkdownRenderer
+                content={demoteInstructionHeadings(challenge.instructions)}
+              />
             </div>
           </TabsContent>
 
           <TabsContent
             value="preview"
             forceMount
+            hidden={activeMode !== 'preview'}
             className="m-0 min-h-0 flex-1 overflow-hidden p-3 focus-visible:ring-0 data-[state=inactive]:hidden"
           >
             {hasHtml ? (
@@ -154,8 +159,9 @@ export function PlaygroundMobileLayout({
           <TabsContent
             value="code"
             forceMount
+            hidden={activeMode !== 'code'}
             className={cn(
-              'm-0 flex min-h-0 flex-1 flex-col overflow-hidden focus-visible:ring-0 data-[state=inactive]:hidden',
+              'm-0 min-h-0 flex-1 flex-col overflow-hidden focus-visible:ring-0 data-[state=active]:flex data-[state=inactive]:hidden',
               isCodeChallenge && 'technical-surface',
             )}
           >

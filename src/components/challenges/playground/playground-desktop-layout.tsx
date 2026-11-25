@@ -13,6 +13,30 @@ import type { Challenge, PlaygroundState } from './types';
 import type { SelectorType } from '../selector-input';
 import type { ChallengeExecution } from './use-challenge-execution';
 
+export function demoteInstructionHeadings(markdown: string): string {
+  const lines = markdown.split(/\r?\n/);
+  let activeFence: '`' | '~' | null = null;
+
+  return lines
+    .map((line) => {
+      const trimmed = line.trimStart();
+      if (trimmed.startsWith('```')) {
+        activeFence = activeFence === '`' ? null : (activeFence ?? '`');
+        return line;
+      }
+      if (trimmed.startsWith('~~~')) {
+        activeFence = activeFence === '~' ? null : (activeFence ?? '~');
+        return line;
+      }
+      if (activeFence) {
+        return line;
+      }
+
+      return line.replace(/^(#{1,5})(\s+)/, '$1#$2');
+    })
+    .join('\n');
+}
+
 interface PlaygroundDesktopLayoutProps {
   challenge: Challenge;
   state: PlaygroundState;
@@ -52,6 +76,11 @@ export function PlaygroundDesktopLayout({
   } = execution;
 
   const hasHtml = !!(challenge.htmlContent || challenge.files);
+  const activeLeftTab =
+    activeTab === 'preview' && hasHtml ? 'preview' : 'instructions';
+  const normalizedInstructions = demoteInstructionHeadings(
+    challenge.instructions,
+  );
 
   return (
     <PanelGroup
@@ -66,7 +95,7 @@ export function PlaygroundDesktopLayout({
         className="workspace-panel flex flex-col"
       >
         <Tabs
-          value={activeTab === 'preview' ? 'preview' : 'instructions'}
+          value={activeLeftTab}
           onValueChange={setActiveTab}
           className="flex-1 flex flex-col min-h-0"
         >
@@ -85,10 +114,11 @@ export function PlaygroundDesktopLayout({
 
           <TabsContent
             value="instructions"
-            className="flex-1 overflow-auto p-6 focus-visible:ring-0"
+            hidden={activeLeftTab !== 'instructions'}
+            className="flex-1 overflow-auto p-6 focus-visible:ring-0 data-[state=inactive]:hidden"
           >
             <div className="prose prose-sm max-w-none prose-p:leading-relaxed prose-pre:border prose-pre:border-workspace-border prose-headings:text-workspace-text prose-p:text-workspace-text prose-li:text-workspace-text">
-              <MarkdownRenderer content={challenge.instructions} />
+              <MarkdownRenderer content={normalizedInstructions} />
             </div>
           </TabsContent>
 
@@ -96,7 +126,8 @@ export function PlaygroundDesktopLayout({
             <TabsContent
               value="preview"
               forceMount
-              className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex flex-col"
+              hidden={activeLeftTab !== 'preview'}
+              className="flex-1 overflow-hidden p-4 focus-visible:ring-0 flex-col data-[state=active]:flex data-[state=inactive]:hidden"
             >
               <WebComponentPreview
                 htmlContent={
