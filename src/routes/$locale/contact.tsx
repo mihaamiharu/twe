@@ -13,7 +13,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { submitContactMessage } from '@/server/contact.fn';
+import {
+  CONTACT_TOPICS,
+  submitContactMessage,
+  type ContactTopic,
+} from '@/server/contact.fn';
 import { createSeoHead } from '@/lib/seo';
 import { toast } from 'sonner';
 import i18n from '@/lib/i18n';
@@ -31,9 +35,7 @@ export const Route = createFileRoute('/$locale/contact')({
   },
 });
 
-const topicOptions = ['general', 'mentoring', 'partnership', 'opportunity', 'other'] as const;
-
-function ContactPage() {
+export function ContactPage() {
   const { t } = useTranslation('contact');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -64,7 +66,7 @@ function ContactPage() {
         data: {
           name,
           email,
-          topic: topic as (typeof topicOptions)[number],
+          topic: topic as ContactTopic,
           message,
         },
       });
@@ -116,11 +118,8 @@ function ContactPage() {
             icon={<Handshake className="h-7 w-7" aria-hidden="true" />}
             title={t('partnerships.title')}
             description={t('partnerships.description')}
-            note={t('partnerships.opportunityNote')}
             cta={t('partnerships.cta')}
-            href="mailto:admin@testingwithekki.com?subject=Partnership%20with%20TestingWithEkki"
-            secondaryCta={t('partnerships.cvCta')}
-            secondaryHref="/Ekki_Syam_CV.pdf"
+            href="mailto:admin@testingwithekki.com?subject=Collaboration%20with%20TestingWithEkki"
           />
         </div>
 
@@ -166,7 +165,7 @@ function ContactPage() {
                 <Label htmlFor="contact-topic">{t('form.topic')}</Label>
                 <select id="contact-topic" name="topic" defaultValue="" required className="flex h-10 w-full rounded-md border border-[var(--soft-border)] bg-[var(--paper-surface)] px-3 text-sm text-[var(--graphite)] outline-none transition-colors focus:border-[var(--brand-orange)] focus:ring-2 focus:ring-[var(--brand-orange)]/20">
                   <option value="" disabled>{t('form.topicPlaceholder')}</option>
-                  {topicOptions.map((topic) => <option key={topic} value={topic}>{t(`form.topics.${topic}`)}</option>)}
+                  {CONTACT_TOPICS.map((topic) => <option key={topic} value={topic}>{t(`form.topics.${topic}`)}</option>)}
                 </select>
               </div>
               <div className="space-y-1.5 sm:col-start-2 sm:row-start-2">
@@ -190,7 +189,7 @@ function ContactPage() {
   );
 }
 
-function ContactOption({ number, icon, title, description, note, cta, href, ctaVariant = 'default', secondaryCta, secondaryHref }: { number: string; icon: React.ReactNode; title: string; description: string; note?: string; cta: string; href: string; ctaVariant?: 'default' | 'link'; secondaryCta?: string; secondaryHref?: string }) {
+function ContactOption({ number, icon, title, description, cta, href, ctaVariant = 'default' }: { number: string; icon: React.ReactNode; title: string; description: string; cta: string; href: string; ctaVariant?: 'default' | 'link' }) {
   return (
     <div className="relative lg:pl-16">
       <div className="absolute left-0 top-1/2 hidden -translate-y-1/2 items-center gap-2 lg:flex">
@@ -206,7 +205,6 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
         <div>
           <h2 className="text-xl font-semibold tracking-[-0.025em]">{title}</h2>
           <p className="mt-1.5 max-w-[34rem] text-sm leading-6 text-[var(--muted-graphite)]">{description}</p>
-          {note && <p className="mt-1.5 text-sm font-medium text-[var(--brand-orange-text)]">{note}</p>}
         </div>
         <div className="hidden h-16 w-px bg-[var(--soft-border)] sm:block" />
         <div className="flex flex-col items-stretch gap-2 sm:items-end">
@@ -221,16 +219,6 @@ function ContactOption({ number, icon, title, description, note, cta, href, ctaV
               {cta} <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </a>
           </Button>
-          {secondaryCta && secondaryHref && (
-            <a
-              href={secondaryHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1 text-sm font-medium text-[var(--brand-orange-text)] underline-offset-4 transition-colors hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] sm:justify-end"
-            >
-              {secondaryCta} <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-            </a>
-          )}
         </div>
       </div>
     </div>

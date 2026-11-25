@@ -1,12 +1,12 @@
 {
   "seo": {
     "title": "Hubungi Ekki | TestingWithEkki",
-    "description": "Hubungi Ekki untuk mentoring QA, partnership, sponsorship, peluang karier, atau pertanyaan tentang TestingWithEkki."
+    "description": "Hubungi Ekki untuk mentoring QA 1:1, sesi pembicara, workshop, kolaborasi edukasi, atau pertanyaan tentang TestingWithEkki."
   },
   "hero": {
     "eyebrow": "KONTAK",
     "title": "Mari ngobrol",
-    "description": "Mencari mentoring QA, tertarik bekerja sama, atau punya hal lain untuk dibahas? Pilih topik yang ingin kamu bicarakan."
+    "description": "Mencari mentoring QA 1:1, tertarik berkolaborasi untuk sesi pembicara atau workshop, atau punya pertanyaan tentang TestingWithEkki? Pilih topik yang ingin kamu bicarakan."
   },
   "mentoring": {
     "title": "Mentoring QA 1:1",
@@ -14,11 +14,9 @@
     "cta": "Pesan sesi 1:1"
   },
   "partnerships": {
-    "title": "Partnership, Sponsorship & Peluang",
-    "description": "Untuk tool testing dan developer, komunitas, event, kolaborasi edukasi, dan sponsorship yang relevan.",
-    "opportunityNote": "Juga terbuka untuk peluang QA engineering dan test automation.",
-    "cta": "Bicarakan kerja sama",
-    "cvCta": "Lihat CV saya"
+    "title": "Pembicara, Workshop & Kolaborasi",
+    "description": "Untuk komunitas QA, tim engineering, acara teknologi, workshop edukasi, dan kolaborasi tool yang relevan.",
+    "cta": "Diskusikan kolaborasi"
   },
   "form": {
     "eyebrow": "PESAN UMUM",
@@ -33,8 +31,7 @@
     "topics": {
       "general": "Pertanyaan umum",
       "mentoring": "Mentoring",
-      "partnership": "Partnership / sponsorship",
-      "opportunity": "Peluang kerja",
+      "partnership": "Pembicara, workshop & kolaborasi",
       "other": "Lainnya"
     },
     "message": "Pesan",

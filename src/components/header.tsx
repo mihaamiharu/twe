@@ -34,7 +34,6 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
-  const isContactPage = location.pathname.endsWith('/contact');
   const isAuthPage =
     location.pathname.includes('/login') ||
     location.pathname.includes('/register');
@@ -89,15 +88,10 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     label: t('common:navigation.about'),
   };
 
-  const primaryCta = isAuthenticated
-    ? {
-        to: LocaleRoutes.learn,
-        params: localeParams(locale),
-      }
-    : {
-        to: LocaleRoutes.register,
-        params: localeParams(locale),
-      };
+  const primaryCta = {
+    to: LocaleRoutes.learn,
+    params: localeParams(locale),
+  };
   const showPrimaryCta = isAuthenticated || !isAuthPage;
 
   const handleSignOut = async () => {
@@ -129,12 +123,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
         }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div
-            className={cn(
-              'flex items-center justify-between',
-              isContactPage ? 'h-[5.5rem]' : 'h-[4.5rem]',
-            )}
-          >
+          <div className="flex h-[4.5rem] items-center justify-between">
             {/* Logo */}
             <div className="flex items-center gap-9">
               <Link
@@ -210,11 +199,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                     <Link
                       to={LocaleRoutes.login}
                       params={localeParams(locale)}
-                      className={cn(
-                        'inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]',
-                        isContactPage &&
-                          'rounded-md border border-[var(--graphite)] px-5',
-                      )}
+                      className="inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]"
                     >
                       {t('common:actions.signIn')}
                     </Link>
@@ -224,14 +209,10 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                       className="rounded-md bg-[var(--brand-orange-deep)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange-deep)]/90"
                     >
                       <Link
-                        to={LocaleRoutes.register}
-                        params={localeParams(locale)}
+                        to={primaryCta.to}
+                        params={primaryCta.params}
                       >
-                        {t(
-                          isContactPage
-                            ? 'common:actions.startLearning'
-                            : 'common:actions.startWebAutomation',
-                        )}
+                        {t('common:actions.startWebAutomation')}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
                     </Button>
@@ -450,7 +431,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 >
                   <Link to={primaryCta.to} params={primaryCta.params}>
                     {t(
-                      isContactPage || isAuthenticated
+                      isAuthenticated
                         ? 'common:actions.startLearning'
                         : 'common:actions.startWebAutomation',
                     )}

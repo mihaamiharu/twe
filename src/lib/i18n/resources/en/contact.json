@@ -1,12 +1,12 @@
 {
   "seo": {
     "title": "Contact Ekki | TestingWithEkki",
-    "description": "Contact Ekki about QA mentoring, partnerships, sponsorships, career opportunities, or questions about TestingWithEkki."
+    "description": "Contact Ekki about 1:1 QA mentoring, talks, workshops, educational collaborations, or questions about TestingWithEkki."
   },
   "hero": {
     "eyebrow": "CONTACT",
     "title": "Let’s talk",
-    "description": "Looking for QA mentoring, interested in working together, or have something else in mind? Choose what you’d like to discuss."
+    "description": "Looking for 1:1 QA mentoring, interested in a talk or workshop collaboration, or have a question about TestingWithEkki? Choose what you’d like to discuss."
   },
   "mentoring": {
     "title": "1:1 QA Mentoring",
@@ -14,11 +14,9 @@
     "cta": "Book a 1:1 session"
   },
   "partnerships": {
-    "title": "Partnerships, Sponsorships & Opportunities",
-    "description": "For testing and developer tools, communities, events, educational collaborations, and relevant sponsorships.",
-    "opportunityNote": "Also open to QA engineering and test automation opportunities.",
-    "cta": "Talk about working together",
-    "cvCta": "View my CV"
+    "title": "Talks, Workshops & Collaborations",
+    "description": "For QA communities, engineering teams, tech events, educational workshops, and relevant tool collaborations.",
+    "cta": "Discuss a collaboration"
   },
   "form": {
     "eyebrow": "GENERAL MESSAGE",
@@ -33,8 +31,7 @@
     "topics": {
       "general": "General question",
       "mentoring": "Mentoring",
-      "partnership": "Partnership / sponsorship",
-      "opportunity": "Job opportunity",
+      "partnership": "Talks, workshops & collaborations",
       "other": "Other"
     },
     "message": "Message",

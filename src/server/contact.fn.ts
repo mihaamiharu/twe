@@ -7,12 +7,19 @@ import { sendContactNotificationEmail } from './email.server';
 import { createRateLimitMiddleware } from './rate-limit.mw';
 import { logger } from '@/lib/logger';
 
-const ContactSchema = z.object({
+export const CONTACT_TOPICS = [
+  'general',
+  'mentoring',
+  'partnership',
+  'other',
+] as const;
+
+export type ContactTopic = (typeof CONTACT_TOPICS)[number];
+
+export const ContactSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   email: z.string().email('Please enter a valid email address'),
-  topic: z
-    .enum(['general', 'mentoring', 'partnership', 'opportunity', 'other'])
-    .default('general'),
+  topic: z.enum(CONTACT_TOPICS).default('general'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
 });
 
