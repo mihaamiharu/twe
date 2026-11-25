@@ -16,6 +16,28 @@ process.env['CLOUDFLARE_INCLUDE_PROCESS_ENV'] = 'false';
 
 const config = defineConfig({
   plugins: [
+    {
+      name: 'twe-speculation-rules-dev-header',
+      configureServer(server) {
+        server.middlewares.use((request, response, next) => {
+          const pathname = request.url?.split('?')[0];
+          if (
+            pathname === '/speculation-rules.json' &&
+            (request.method === 'GET' || request.method === 'HEAD')
+          ) {
+            response.statusCode = 200;
+            response.setHeader(
+              'Content-Type',
+              'application/speculationrules+json; charset=utf-8',
+            );
+            response.setHeader('Cache-Control', 'public, max-age=3600');
+            response.end(request.method === 'HEAD' ? undefined : '{}');
+            return;
+          }
+          next();
+        });
+      },
+    },
     contentManifestPlugin(),
     ogAssetsPlugin(),
     satoriWorkerdPlugin(),
