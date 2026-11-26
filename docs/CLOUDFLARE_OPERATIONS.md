@@ -37,7 +37,7 @@ Email, GitHub and AI work is bounded and awaited. Provider errors must not expos
 
 ## Release and rollback
 
-PRs to `main` run quality/build, unit, disposable D1 integration and E2E checks. Deployments are manual; merging does not deploy. The candidate workflow requires the reviewed full SHA, isolated environment credentials and explicit production approval. Its production branch guard currently requires `release/cloudflare-migration`.
+PRs to `main` run quality/build, unit, disposable D1 integration and E2E checks. Deployments are manual; merging does not deploy. The candidate workflow requires the reviewed full SHA, isolated environment credentials and explicit production approval. Its production branch guard requires `main`.
 
 ```sh
 bun run cf:build:production

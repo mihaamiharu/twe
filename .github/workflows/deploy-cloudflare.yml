@@ -39,7 +39,7 @@ jobs:
           test "$APPROVED_SHA" = "$(git rev-parse HEAD)"
           if [ "$TARGET" = production ]; then
             test "$APPROVE_PRODUCTION" = true
-            test "${{ github.ref }}" = refs/heads/release/cloudflare-migration
+            test "${{ github.ref }}" = refs/heads/main
           fi
       - uses: actions/setup-node@v4
         with:
