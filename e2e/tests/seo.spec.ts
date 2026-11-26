@@ -97,7 +97,7 @@ test.describe('SEO Checks', () => {
         path: '/id/contact',
         title: 'Hubungi Ekki | TestingWithEkki',
         description:
-          'Hubungi Ekki untuk mentoring QA, partnership, sponsorship, peluang karier, atau pertanyaan tentang TestingWithEkki.',
+          'Hubungi Ekki untuk mentoring QA 1:1, sesi pembicara, workshop, kolaborasi edukasi, atau pertanyaan tentang TestingWithEkki.',
       },
       {
         path: '/id/changelog',
