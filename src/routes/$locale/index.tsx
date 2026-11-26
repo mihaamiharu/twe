@@ -1,15 +1,11 @@
 import { createFileRoute, getRouteApi, Link } from '@tanstack/react-router';
-import {
-  ArrowRight,
-  BookOpen,
-  Check,
-  Code2,
-  FlaskConical,
-  Play,
-} from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { QaDoodle } from '@/components/qa-illustrations';
-import { HomeHeroVisual, PracticePreview } from '@/components/rebrand-visuals';
+import {
+  HeroVerificationStage,
+  LabsPipelineSchematic,
+  WorkflowSpotlight,
+} from '@/components/home-workbench';
 import { authQueryOptions } from '@/lib/auth.query';
 import { tutorialsListQueryOptions } from '@/lib/tutorials.query';
 import { BASE_URL, createSeoHead, createWebsiteSchema } from '@/lib/seo';
@@ -59,236 +55,247 @@ function HomePage() {
     ? lessonsResponse.data.slice(0, 3)
     : [];
 
-  const methodSteps = [
-    { number: '01', label: t('learnPractice.steps.learn.label'), title: t('learnPractice.steps.learn.title'), description: t('learnPractice.steps.learn.description'), icon: BookOpen },
-    { number: '02', label: t('learnPractice.steps.practice.label'), title: t('learnPractice.steps.practice.title'), description: t('learnPractice.steps.practice.description'), icon: Code2 },
-    { number: '03', label: t('learnPractice.steps.review.label'), title: t('learnPractice.steps.review.title'), description: t('learnPractice.steps.review.description'), icon: Check },
-  ];
-
   return (
-    <div className="overflow-hidden bg-[var(--warm-canvas)] text-[var(--graphite)]">
-      <section className="mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-16 sm:px-8 lg:grid-cols-[0.82fr_1.18fr] lg:gap-4 lg:px-12 lg:pb-28 lg:pt-20">
-        <div className="relative z-10 max-w-2xl">
-          <p className="reveal mb-6 font-mono text-xs font-medium uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">
-            {t('hero.eyebrow')}
-          </p>
-          <h1 className="reveal-solid max-w-[680px] text-[clamp(3rem,6vw,4.75rem)] font-semibold leading-[0.98] tracking-[-0.055em]">
-            {t('hero.title')}
-            <span className="text-[var(--brand-orange)]">.</span>
-          </h1>
-          <p className="reveal mt-7 max-w-xl text-lg leading-8 text-[var(--muted-graphite)] sm:text-[1.125rem]" style={stagger(2)}>
-            {t('hero.description')}
-          </p>
-          <div className="reveal mt-8 flex flex-col items-start gap-3 sm:flex-row" style={stagger(3)}>
-            <Link
-              to={LocaleRoutes.learn}
-              params={params}
-              className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange-deep)] px-5 text-[15px] font-medium text-white hover:bg-[#9c3618] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
+    <div className="overflow-x-clip bg-[var(--paper-surface)] text-[var(--graphite)]">
+      {/* 1. Opening Obsidian Verification Stage (bleeds seamlessly to y = 0) */}
+      <section className="home-hero-stage surface-dark -mt-[4.5rem] bg-[#111312] pb-16 pt-[6rem] text-[#f4f3ee] sm:pb-20 sm:pt-[6.5rem] lg:pb-24 lg:pt-[6.75rem]">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="mx-auto max-w-5xl text-center">
+            <h1 className="reveal-solid text-[clamp(2.85rem,6.2vw,5.25rem)] font-semibold leading-[0.95] tracking-[-0.045em] text-[#fbf9f4]">
+              {t('hero.title')}
+              <span className="text-[#e65f3a]">.</span>
+            </h1>
+            <p
+              className="reveal mx-auto mt-5 max-w-[52ch] text-[1.0625rem] leading-[1.6] text-[#c9c7bf]"
+              style={stagger(1)}
             >
-              {t('hero.startWebAutomation')}
-              <ArrowRight className="h-4 w-4" aria-hidden="true" />
-            </Link>
-            <Link
-              to={LocaleRoutes.practice}
-              params={params}
-              className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2 rounded-lg border border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 text-[15px] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--warm-canvas)]"
-            >
-              {t('hero.explorePractice')}
-            </Link>
+              {t('hero.description')}
+            </p>
+            <div className="reveal mt-6 flex justify-center" style={stagger(2)}>
+              <Link
+                to={LocaleRoutes.learn}
+                params={params}
+                className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2.5 rounded-lg bg-[#e65f3a] px-6 text-[1.0625rem] font-semibold text-[#111312] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#f0734f] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbf9f4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#111312]"
+              >
+                {t('hero.startWebAutomation')}
+                <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
           </div>
-          <div className="reveal mt-9 flex items-center gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]" style={stagger(4)}>
-            <span className="flex -space-x-2" aria-hidden="true">
-              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#d8b5a7]" />
-              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#b9c4c8]" />
-              <span className="h-7 w-7 rounded-full border-2 border-[var(--warm-canvas)] bg-[#d4c8a7]" />
-            </span>
-            <span>{t('hero.creatorNote')}</span>
+
+          <div className="reveal mt-9 sm:mt-11" style={stagger(3)}>
+            <HeroVerificationStage />
           </div>
         </div>
-        <HomeHeroVisual />
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="reveal-scroll grid gap-10 rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-6 sm:p-9 lg:grid-cols-[0.72fr_1.28fr] lg:gap-16 lg:p-12">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">{t('learningPath.eyebrow')}</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learningPath.title')}</h2>
-            <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learningPath.description')}</p>
+      {/* 2. Curriculum Index on Crisp Gallery Paper */}
+      <section className="bg-[var(--paper-surface)] py-20 sm:py-24 lg:py-32">
+        <div className="mx-auto grid max-w-7xl items-start gap-12 px-5 sm:px-8 lg:grid-cols-[0.42fr_0.58fr] lg:gap-20 lg:px-10">
+          <div className="reveal-scroll lg:sticky lg:top-28">
+            <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-semibold leading-[1.06] tracking-[-0.035em] text-[var(--graphite)]">
+              {t('learningPath.title')}
+            </h2>
+            <p className="mt-5 max-w-[46ch] text-[1.0625rem] leading-[1.65] text-[var(--muted-graphite)]">
+              {t('learningPath.description')}
+            </p>
             <Link
               to={LocaleRoutes.learn}
               params={params}
-              className="motion-hover-arrow-group mt-7 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange-text)] transition-colors hover:text-[var(--graphite)]"
+              className="motion-hover-arrow-group mt-8 inline-flex items-center gap-2 text-[1.0625rem] font-medium text-[var(--brand-orange-text)] transition-[color] duration-200 hover:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
             >
               {t('learningPath.cta')}
-              <ArrowRight className="motion-hover-arrow h-4 w-4" aria-hidden="true" />
+              <ArrowRight
+                className="motion-hover-arrow h-4 w-4"
+                aria-hidden="true"
+              />
             </Link>
           </div>
-            <div
-              data-testid="current-lessons"
-              className="relative grid gap-3 sm:grid-cols-3"
-            >
-              {currentLessons.map((lesson, index) => (
-                <Link
-                  key={lesson.slug}
-                  to={LocaleRoutes.learnDetail}
-                  params={{ ...params, slug: lesson.slug }}
-                  style={stagger(index + 1)}
-                  className="reveal-scroll motion-hover-lift motion-hover-arrow-group group relative flex min-h-44 flex-col rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-4 transition-colors hover:border-[var(--brand-orange)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
-                >
-                  <span className="font-mono text-[11px] text-[var(--brand-orange-text)]">
+
+          <div
+            data-testid="current-lessons"
+            className="divide-y divide-[var(--soft-border)] border-y border-[var(--soft-border)]"
+          >
+            {currentLessons.map((lesson, index) => (
+              <Link
+                key={lesson.slug}
+                to={LocaleRoutes.learnDetail}
+                params={{ ...params, slug: lesson.slug }}
+                style={stagger(index + 1)}
+                className="reveal-scroll motion-hover-arrow-group group flex items-start justify-between gap-6 py-7 transition-[background-color] duration-200 hover:bg-[#f4f0e8]/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)] sm:px-4"
+              >
+                <div className="min-w-0">
+                  <p className="text-[0.875rem] font-medium tabular-nums text-[var(--brand-orange-text)]">
                     {t('learningPath.lessonNumber', { number: index + 1 })}
-                  </span>
+                    {lesson.estimatedMinutes > 0 && (
+                      <span className="text-[var(--muted-graphite)]">
+                        {' · '}
+                        {t('learningPath.readingTime', {
+                          minutes: lesson.estimatedMinutes,
+                        })}
+                      </span>
+                    )}
+                  </p>
                   <h3
-                    className="mt-4 font-semibold leading-6 group-hover:text-[var(--brand-orange-text)]"
+                    className="mt-2 text-[1.0625rem] font-semibold leading-[1.4] text-[var(--graphite)] transition-[color] duration-200 group-hover:text-[var(--brand-orange-text)]"
                     style={{ viewTransitionName: `lesson-${lesson.slug}` }}
                   >
                     {lesson.title}
                   </h3>
-                  <p className="mt-2 line-clamp-3 text-sm leading-6 text-[var(--muted-graphite)]">
+                  <p className="mt-2 max-w-[54ch] text-[1.0625rem] leading-[1.6] text-[var(--muted-graphite)]">
                     {lesson.description}
                   </p>
-                  <ArrowRight
-                    className="motion-hover-arrow mt-auto h-4 w-4 self-end text-[var(--brand-orange-text)]"
-                    aria-hidden="true"
-                  />
-                </Link>
-              ))}
-              {currentLessons.length === 0 && (
-                <p className="rounded-lg border border-dashed border-[var(--soft-border)] p-5 text-sm leading-6 text-[var(--muted-graphite)] sm:col-span-3">
-                  {t('learningPath.noLessons')}
-                </p>
-              )}
-            </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="grid items-start gap-12 lg:grid-cols-[0.7fr_1.3fr] lg:gap-20">
-          <div className="reveal-scroll">
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">{t('learnPractice.eyebrow')}</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('learnPractice.title')}</h2>
-            <p className="mt-5 max-w-md text-base leading-7 text-[var(--muted-graphite)]">{t('learnPractice.description')}</p>
-          </div>
-          <div className="grid gap-7 lg:grid-cols-[0.85fr_1.15fr]">
-            <ol className="space-y-5">
-              {methodSteps.map((step, index) => {
-                const Icon = step.icon;
-                return (
-                  <li key={step.number} style={stagger(index)} className="reveal-scroll flex gap-4 border-b border-[var(--soft-border)] pb-5 last:border-b-0">
-                    <span className="font-mono text-xs text-[var(--brand-orange-text)]">{step.number}</span>
-                    <div>
-                      <div className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--muted-graphite)]">
-                        <Icon className="h-3.5 w-3.5 text-[var(--brand-orange-text)]" aria-hidden="true" />
-                        {step.label}
-                      </div>
-                      <h3 className="mt-2 text-lg font-semibold">{step.title}</h3>
-                      <p className="mt-2 text-sm leading-6 text-[var(--muted-graphite)]">{step.description}</p>
-                    </div>
-                  </li>
-                );
-              })}
-            </ol>
-            <div className="reveal-scroll lg:pt-4" style={stagger(2)}>
-              <PracticePreview />
-              <Link to={LocaleRoutes.practice} params={params} className="motion-hover-arrow-group mt-4 inline-flex items-center gap-2 font-mono text-xs uppercase tracking-[0.12em] text-[var(--brand-orange-text)] hover:text-[var(--graphite)]">
-                {t('learnPractice.cta')}
-                <ArrowRight className="motion-hover-arrow h-3.5 w-3.5" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="reveal-scroll grid items-center gap-10 rounded-xl bg-[var(--orange-tint)]/55 p-7 sm:p-10 lg:grid-cols-[0.8fr_1.2fr] lg:p-14">
-          <div className="relative mx-auto w-full max-w-[300px]">
-            <div className="absolute inset-4 rounded-[42%] border border-[var(--brand-orange)]/35" aria-hidden="true" />
-            <img src="/testing-workflow-illustration-480.webp" srcSet="/testing-workflow-illustration-240.webp 240w, /testing-workflow-illustration-480.webp 480w" sizes="216px" alt="Illustration of a software testing workflow" className="relative mx-auto aspect-square w-[72%] rounded-[42%] object-cover object-center" width={480} height={480} loading="lazy" decoding="async" />
-            <div className="absolute bottom-2 left-0 rounded-md bg-[var(--paper-surface)] px-3 py-2 font-mono text-[10px] text-[var(--brand-orange-text)] shadow-sm">TEST FLOW / TWE</div>
-          </div>
-          <div>
-            <h2 className="max-w-2xl text-3xl font-semibold leading-tight tracking-[-0.035em] sm:text-4xl">{t('philosophy.title')}</h2>
-            <p className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted-graphite)]">{t('philosophy.description')}</p>
-            <div className="mt-8 border-t border-[var(--brand-orange)]/25 pt-6">
-              <p className="font-mono text-xs uppercase tracking-[0.15em] text-[var(--brand-orange-text)]">{t('creator.eyebrow')}</p>
-              <h3 className="mt-2 text-2xl font-semibold">{t('creator.title')}</h3>
-              <p className="mt-3 max-w-xl text-base leading-7 text-[var(--muted-graphite)]">{t('creator.description')}</p>
-              <Link to={LocaleRoutes.about} params={params} className="motion-hover-arrow-group mt-5 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange-text)] hover:text-[var(--graphite)]">
-                {t('creator.cta')} <ArrowRight className="motion-hover-arrow h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-20 sm:px-8 lg:px-12 lg:pb-28">
-        <div className="border-y border-[var(--soft-border)]">
-          <div
-            data-empty-state
-            data-empty-state-illustration="thinking"
-            className="grid items-center gap-10 py-10 sm:py-12 lg:grid-cols-[0.82fr_1.18fr] lg:gap-16 lg:py-14"
-          >
-            <div className="reveal-scroll max-w-xl">
-              <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--brand-orange-text)]">{t('labs.eyebrow')}</p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('labs.title')}</h2>
-              <p className="mt-5 text-base leading-7 text-[var(--muted-graphite)]">{t('labs.description')}</p>
-              <Link
-                to={LocaleRoutes.labs}
-                params={params}
-                className="motion-hover-arrow-group mt-6 inline-flex items-center gap-2 text-[15px] font-medium text-[var(--brand-orange-text)] transition-colors hover:text-[var(--graphite)]"
-              >
-                {t('labs.cta')}
-                <ArrowRight className="motion-hover-arrow h-4 w-4" aria-hidden="true" />
-              </Link>
-            </div>
-
-            <div className="reveal-scroll relative overflow-hidden rounded-xl border border-[var(--soft-border)] bg-[var(--paper-surface)] p-5 sm:p-7" style={stagger(1)}>
-              <div className="absolute -right-12 -top-16 h-44 w-44 rounded-full border border-[var(--brand-orange)]/20" aria-hidden="true" />
-              <div className="absolute -bottom-20 -left-12 h-44 w-44 rounded-full border border-[var(--brand-orange)]/15" aria-hidden="true" />
-              <div className="relative">
-                <div className="flex items-start justify-between gap-4 border-b border-[var(--soft-border)] pb-5">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--orange-tint)]">
-                      <FlaskConical className="h-5 w-5 text-[var(--brand-orange-text)]" aria-hidden="true" />
-                    </span>
-                    <div>
-                      <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--brand-orange-text)]">{t('labs.preview.label')}</p>
-                      <p className="mt-1 text-sm font-semibold">{t('labs.preview.title')}</p>
-                    </div>
-                  </div>
-                  <span className="shrink-0 rounded-full border border-[var(--brand-orange)]/30 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.12em] text-[var(--brand-orange-text)]">{t('labs.preview.status')}</span>
                 </div>
-                <div className="mt-6 grid grid-cols-[1fr_auto_1fr_auto_1fr] items-center gap-2 sm:gap-3">
-                  {[t('labs.preview.steps.observe'), t('labs.preview.steps.try'), t('labs.preview.steps.review')].map((step, index) => (
-                    <div key={step} className="contents">
-                      <div className="rounded-lg border border-[var(--soft-border)] bg-[var(--warm-canvas)] p-3 text-center">
-                        <span className="font-mono text-[10px] text-[var(--brand-orange-text)]">0{index + 1}</span>
-                        <p className="mt-2 text-xs font-semibold sm:text-sm">{step}</p>
-                      </div>
-                      {index < 2 && <QaDoodle kind="trace" className="h-5 w-5 sm:h-6 sm:w-6" />}
-                    </div>
-                  ))}
-                </div>
-                <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-[var(--muted-graphite)]">{t('labs.preview.caption')}</p>
+                <ArrowRight
+                  className="motion-hover-arrow mt-7 h-5 w-5 shrink-0 text-[var(--muted-graphite)] transition-[color,transform] duration-200 group-hover:text-[var(--brand-orange-text)]"
+                  aria-hidden="true"
+                />
+              </Link>
+            ))}
+
+            {currentLessons.length === 0 && (
+              <p className="py-8 text-[1.0625rem] leading-[1.6] text-[var(--muted-graphite)]">
+                {t('learningPath.noLessons')}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. Interactive Learn + Practice Workflow on Architectural Stone */}
+      <section className="border-y border-[#dfd9cc] bg-[#efece4] py-20 sm:py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="reveal-scroll flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-semibold leading-[1.06] tracking-[-0.035em] text-[var(--graphite)]">
+                {t('learnPractice.title')}
+              </h2>
+              <p className="mt-5 max-w-[56ch] text-[1.0625rem] leading-[1.65] text-[var(--muted-graphite)]">
+                {t('learnPractice.description')}
+              </p>
+            </div>
+
+            <Link
+              to={LocaleRoutes.practice}
+              params={params}
+              className="motion-hover-arrow-group inline-flex shrink-0 items-center gap-2 text-[1.0625rem] font-medium text-[var(--brand-orange-text)] transition-[color] duration-200 hover:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[#efece4]"
+            >
+              {t('learnPractice.cta')}
+              <ArrowRight
+                className="motion-hover-arrow h-4 w-4"
+                aria-hidden="true"
+              />
+            </Link>
+          </div>
+
+          <div className="reveal-scroll mt-12 sm:mt-14" style={stagger(1)}>
+            <WorkflowSpotlight />
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Philosophy & Creator Portrait Feature on Crisp Gallery Paper */}
+      <section className="bg-[var(--paper-surface)] py-20 sm:py-24 lg:py-32">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="reveal-scroll max-w-4xl">
+            <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-semibold leading-[1.08] tracking-[-0.035em] text-[var(--graphite)]">
+              {t('philosophy.title')}
+            </h2>
+            <p className="mt-5 max-w-[60ch] text-[1.0625rem] leading-[1.65] text-[var(--muted-graphite)]">
+              {t('philosophy.description')}
+            </p>
+          </div>
+
+          <div className="reveal-scroll mt-14 grid items-center gap-12 border-t border-[var(--soft-border)] pt-14 sm:mt-16 sm:pt-16 lg:grid-cols-[0.4fr_0.6fr] lg:gap-20">
+            <div className="mx-auto w-full max-w-[360px] lg:mx-0">
+              <div className="overflow-hidden rounded-2xl bg-[#ebe6dc]">
+                <img
+                  src="/me.jpg"
+                  alt={t('creator.portraitAlt')}
+                  className="block aspect-[4/5] w-full object-cover object-top"
+                  width={1200}
+                  height={1500}
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             </div>
+
+            <div className="max-w-2xl">
+              <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-semibold leading-[1.08] tracking-[-0.035em] text-[var(--graphite)]">
+                {t('creator.title')}
+              </h2>
+              <p className="mt-5 max-w-[54ch] text-[1.0625rem] leading-[1.7] text-[var(--muted-graphite)]">
+                {t('creator.description')}
+              </p>
+              <Link
+                to={LocaleRoutes.about}
+                params={params}
+                className="motion-hover-arrow-group mt-8 inline-flex items-center gap-2 text-[1.0625rem] font-medium text-[var(--brand-orange-text)] transition-[color] duration-200 hover:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+              >
+                {t('creator.cta')}
+                <ArrowRight
+                  className="motion-hover-arrow h-4 w-4"
+                  aria-hidden="true"
+                />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-24 sm:px-8 lg:px-12 lg:pb-32">
-        <div className="reveal-scroll surface-dark rounded-xl bg-[var(--graphite)] px-7 py-12 text-[var(--paper-surface)] sm:px-12 sm:py-14 lg:flex lg:items-center lg:justify-between lg:gap-12">
-          <div>
-            <p className="font-mono text-xs uppercase tracking-[0.18em] text-[var(--orange-tint)]">{t('cta.eyebrow')}</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{t('cta.title')}</h2>
-            <p className="mt-4 max-w-xl text-base leading-7 text-[#d2d0c9]">{t('cta.description')}</p>
-          </div>
-          <div className="mt-8 flex shrink-0 flex-col items-start gap-4 sm:flex-row lg:mt-0 lg:flex-col lg:items-start">
-            <Link to={LocaleRoutes.learn} params={params} className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2 rounded-lg bg-[var(--brand-orange-deep)] px-5 text-[15px] font-medium text-white hover:bg-[#9c3618] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--graphite)]">
-              {t('cta.primary')} <ArrowRight className="h-4 w-4" aria-hidden="true" />
+      {/* 5. Labs Architecture Band on Deep Pine-Slate */}
+      <section className="surface-dark bg-[#13201c] py-20 text-[#f4f3ee] sm:py-24 lg:py-32">
+        <div
+          data-labs-preview
+          className="mx-auto grid max-w-7xl items-start gap-12 px-5 sm:px-8 lg:grid-cols-[0.44fr_0.56fr] lg:gap-20 lg:px-10"
+        >
+          <div className="reveal-scroll lg:sticky lg:top-28">
+            <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-semibold leading-[1.06] tracking-[-0.035em] text-[#f4f3ee]">
+              {t('labs.title')}
+            </h2>
+            <p className="mt-5 max-w-[46ch] text-[1.0625rem] leading-[1.65] text-[#b8c7c1]">
+              {t('labs.description')}
+            </p>
+            <Link
+              to={LocaleRoutes.labs}
+              params={params}
+              className="motion-hover-arrow-group mt-8 inline-flex items-center gap-2 text-[1.0625rem] font-medium text-[#7ce3c1] transition-[color] duration-200 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7ce3c1] focus-visible:ring-offset-2 focus-visible:ring-offset-[#13201c]"
+            >
+              {t('labs.cta')}
+              <ArrowRight
+                className="motion-hover-arrow h-4 w-4"
+                aria-hidden="true"
+              />
             </Link>
-            <Link to={LocaleRoutes.practice} params={params} className="motion-hover-arrow-group inline-flex items-center gap-2 text-[15px] font-medium text-[var(--orange-tint)] hover:text-white">
-              {t('cta.secondary')} <Play className="motion-hover-arrow h-3.5 w-3.5" aria-hidden="true" />
+          </div>
+
+          <div className="reveal-scroll" style={stagger(1)}>
+            <LabsPipelineSchematic />
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Bold Signature Vermilion Closing Statement */}
+      <section className="bg-[#b23f1c] py-20 text-[#fbf9f4] sm:py-24 lg:py-28">
+        <div className="reveal-scroll mx-auto flex max-w-7xl flex-col gap-8 px-5 sm:px-8 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+          <div className="max-w-2xl">
+            <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-semibold leading-[1.06] tracking-[-0.035em] text-[#fbf9f4]">
+              {t('cta.title')}
+            </h2>
+            <p className="mt-4 max-w-[54ch] text-[1.0625rem] leading-[1.65] text-[#fce7df]">
+              {t('cta.description')}
+            </p>
+          </div>
+
+          <div className="shrink-0">
+            <Link
+              to={LocaleRoutes.learn}
+              params={params}
+              className="motion-hover-lift motion-press inline-flex h-12 items-center justify-center gap-2.5 rounded-lg bg-[#fbf9f4] px-6 text-[1.0625rem] font-semibold text-[#141615] transition-[background-color,transform] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] hover:bg-[#ebe6dc] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbf9f4] focus-visible:ring-offset-2 focus-visible:ring-offset-[#b23f1c]"
+            >
+              {t('cta.primary')}
+              <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </Link>
           </div>
         </div>

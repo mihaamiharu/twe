@@ -9,16 +9,22 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { supportedLngs, type Locale } from '@/lib/i18n/settings';
+import { cn } from '@/lib/utils';
 
 const languageNames: Record<Locale, string> = {
   en: 'English',
   id: 'Bahasa Indonesia',
 };
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({
+  tone = 'light',
+}: {
+  tone?: 'light' | 'dark';
+}) {
   const location = useLocation();
   const params = useParams({ strict: false });
   const currentLocale = (params.locale as Locale) || 'en';
+  const isDark = tone === 'dark';
 
   const handleLanguageChange = (newLocale: Locale) => {
     if (newLocale === currentLocale) return;
@@ -48,28 +54,43 @@ export function LanguageSwitcher() {
         <Button
           variant="ghost"
           size="default"
-          className="min-w-[5rem] gap-1 rounded-md px-2 font-mono text-xs tracking-wide text-[var(--graphite)] shadow-none hover:bg-[var(--orange-tint)] hover:text-[var(--graphite)]"
+          className={cn(
+            'min-w-[4.75rem] gap-1 rounded-md px-2 text-[0.875rem] font-medium shadow-none transition-[background-color,color] duration-200',
+            isDark
+              ? 'text-[#f4f3ee] hover:bg-white/10 hover:text-white'
+              : 'text-[var(--graphite)] hover:bg-[var(--orange-tint)] hover:text-[var(--graphite)]',
+          )}
         >
           {/* Visible text stays part of the accessible name. */}
           <span className="sr-only">
             {`Switch language, currently ${languageNames[currentLocale]}:`}
           </span>
           <span
-            className={
+            className={cn(
               currentLocale === 'en'
-                ? 'text-foreground'
-                : 'text-muted-foreground'
-            }
+                ? isDark
+                  ? 'text-white'
+                  : 'text-foreground'
+                : isDark
+                  ? 'text-[#9e9d95]'
+                  : 'text-muted-foreground',
+            )}
           >
             EN
           </span>
-          <span className="text-muted-foreground">/</span>
+          <span className={isDark ? 'text-[#7f8079]' : 'text-muted-foreground'}>
+            /
+          </span>
           <span
-            className={
+            className={cn(
               currentLocale === 'id'
-                ? 'text-foreground'
-                : 'text-muted-foreground'
-            }
+                ? isDark
+                  ? 'text-white'
+                  : 'text-foreground'
+                : isDark
+                  ? 'text-[#9e9d95]'
+                  : 'text-muted-foreground',
+            )}
           >
             ID
           </span>

@@ -34,6 +34,8 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   const location = useLocation();
   const params = useParams({ strict: false });
   const locale = params.locale || 'en';
+  const isHomeHero = /^\/(en|id)\/?$/.test(location.pathname);
+  const isOverDarkHero = isHomeHero && !scrolled;
   const isAuthPage =
     location.pathname.includes('/login') ||
     location.pathname.includes('/register');
@@ -41,11 +43,12 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
   // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      setScrolled(window.scrollY > 24);
     };
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (!isMobileMenuOpen) return;
@@ -80,13 +83,17 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
       params: localeParams(locale),
       label: t('common:navigation.practice'),
     },
+    {
+      to: LocaleRoutes.labs,
+      params: localeParams(locale),
+      label: t('common:navigation.labs'),
+    },
+    {
+      to: LocaleRoutes.about,
+      params: localeParams(locale),
+      label: t('common:navigation.about'),
+    },
   ];
-
-  const aboutLink = {
-    to: LocaleRoutes.about,
-    params: localeParams(locale),
-    label: t('common:navigation.about'),
-  };
 
   const primaryCta = {
     to: LocaleRoutes.learn,
@@ -108,32 +115,63 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
     }
   };
 
+  const desktopLinkBase = cn(
+    'relative flex min-h-11 items-center text-[0.875rem] font-medium transition-[color] duration-200 after:absolute after:inset-x-0 after:bottom-2 after:h-0.5 after:origin-left after:scale-x-0 after:bg-[var(--brand-orange)] after:transition-transform after:duration-200 after:ease-[cubic-bezier(0.22,1,0.36,1)] hover:after:scale-x-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2',
+    isOverDarkHero
+      ? 'text-[#cfcdc4] hover:text-white focus-visible:text-white focus-visible:ring-offset-[#111312]'
+      : 'text-[var(--muted-graphite)] hover:text-[var(--graphite)] focus-visible:text-[var(--graphite)] focus-visible:ring-offset-[var(--paper-surface)]',
+  );
+
+  const desktopLinkActive = cn(
+    'relative flex min-h-11 items-center text-[0.875rem] font-semibold transition-[color] duration-200 after:absolute after:inset-x-0 after:bottom-2 after:h-0.5 after:origin-left after:scale-x-100 after:bg-[var(--brand-orange)] after:transition-transform after:duration-200 after:ease-[cubic-bezier(0.22,1,0.36,1)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2',
+    isOverDarkHero
+      ? 'text-white focus-visible:ring-offset-[#111312]'
+      : 'text-[var(--graphite)] focus-visible:ring-offset-[var(--paper-surface)]',
+  );
+
   return (
     <>
       <header
         data-shell="header"
+        data-header-surface={isOverDarkHero ? 'transparent' : 'solid'}
         className={cn(
-          'sticky top-0 z-40 w-full border-b bg-[var(--paper-surface)] transition-colors duration-200',
-          scrolled
-            ? 'border-[var(--soft-border)]'
-            : 'border-[var(--soft-border)]/70',
+          'sticky top-0 z-40 w-full border-b transition-[background-color,border-color,color] duration-200 ease-[cubic-bezier(0.22,1,0.36,1)]',
+          isOverDarkHero
+            ? 'border-transparent bg-transparent text-[#f4f3ee]'
+            : scrolled
+              ? 'border-[var(--soft-border)] bg-[var(--paper-surface)]/95 text-[var(--graphite)] backdrop-blur-md'
+              : 'border-[var(--soft-border)]/70 bg-[var(--paper-surface)] text-[var(--graphite)]',
         )}
         style={{
           paddingRight: 'var(--removed-body-scroll-bar-size, 0px)',
         }}
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex h-[4.5rem] items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center gap-9">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
+          <div className="flex h-[4.5rem] items-center justify-between gap-6">
+            {/* Wordmark + single-line desktop nav */}
+            <div className="flex items-center gap-10">
               <Link
                 to={LocaleRoutes.home}
                 params={localeParams(locale)}
-                className="group inline-flex min-h-11 items-center"
+                className="group inline-flex min-h-11 shrink-0 items-center"
               >
-                <span className="text-[1.2rem] font-semibold tracking-[-0.04em] text-[var(--graphite)] group-hover:text-[var(--brand-orange-text)]">
+                <span
+                  className={cn(
+                    'text-[1.375rem] font-bold tracking-[-0.045em] transition-[color] duration-200',
+                    isOverDarkHero
+                      ? 'text-[#fbf9f4] group-hover:text-white'
+                      : 'text-[var(--graphite)] group-hover:text-[var(--brand-orange-text)]',
+                  )}
+                >
                   TestingWith
-                  <span className="twe-wordmark-ekki text-[var(--brand-orange-text)]">
+                  <span
+                    className={cn(
+                      'twe-wordmark-ekki',
+                      isOverDarkHero
+                        ? 'text-[#ff8862]'
+                        : 'text-[var(--brand-orange-text)]',
+                    )}
+                  >
                     Ekki
                   </span>
                 </span>
@@ -148,70 +186,51 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                     key={link.to}
                     to={link.to}
                     params={link.params}
-                    className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-0 after:bg-[var(--brand-orange)] after:transition-transform after:duration-200 after:ease-(--ease-ui-out) hover:text-[var(--graphite)] hover:after:scale-x-100 focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
+                    className={desktopLinkBase}
                     activeProps={{
-                      className:
-                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-100 after:bg-[var(--brand-orange)] after:transition-transform after:duration-200 after:ease-(--ease-ui-out) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
+                      className: desktopLinkActive,
                     }}
                   >
                     {link.label}
                   </Link>
                 ))}
-                <Link
-                  to={LocaleRoutes.labs}
-                  params={localeParams(locale)}
-                  className="inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
-                  activeProps={{
-                    className:
-                      'inline-flex min-h-11 items-center gap-2 text-[0.9rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
-                  }}
-                >
-                  {t('common:navigation.labs')}{' '}
-                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange-text)]">
-                    {t('common:navigation.labsSoon')}
-                  </span>
-                </Link>
-                <Link
-                  to={aboutLink.to}
-                  params={aboutLink.params}
-                  className="relative flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--muted-graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-0 after:bg-[var(--brand-orange)] after:transition-transform after:duration-200 after:ease-(--ease-ui-out) hover:text-[var(--graphite)] hover:after:scale-x-100 focus-visible:text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
-                  activeProps={{
-                    className:
-                        'relative flex min-h-11 items-center text-[0.9rem] font-semibold text-[var(--graphite)] transition-colors after:absolute after:inset-x-0 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-100 after:bg-[var(--brand-orange)] after:transition-transform after:duration-200 after:ease-(--ease-ui-out) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
-                  }}
-                >
-                  {aboutLink.label}
-                </Link>
               </nav>
             </div>
 
-            {/* Right side */}
-            <div className="flex items-center gap-3">
+            {/* Right controls */}
+            <div className="flex shrink-0 items-center gap-3">
               <div className="hidden items-center sm:flex">
-                <LanguageSwitcher />
+                <LanguageSwitcher tone={isOverDarkHero ? 'dark' : 'light'} />
               </div>
 
               {isAuthenticated && user ? (
                 <UserMenu user={user} locale={locale} />
               ) : (
                 !isAuthPage && (
-                  <div className="hidden items-center gap-3 lg:flex">
+                  <div className="hidden items-center gap-4 lg:flex">
                     <Link
                       to={LocaleRoutes.login}
                       params={localeParams(locale)}
-                      className="inline-flex min-h-11 items-center text-[0.9rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]"
+                      className={cn(
+                        'inline-flex min-h-11 items-center text-[0.875rem] font-medium transition-[color] duration-200',
+                        isOverDarkHero
+                          ? 'text-[#e7e5dd] hover:text-white focus-visible:text-white'
+                          : 'text-[var(--graphite)] hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]',
+                      )}
                     >
                       {t('common:actions.signIn')}
                     </Link>
                     <Button
                       size="sm"
                       asChild
-                      className="rounded-md bg-[var(--brand-orange-deep)] px-5 text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange-deep)]/90"
+                      className={cn(
+                        'h-10 rounded-lg px-4 text-[0.875rem] font-medium shadow-none transition-[background-color,color] duration-200',
+                        isOverDarkHero
+                          ? 'bg-[#fbf9f4] text-[#141615] hover:bg-[#e8e3d9]'
+                          : 'bg-[var(--brand-orange-deep)] text-[var(--paper-surface)] hover:bg-[#993617]',
+                      )}
                     >
-                      <Link
-                        to={primaryCta.to}
-                        params={primaryCta.params}
-                      >
+                      <Link to={primaryCta.to} params={primaryCta.params}>
                         {t('common:actions.startWebAutomation')}
                         <ArrowRight className="h-4 w-4" aria-hidden="true" />
                       </Link>
@@ -224,7 +243,12 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               <Button
                 variant="ghost"
                 size="icon"
-                className="lg:hidden"
+                className={cn(
+                  'lg:hidden',
+                  isOverDarkHero
+                    ? 'text-[#fbf9f4] hover:bg-white/10 hover:text-white'
+                    : 'text-[var(--graphite)]',
+                )}
                 type="button"
                 onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
                 aria-expanded={isMobileMenuOpen}
@@ -250,7 +274,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div
-            className="fixed inset-0 bg-[var(--graphite)]/15"
+            className="fixed inset-0 bg-[var(--graphite)]/25"
             onClick={() => setIsMobileMenuOpen(false)}
             aria-hidden="true"
           />
@@ -258,7 +282,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
           <nav
             id="mobile-navigation"
             aria-label="Mobile navigation"
-            className="relative flex h-full w-full max-w-[22rem] flex-col border-r border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 py-5 animate-in fade-in-0 slide-in-from-left duration-200 ease-(--ease-ui-out) motion-reduce:animate-none motion-reduce:opacity-100"
+            className="relative flex h-full w-full max-w-[22rem] flex-col border-r border-[var(--soft-border)] bg-[var(--paper-surface)] px-5 py-5 animate-in fade-in-0 slide-in-from-left duration-200 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:animate-none motion-reduce:opacity-100"
           >
             <div className="mb-7 flex items-center justify-between">
               <Link
@@ -267,7 +291,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="group inline-flex min-h-11 items-center"
               >
-                <span className="text-[1.15rem] font-semibold tracking-[-0.04em] text-[var(--graphite)] group-hover:text-[var(--brand-orange-text)]">
+                <span className="text-[1.25rem] font-bold tracking-[-0.045em] text-[var(--graphite)] group-hover:text-[var(--brand-orange-text)]">
                   TestingWith
                   <span className="twe-wordmark-ekki text-[var(--brand-orange-text)]">
                     Ekki
@@ -294,44 +318,15 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                     to={link.to}
                     params={link.params}
                     onClick={() => setIsMobileMenuOpen(false)}
-                    className="flex min-h-12 items-center border-b border-transparent px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]"
+                    className="flex min-h-12 items-center border-b border-transparent px-1 text-[1.0625rem] font-medium text-[var(--graphite)] transition-[color,border-color] duration-200 hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]"
                     activeProps={{
                       className:
-                        'flex min-h-12 items-center border-b-2 border-[var(--brand-orange)] px-1 text-[1rem] font-semibold text-[var(--graphite)]',
+                        'flex min-h-12 items-center border-b-2 border-[var(--brand-orange)] px-1 text-[1.0625rem] font-semibold text-[var(--graphite)]',
                     }}
                   >
                     {link.label}
                   </Link>
                 ))}
-
-                <Link
-                  to={LocaleRoutes.labs}
-                  params={localeParams(locale)}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex min-h-12 items-center gap-2 px-1 text-[1rem] font-medium text-[var(--muted-graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]"
-                  activeProps={{
-                    className:
-                      'flex min-h-12 items-center gap-2 px-1 text-[1rem] font-semibold text-[var(--graphite)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-orange)] focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--paper-surface)]',
-                  }}
-                >
-                  {t('common:navigation.labs')}{' '}
-                  <span className="rounded bg-[var(--orange-tint)] px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.08em] text-[var(--brand-orange-text)]">
-                    {t('common:navigation.labsSoon')}
-                  </span>
-                </Link>
-
-                <Link
-                  to={aboutLink.to}
-                  params={aboutLink.params}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex min-h-12 items-center border-b border-transparent px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:border-[var(--brand-orange)] hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]"
-                  activeProps={{
-                    className:
-                      'flex min-h-12 items-center border-b-2 border-[var(--brand-orange)] px-1 text-[1rem] font-semibold text-[var(--graphite)]',
-                  }}
-                >
-                  {aboutLink.label}
-                </Link>
               </div>
 
               <div className="my-5 border-t border-[var(--soft-border)]" />
@@ -340,7 +335,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                 to={LocaleRoutes.contact}
                 params={localeParams(locale)}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex min-h-12 items-center px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]"
+                className="flex min-h-12 items-center px-1 text-[1.0625rem] font-medium text-[var(--graphite)] transition-[color] duration-200 hover:text-[var(--brand-orange-text)] focus-visible:text-[var(--brand-orange-text)]"
               >
                 {t('legal:contact.title')}
               </Link>
@@ -358,7 +353,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                       to={LocaleRoutes.profile}
                       params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)]"
+                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-[color] duration-200 hover:text-[var(--brand-orange-text)]"
                     >
                       <User className="h-4 w-4" aria-hidden="true" />
                       {t('common:navigation.profile')}
@@ -367,7 +362,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                       to={LocaleRoutes.leaderboard}
                       params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)]"
+                      className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-[color] duration-200 hover:text-[var(--brand-orange-text)]"
                     >
                       <Trophy className="h-4 w-4" aria-hidden="true" />
                       {t('common:navigation.leaderboard')}
@@ -376,7 +371,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                       <Link
                         to="/admin"
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)]"
+                        className="flex min-h-12 items-center gap-3 px-1 text-[var(--graphite)] transition-[color] duration-200 hover:text-[var(--brand-orange-text)]"
                       >
                         <LayoutDashboard
                           className="h-4 w-4"
@@ -388,7 +383,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                     <div className="flex min-h-12 items-center px-1">
                       <BugReportDialog
                         trigger={
-                          <button className="inline-flex items-center gap-3 text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)]">
+                          <button className="inline-flex items-center gap-3 text-[var(--graphite)] transition-[color] duration-200 hover:text-[var(--brand-orange-text)]">
                             <Bug className="h-4 w-4" aria-hidden="true" />
                             {t('bugs:dialog.trigger')}
                           </button>
@@ -400,7 +395,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                         setIsMobileMenuOpen(false);
                         void handleSignOut();
                       }}
-                      className="flex min-h-12 w-full items-center gap-3 px-1 text-left text-[var(--brand-error)] transition-colors hover:text-[var(--brand-error)]/80"
+                      className="flex min-h-12 w-full items-center gap-3 px-1 text-left text-[var(--brand-error)] transition-[color] duration-200 hover:text-[var(--brand-error)]/80"
                     >
                       <LogOut className="h-4 w-4" aria-hidden="true" />
                       {t('common:navigation.logout')}
@@ -412,7 +407,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
                       to={LocaleRoutes.login}
                       params={localeParams(locale)}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className="flex min-h-12 items-center gap-3 px-1 text-[1rem] font-medium text-[var(--graphite)] transition-colors hover:text-[var(--brand-orange-text)]"
+                      className="flex min-h-12 items-center gap-3 px-1 text-[1.0625rem] font-medium text-[var(--graphite)] transition-[color] duration-200 hover:text-[var(--brand-orange-text)]"
                     >
                       <User className="h-4 w-4" aria-hidden="true" />
                       {t('common:actions.signIn')}
@@ -426,7 +421,7 @@ export function HeaderComponent({ session }: { session: AuthSession | null }) {
               <div className="mt-5 border-t border-[var(--soft-border)] pt-5">
                 <Button
                   asChild
-                  className="h-12 w-full rounded-md bg-[var(--brand-orange-deep)] text-[var(--paper-surface)] shadow-none hover:bg-[var(--brand-orange-deep)]/90"
+                  className="h-12 w-full rounded-lg bg-[var(--brand-orange-deep)] text-[1.0625rem] font-medium text-[var(--paper-surface)] shadow-none hover:bg-[#993617]"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <Link to={primaryCta.to} params={primaryCta.params}>
@@ -453,12 +448,9 @@ function areHeaderPropsEqual(
   prev: { session: AuthSession | null },
   next: { session: AuthSession | null },
 ) {
-  // If session existence changes, re-render
   if (!!prev.session !== !!next.session) return false;
-  // If both null, no change
   if (!prev.session && !next.session) return true;
 
-  // Check user details specifically (name, image, email)
   return (
     prev.session?.user?.id === next.session?.user?.id &&
     prev.session?.user?.name === next.session?.user?.name &&

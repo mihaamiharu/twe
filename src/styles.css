@@ -765,6 +765,22 @@ body {
   background-image: none;
 }
 
+/* Home obsidian stage: subtle architectural top illumination without neon glare. */
+.home-hero-stage {
+  background-image:
+    radial-gradient(
+      68% 42% at 50% 0%,
+      rgb(230 95 58 / 16%) 0%,
+      rgb(230 95 58 / 4%) 48%,
+      transparent 78%
+    ),
+    radial-gradient(
+      45% 32% at 82% 8%,
+      rgb(35 133 109 / 11%) 0%,
+      transparent 70%
+    );
+}
+
 .type-technical {
   font-family: var(--font-mono);
   font-size: 0.75rem;

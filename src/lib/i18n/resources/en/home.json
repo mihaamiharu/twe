@@ -1,53 +1,133 @@
 {
   "hero": {
-    "eyebrow": "PRACTICAL SOFTWARE TESTING EDUCATION",
+    "eyebrow": "Practical software testing education",
     "title": "Grow beyond test execution",
-    "description": "Learn how the web works, build the programming foundations you need, and put them to work with Playwright.",
+    "description": "Learn how the web works, build your programming foundations, and automate real flows with Playwright.",
     "startWebAutomation": "Start Web Automation",
     "explorePractice": "Browse Practice",
-    "creatorNote": "Created by Ekki · Learn at your own pace"
+    "creatorNote": "Created by Ekki, built for self-paced learning."
+  },
+  "workbench": {
+    "ariaLabel": "Interactive Playwright verification workbench",
+    "file": "tests/login.spec.ts",
+    "runCheck": "Run check",
+    "running": "Running...",
+    "steps": {
+      "inspect": "Inspect",
+      "run": "Run",
+      "verify": "Verify"
+    },
+    "browser": {
+      "signInUrl": "demo.twe.dev/sign-in",
+      "dashboardUrl": "demo.twe.dev/dashboard",
+      "signInHeading": "Sign in to workspace",
+      "emailLabel": "Email",
+      "emailPlaceholder": "ekki@qa.dev",
+      "passwordLabel": "Password",
+      "signInAction": "Sign in",
+      "locatorCallout": "role=button[name=\"Sign in\"]",
+      "dashboardHeading": "Dashboard",
+      "dashboardSubtext": "Authenticated session active for ekki@qa.dev",
+      "dashboardChecks": "14 automated checks passing",
+      "assertionCallout": "Visible in viewport"
+    },
+    "verdict": {
+      "inspect": "Matched 1 accessible button locator in 4 ms",
+      "run": "Submitted credentials and received HTTP 200 in 38 ms",
+      "verify": "Assertion passed: Dashboard heading visible in 42 ms"
+    }
   },
   "learningPath": {
-    "eyebrow": "WEB AUTOMATION / CURRENT LESSONS",
+    "eyebrow": "Web Automation curriculum",
     "title": "Learn Web Automation step by step.",
-    "description": "Begin with web fundamentals, build your JavaScript and TypeScript skills, then move into Playwright.",
-    "cta": "Browse All Lessons",
+    "description": "Begin with how browsers parse and render pages, strengthen your JavaScript and TypeScript fundamentals, then move into reliable Playwright suites.",
+    "cta": "Browse all lessons",
     "lessonNumber": "Lesson {{number}}",
+    "readingTime": "{{minutes}} min read",
     "noLessons": "The current lesson catalog is unavailable right now."
   },
   "learnPractice": {
-    "eyebrow": "LEARN + PRACTICE",
+    "eyebrow": "Learn and Practice",
     "title": "Learn the concept. Practice it yourself.",
-    "description": "Use Learn for context, then apply each skill in an interactive Practice challenge.",
+    "description": "Read concise explanations in Learn, then write and run real Playwright assertions in your browser without setting up a local project.",
     "cta": "Browse Practice",
     "steps": {
-      "learn": { "label": "LEARN", "title": "Understand the concept", "description": "Learn how the technique works and when to use it." },
-      "practice": { "label": "PRACTICE", "title": "Try it yourself", "description": "Apply the skill in your browser without any local setup." },
-      "review": { "label": "REVIEW", "title": "Review the result", "description": "Run your solution, inspect the output, and try again." }
+      "learn": {
+        "label": "Learn",
+        "title": "Understand the concept",
+        "description": "See why a locator strategy or async pattern works and when to choose it."
+      },
+      "practice": {
+        "label": "Practice",
+        "title": "Try it yourself",
+        "description": "Write TypeScript and Playwright directly in the browser sandbox with zero local setup."
+      },
+      "review": {
+        "label": "Review",
+        "title": "Review the result",
+        "description": "Inspect assertion output, spot brittle assumptions, and refine your solution."
+      }
+    },
+    "spotlight": {
+      "learnTitle": "Prefer accessible roles over brittle CSS chains",
+      "learnBody": "Query elements the way users and assistive technologies find them so layout refactors do not break your suite.",
+      "learnAvoidLabel": "Fragile selector",
+      "learnAvoidCode": "page.locator('div.card > form > button:nth-child(3)')",
+      "learnPreferLabel": "Resilient Playwright locator",
+      "learnPreferCode": "page.getByRole('button', { name: 'Checkout' })",
+      "practiceFile": "challenges/checkout-action.spec.ts",
+      "practiceTask": "Trigger checkout and confirm the confirmation banner renders.",
+      "practiceStatus": "Browser sandbox ready, no local install required",
+      "reviewHeading": "Verification trace",
+      "reviewChecks": {
+        "locator": "Located accessible button \"Checkout\"",
+        "action": "Dispatched click and waited for network idle",
+        "assertion": "Confirmed order confirmation heading is visible"
+      },
+      "reviewDuration": "3 checks passed in 18 ms"
     }
   },
   "philosophy": {
     "title": "Understand the why. Practice the how. Use the right tools.",
-    "description": "TWE focuses on understanding the systems you test, applying each concept yourself, and choosing tools based on the work.",
+    "description": "TestingWithEkki focuses on understanding the systems you test, applying every concept hands-on, and picking tools based on the problem in front of you.",
     "why": "Understand the why.",
     "how": "Practice the how.",
     "tools": "Use the right tools."
   },
   "creator": {
-    "eyebrow": "CREATOR",
+    "eyebrow": "Creator",
     "title": "Learn testing with Ekki.",
-    "description": "I’m a QA/SDET working across automation, integration-heavy systems, and test infrastructure. I built TWE to share the kind of practical learning and mentorship that helped shape my own career.",
+    "description": "I am a QA engineer and SDET working across web automation, integration-heavy systems, and test infrastructure. I built TestingWithEkki to share the practical guidance and engineering habits that shaped my own career.",
+    "portraitAlt": "Portrait of Ekki, creator of TestingWithEkki",
     "cta": "About Ekki"
   },
   "labs": {
-    "eyebrow": "LABS · COMING SOON",
+    "eyebrow": "Labs in development",
     "title": "Practice beyond the browser sandbox.",
-    "description": "Labs will offer guided projects using real repositories, APIs, test frameworks, and CI pipelines. It’s still in development.",
+    "description": "Labs is in active development. It will bring guided engineering projects backed by real repositories, live APIs, full Playwright suites, and CI pipelines.",
     "cta": "Visit Labs",
+    "pipeline": {
+      "repository": {
+        "title": "Real repositories",
+        "description": "Clone multi-page applications, inspect git diffs, and diagnose regressions in context."
+      },
+      "apis": {
+        "title": "Live API boundaries",
+        "description": "Seed deterministic state, mock edge failures, and validate backend contracts."
+      },
+      "suite": {
+        "title": "Structured test suites",
+        "description": "Organize custom fixtures, page objects, and reusable assertions that scale."
+      },
+      "ci": {
+        "title": "Continuous integration runs",
+        "description": "Read failure traces, eliminate flaky waits, and ship reliable pull requests."
+      }
+    },
     "preview": {
-      "label": "LAB NOTE / 001",
-      "title": "Guided QA project",
-      "status": "IN PROGRESS",
+      "label": "Guided QA project",
+      "title": "Real engineering environments",
+      "status": "In active development",
       "steps": {
         "observe": "Set up",
         "try": "Test",
@@ -57,9 +137,9 @@
     }
   },
   "cta": {
-    "eyebrow": "START HERE",
+    "eyebrow": "Start here",
     "title": "Start with Web Automation.",
-    "description": "Build the foundations, learn Playwright, and practice as you go.",
+    "description": "Build durable testing foundations, master Playwright, and practice directly in your browser.",
     "primary": "Start Web Automation",
     "secondary": "Browse Practice"
   }

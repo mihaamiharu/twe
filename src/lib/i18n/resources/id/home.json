@@ -1,53 +1,133 @@
 {
   "hero": {
-    "eyebrow": "BELAJAR SOFTWARE TESTING SECARA PRAKTIS",
+    "eyebrow": "Belajar software testing secara praktis",
     "title": "Tingkatkan skill testing kamu",
-    "description": "Pelajari cara kerja web, bangun fondasi pemrograman, lalu mulai praktik dengan Playwright.",
+    "description": "Pelajari cara kerja web, bangun fondasi pemrograman, lalu otomatisasi alur nyata dengan Playwright.",
     "startWebAutomation": "Mulai Web Automation",
     "explorePractice": "Lihat tantangan",
-    "creatorNote": "Dibuat oleh Ekki · Belajar sesuai waktumu"
+    "creatorNote": "Dibuat oleh Ekki untuk belajar mandiri sesuai ritmemu."
+  },
+  "workbench": {
+    "ariaLabel": "Simulasi interaktif verifikasi Playwright",
+    "file": "tests/login.spec.ts",
+    "runCheck": "Jalankan cek",
+    "running": "Menjalankan...",
+    "steps": {
+      "inspect": "Inspeksi",
+      "run": "Jalankan",
+      "verify": "Verifikasi"
+    },
+    "browser": {
+      "signInUrl": "demo.twe.dev/sign-in",
+      "dashboardUrl": "demo.twe.dev/dashboard",
+      "signInHeading": "Masuk ke workspace",
+      "emailLabel": "Email",
+      "emailPlaceholder": "ekki@qa.dev",
+      "passwordLabel": "Kata sandi",
+      "signInAction": "Masuk",
+      "locatorCallout": "role=button[name=\"Masuk\"]",
+      "dashboardHeading": "Dashboard",
+      "dashboardSubtext": "Sesi terautentikasi aktif untuk ekki@qa.dev",
+      "dashboardChecks": "14 pengecekan otomatis lulus",
+      "assertionCallout": "Terlihat di viewport"
+    },
+    "verdict": {
+      "inspect": "Menemukan 1 locator tombol yang aksesibel dalam 4 ms",
+      "run": "Kredensial dikirim dan menerima HTTP 200 dalam 38 ms",
+      "verify": "Assertion lulus: judul Dashboard terlihat dalam 42 ms"
+    }
   },
   "learningPath": {
-    "eyebrow": "WEB AUTOMATION / PELAJARAN TERSEDIA",
+    "eyebrow": "Kurikulum Web Automation",
     "title": "Pelajari Web Automation langkah demi langkah.",
-    "description": "Mulai dari dasar web, pelajari JavaScript dan TypeScript, lalu lanjut ke Playwright.",
+    "description": "Mulai dari cara browser memproses halaman, perkuat dasar JavaScript dan TypeScript, lalu bangun pengujian Playwright yang andal.",
     "cta": "Lihat semua pelajaran",
     "lessonNumber": "Pelajaran {{number}}",
+    "readingTime": "{{minutes}} menit baca",
     "noLessons": "Katalog pelajaran belum bisa ditampilkan."
   },
   "learnPractice": {
-    "eyebrow": "BELAJAR + LATIHAN",
+    "eyebrow": "Belajar dan Latihan",
     "title": "Pelajari konsepnya. Praktikkan sendiri.",
-    "description": "Pahami konsepnya lewat materi di Belajar, lalu praktikkan lewat tantangan interaktif di Latihan.",
+    "description": "Pahami penjelasan ringkas di Belajar, lalu tulis dan jalankan assertion Playwright langsung di browser tanpa setup lokal.",
     "cta": "Lihat tantangan",
     "steps": {
-      "learn": { "label": "BELAJAR", "title": "Pahami konsepnya", "description": "Pahami cara kerja setiap teknik dan kapan perlu menggunakannya." },
-      "practice": { "label": "LATIHAN", "title": "Coba sendiri", "description": "Terapkan konsepnya langsung di browser tanpa perlu setup lokal." },
-      "review": { "label": "TINJAU", "title": "Tinjau hasilnya", "description": "Jalankan solusimu, lihat output, lalu coba lagi." }
+      "learn": {
+        "label": "Belajar",
+        "title": "Pahami konsepnya",
+        "description": "Pelajari alasan di balik strategi locator atau pola async dan kapan menggunakannya."
+      },
+      "practice": {
+        "label": "Latihan",
+        "title": "Coba sendiri",
+        "description": "Tulis kode TypeScript dan Playwright langsung di sandbox browser tanpa instalasi lokal."
+      },
+      "review": {
+        "label": "Tinjau",
+        "title": "Tinjau hasilnya",
+        "description": "Amati output assertion, temukan asumsi yang rapuh, dan sempurnakan solusimu."
+      }
+    },
+    "spotlight": {
+      "learnTitle": "Utamakan peran aksesibel daripada rantai CSS yang rapuh",
+      "learnBody": "Pilih elemen seperti cara pengguna menemukannya agar perubahan tata letak tidak mematahkan suite pengujian.",
+      "learnAvoidLabel": "Selector rapuh",
+      "learnAvoidCode": "page.locator('div.card > form > button:nth-child(3)')",
+      "learnPreferLabel": "Locator Playwright yang tangguh",
+      "learnPreferCode": "page.getByRole('button', { name: 'Checkout' })",
+      "practiceFile": "challenges/checkout-action.spec.ts",
+      "practiceTask": "Klik tombol checkout dan pastikan banner konfirmasi muncul.",
+      "practiceStatus": "Sandbox browser siap, tanpa instalasi lokal",
+      "reviewHeading": "Jejak verifikasi",
+      "reviewChecks": {
+        "locator": "Menemukan tombol aksesibel \"Checkout\"",
+        "action": "Menjalankan klik dan menunggu jaringan stabil",
+        "assertion": "Memastikan judul konfirmasi pesanan tampil"
+      },
+      "reviewDuration": "3 pengecekan lulus dalam 18 ms"
     }
   },
   "philosophy": {
     "title": "Pahami cara kerjanya. Praktikkan langsung. Pilih tool yang tepat.",
-    "description": "Di TWE, kamu mempelajari sistem yang kamu uji, mempraktikkan setiap konsep secara langsung, dan memilih tool sesuai kebutuhan.",
+    "description": "Di TestingWithEkki, kamu mempelajari sistem yang kamu uji, mempraktikkan setiap konsep secara langsung, dan memilih tool sesuai masalah yang dihadapi.",
     "why": "Pahami cara kerjanya.",
     "how": "Praktikkan langsung.",
     "tools": "Pilih tool yang tepat."
   },
   "creator": {
-    "eyebrow": "DIBUAT OLEH EKKI",
+    "eyebrow": "Dibuat oleh Ekki",
     "title": "Belajar testing bersama Ekki.",
-    "description": "Saya QA/SDET yang banyak bekerja dengan otomasi, sistem dengan banyak integrasi, dan infrastruktur testing. Saya membangun TWE untuk berbagi cara belajar praktis dan bimbingan yang dulu membantu saya berkembang dalam karier.",
+    "description": "Saya QA engineer dan SDET yang banyak bekerja dengan web automation, sistem dengan banyak integrasi, dan infrastruktur testing. Saya membangun TestingWithEkki untuk berbagi panduan praktis dan kebiasaan rekayasa yang membentuk karier saya.",
+    "portraitAlt": "Foto Ekki, pembuat TestingWithEkki",
     "cta": "Tentang Ekki"
   },
   "labs": {
-    "eyebrow": "LABS · SEGERA HADIR",
+    "eyebrow": "Labs dalam pengembangan",
     "title": "Berlatih di luar browser sandbox.",
-    "description": "Di Labs, kamu akan mengerjakan proyek QA dengan panduan dan menggunakan repository nyata, API, framework testing, serta pipeline CI. Labs masih dalam tahap pengembangan.",
+    "description": "Labs sedang dalam tahap pengembangan aktif. Fitur ini akan menghadirkan proyek QA terpandu dengan repository nyata, API aktif, suite Playwright penuh, dan pipeline CI.",
     "cta": "Kunjungi Labs",
+    "pipeline": {
+      "repository": {
+        "title": "Repository nyata",
+        "description": "Kloning aplikasi multi-halaman, baca git diff, dan analisis regresi dalam konteks asli."
+      },
+      "apis": {
+        "title": "Batasan API aktif",
+        "description": "Siapkan data uji deterministik, simulasikan error jaringan, dan validasi kontrak backend."
+      },
+      "suite": {
+        "title": "Suite pengujian terstruktur",
+        "description": "Susun fixture khusus, page object, dan assertion yang mudah dirawat."
+      },
+      "ci": {
+        "title": "Eksekusi continuous integration",
+        "description": "Baca trace kegagalan, hilangkan wait yang tidak stabil, dan kirim pull request yang bersih."
+      }
+    },
     "preview": {
-      "label": "CATATAN LAB / 001",
-      "title": "Proyek QA dengan panduan",
-      "status": "SEDANG DISIAPKAN",
+      "label": "Proyek QA terpandu",
+      "title": "Lingkungan rekayasa nyata",
+      "status": "Sedang dikembangkan",
       "steps": {
         "observe": "Setup",
         "try": "Test",
@@ -57,9 +137,9 @@
     }
   },
   "cta": {
-    "eyebrow": "MULAI DI SINI",
+    "eyebrow": "Mulai di sini",
     "title": "Mulai dengan Web Automation.",
-    "description": "Bangun fondasi Web Automation, pelajari Playwright, dan terus berlatih.",
+    "description": "Bangun fondasi testing yang kuat, kuasai Playwright, dan langsung berlatih di browser.",
     "primary": "Mulai Web Automation",
     "secondary": "Lihat tantangan"
   }

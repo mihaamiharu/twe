@@ -10,7 +10,6 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(primary).toContainText('Learn');
     await expect(primary).toContainText('Practice');
     await expect(primary).toContainText('Labs');
-    await expect(primary).toContainText('Soon');
     await expect(primary).toContainText('About');
     await expect(
       primary.getByRole('link', { name: 'Leaderboard' }),
@@ -80,7 +79,7 @@ test.describe('Rebrand V1 global shell', () => {
       }),
     ).toBeVisible();
     await expect(
-      page.locator('header').getByRole('link', { name: 'Labs Soon' }),
+      page.locator('header').getByRole('link', { name: 'Labs' }),
     ).toHaveAttribute('href', '/en/labs');
     await expect(
       page.getByRole('link', { name: 'Explore Practice' }).first(),
@@ -186,7 +185,6 @@ test.describe('Rebrand V1 global shell', () => {
     await expect(mobileNavigation).toContainText('Learn');
     await expect(mobileNavigation).toContainText('Practice');
     await expect(mobileNavigation).toContainText('Labs');
-    await expect(mobileNavigation).toContainText('Soon');
     await expect(mobileNavigation).toContainText('About');
     await expect(mobileNavigation).toContainText('Contact');
     await expect(mobileNavigation).toContainText('Sign In');
@@ -274,12 +272,10 @@ test.describe('Rebrand V1 global shell', () => {
     ).toContainText('TIDAK ADA HASIL');
 
     await page.goto('/en');
-    const labsEmptyState = page.locator(
-      '[data-empty-state][data-empty-state-illustration="thinking"]',
-    );
-    await expect(labsEmptyState).toHaveCount(1);
-    await expect(labsEmptyState).toContainText('LABS · COMING SOON');
-    await expect(labsEmptyState.locator('img')).toHaveCount(0);
+    const labsPreview = page.locator('[data-labs-preview]');
+    await expect(labsPreview).toHaveCount(1);
+    await expect(labsPreview).toContainText('Practice beyond the browser sandbox.');
+    await expect(labsPreview.locator('img')).toHaveCount(0);
   });
 
   test('uses the Thinking Inspector for empty profile tabs', async ({
